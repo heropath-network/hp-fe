@@ -1,1 +1,16 @@
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000'
+
+export const CHART_LIBRARY_PATH = '/vendor/charting_library/charting_library/'
+
+export enum ProjectId {
+  NULL_PROJECT = 0,
+  GAINS = 3,      // GTrade
+  MUX_V3 = 6,     // MUX V3 (default)
+}
+
+// Oracle Display Names
+export const ORACLE_NAMES: Record<ProjectId, string> = {
+  [ProjectId.NULL_PROJECT]: 'Unknown',
+  [ProjectId.GAINS]: 'GTrade',
+  [ProjectId.MUX_V3]: 'Asterdex',
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/GainsOracleCandle",
+  "definitions": {
+    "GainsOracleCandle": {
+      "type": "object",
+      "properties": {
+        "time": {
+          "$ref": "#/definitions/IntString"
+        },
+        "open": {
+          "$ref": "#/definitions/IntString"
+        },
+        "close": {
+          "$ref": "#/definitions/IntString"
+        },
+        "low": {
+          "$ref": "#/definitions/IntString"
+        },
+        "high": {
+          "$ref": "#/definitions/IntString"
+        }
+      },
+      "required": [
+        "time",
+        "open",
+        "close",
+        "low",
+        "high"
+      ]
+    },
+    "IntString": {
+      "type": [
+        "string",
+        "number"
+      ]
+    }
+  }
+}
+
