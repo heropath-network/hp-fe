@@ -14,12 +14,14 @@
     "@headlessui/vue": "^1.7.23",
     "@tanstack/vue-query": "^5.92.0",
     "@wagmi/vue": "^0.4.2",
+    "lodash-es": "^4.17.21",
     "pinia": "^2.1.7",
     "viem": "~2.40.3",
     "vue": "^3.5.11",
     "vue-router": "^4.4.5"
   },
   "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
     "@types/node": "^22.8.6",
     "@vitejs/plugin-vue": "^5.1.4",
     "autoprefixer": "^10.4.20",
