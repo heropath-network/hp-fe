@@ -6,11 +6,13 @@ import Menu from "@/views/Menu.vue";
 </script>
 
 <template>
-  <div>
+  <div class="min-h-screen bg-[var(--hp-bg-dark)] text-[var(--hp-white-color)]">
     <Header />
-    <Menu />
-    <main>
-      <RouterView />
-    </main>
+    <div class="flex">
+      <Menu />
+      <main class="ml-[224px] h-screen overflow-auto px-8 pb-12 pt-20">
+        <RouterView />
+      </main>
+    </div>
   </div>
 </template>

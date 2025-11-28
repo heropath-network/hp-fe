@@ -6,7 +6,6 @@ import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
 
-import "./assets/main.scss";
 import { runtimeConfig } from "./config/runtimeConfig";
 import { wagmiConfig } from "./config/wagmiConfig";
 import { WagmiPlugin } from "@wagmi/vue";

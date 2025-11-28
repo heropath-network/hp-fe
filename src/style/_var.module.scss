@@ -3,6 +3,7 @@ $bgNormal: #1d1d1d;
 $bgLight: #272727;
 $textColor: #9b9b9b;
 $primaryGreen: #6ce99e;
+$brandBlue: #27a2f8;
 $whiteColor: #fff;
 $lineColor: #262626;
 $blackColor: #000;
@@ -10,14 +11,15 @@ $textGreen: #10c8a8;
 $textRed: #ff4e59;
 
 :export {
-  bgdark: $bgDark;
-  bgnormal: $bgNormal;
-  bglight: $bgLight;
-  textcolor: $textColor;
-  primarygreen: $primaryGreen;
-  whitecolor: $whiteColor;
-  linecolor: $lineColor;
-  blackcolor: $blackColor;
-  textgreen: $textGreen;
-  textred: $textRed;
+  bgDark: $bgDark;
+  bgNormal: $bgNormal;
+  bgLight: $bgLight;
+  textColor: $textColor;
+  primaryGreen: $primaryGreen;
+  brandBlue: $brandBlue;
+  whiteColor: $whiteColor;
+  lineColor: $lineColor;
+  blackColor: $blackColor;
+  textGreen: $textGreen;
+  textRed: $textRed;
 }
