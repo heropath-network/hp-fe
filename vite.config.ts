@@ -21,7 +21,7 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: Number(process.env.PORT) || 4000,
-    allowedHosts: ["dev.mux.network"],
+    allowedHosts: ['heropath.network', 'dev1.heropath.network', 'dev2.heropath.network', 'heropath.local'],
   },
   css: {
     preprocessorOptions: {

@@ -40,12 +40,10 @@
         </div>
       </div>
 
-      <!-- chart placeholder -->
+      <!-- chart -->
       <div class="mb-6 rounded-lg border border-gray-800 bg-gray-900 p-4">
         <h2 class="mb-4 text-xl font-semibold text-white">Price Chart (TradingView)</h2>
-        <div class="h-96 rounded bg-gray-800 flex items-center justify-center text-gray-500">
-          Chart will be implemented here
-        </div>
+        <div id="tv_chart_container" class="h-96"></div>
       </div>
 
       <!-- debug log -->
@@ -66,6 +64,9 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { widget as TradingViewWidget } from '../../vendor/charting_library/charting_library'
+import { createDatafeed } from './TcTestRemoveMeC-datafeed'
+import type { IChartingLibraryWidget } from '../../vendor/charting_library/charting_library'
 
 interface Market {
   id: string
@@ -130,6 +131,7 @@ const debugLogs = ref<DebugLog[]>([])
 
 let ws: WebSocket | null = null
 let priceUpdateInterval: number | null = null
+let tvWidget: IChartingLibraryWidget | null = null
 
 function addLog(message: string, type: 'info' | 'success' | 'error' = 'info') {
   const time = new Date().toLocaleTimeString()
@@ -149,8 +151,40 @@ async function loadMarketsConfig() {
       selectedMarketId.value = markets.value[0].id
     }
     addLog(`Loaded ${markets.value.length} markets from config`, 'success')
+    // initialize TradingView after config is loaded
+    initTradingView()
   } catch (error) {
     addLog(`Failed to load markets config: ${error}`, 'error')
+  }
+}
+
+function initTradingView() {
+  if (!config.value || markets.value.length === 0) {
+    addLog('Cannot init TradingView: config not loaded', 'error')
+    return
+  }
+  try {
+    const datafeed = createDatafeed(config.value)
+    tvWidget = new TradingViewWidget({
+      symbol: markets.value[0].symbol,
+      datafeed: datafeed,
+      interval: '5' as any,
+      container: 'tv_chart_container',
+      library_path: '/charting_library/',
+      locale: 'en',
+      disabled_features: ['use_localstorage_for_settings'],
+      enabled_features: ['study_templates'],
+      charts_storage_url: 'https://saveload.tradingview.com',
+      charts_storage_api_version: '1.1',
+      client_id: 'tradingview.com',
+      user_id: 'public_user_id',
+      fullscreen: false,
+      autosize: true,
+      theme: 'dark',
+    })
+    addLog('TradingView widget initialized', 'success')
+  } catch (error) {
+    addLog(`Failed to init TradingView: ${error}`, 'error')
   }
 }
 
@@ -252,6 +286,12 @@ watch(selectedMarketId, (newId) => {
     disconnectWebSocket()
     fetchLatestPrice()
     connectWebSocket()
+    // update TradingView chart symbol
+    if (tvWidget && market) {
+      tvWidget.setSymbol(market.symbol, '5' as any, () => {
+        addLog(`TradingView chart updated to ${market.symbol}`, 'success')
+      })
+    }
   }
 })
 
@@ -262,6 +302,10 @@ onMounted(() => {
 
 onUnmounted(() => {
   disconnectWebSocket()
+  if (tvWidget) {
+    tvWidget.remove()
+    tvWidget = null
+  }
   addLog('Component unmounted', 'info')
 })
 </script>
