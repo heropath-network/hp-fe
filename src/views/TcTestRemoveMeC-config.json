@@ -1,0 +1,10 @@
+{
+  "markets": [
+    {
+      "id": "market1",
+      "symbol": "EXAMPLE/USD",
+      "name": "Example Market",
+      "address": "0x0000000000000000000000000000000000000000"
+    }
+  ]
+}
