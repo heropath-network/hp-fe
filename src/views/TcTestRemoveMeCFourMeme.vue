@@ -67,12 +67,35 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 
-// load markets config
 interface Market {
   id: string
   symbol: string
   name: string
-  address?: string
+  address: string
+}
+
+interface Config {
+  apiBaseUrl: string
+  network: string
+  markets: Market[]
+}
+
+interface TokenPrice {
+  price: string
+  maxPrice: string
+  increase: string
+  marketCap: string
+}
+
+interface TokenData {
+  id: string
+  address: string
+  symbol: string
+  name: string
+  tokenPrice: TokenPrice
+  trading: string
+  dayIncrease: string
+  tradingUsd: string
 }
 
 interface DebugLog {
@@ -81,6 +104,7 @@ interface DebugLog {
   message: string
 }
 
+const config = ref<Config | null>(null)
 const markets = ref<Market[]>([])
 const selectedMarketId = ref<string>('')
 const latestPrice = ref<string>('')
@@ -89,6 +113,7 @@ const updateCount = ref(0)
 const debugLogs = ref<DebugLog[]>([])
 
 let ws: WebSocket | null = null
+let priceUpdateInterval: number | null = null
 
 function addLog(message: string, type: 'info' | 'success' | 'error' = 'info') {
   const time = new Date().toLocaleTimeString()
@@ -102,8 +127,8 @@ function addLog(message: string, type: 'info' | 'success' | 'error' = 'info') {
 async function loadMarketsConfig() {
   try {
     const configModule = await import('./TcTestRemoveMeC-config.json')
-    const data = configModule.default
-    markets.value = data.markets || []
+    config.value = configModule.default
+    markets.value = config.value.markets || []
     if (markets.value.length > 0) {
       selectedMarketId.value = markets.value[0].id
     }
@@ -114,21 +139,52 @@ async function loadMarketsConfig() {
 }
 
 async function fetchLatestPrice() {
-  // TODO: implement API call to get latest price from four.meme
-  addLog('fetchLatestPrice() - to be implemented', 'info')
+  if (!config.value || !selectedMarketId.value) {
+    addLog('Config or market not selected', 'error')
+    return
+  }
+  const market = markets.value.find(m => m.id === selectedMarketId.value)
+  if (!market) {
+    addLog('Market not found', 'error')
+    return
+  }
+  try {
+    addLog(`Fetching price for ${market.symbol} (${market.address})...`, 'info')
+    const url = `${config.value.apiBaseUrl}/private/token/get?address=${market.address}`
+    const response = await fetch(url)
+    const data = await response.json()
+    if (data.code === 0 && data.data) {
+      const tokenData: TokenData = data.data
+      latestPrice.value = parseFloat(tokenData.tokenPrice.price).toFixed(10)
+      addLog(`Price updated: $${latestPrice.value}`, 'success')
+      updateCount.value++
+    } else {
+      addLog(`API error: ${data.msg || 'Unknown error'}`, 'error')
+    }
+  } catch (error) {
+    addLog(`Failed to fetch price: ${error}`, 'error')
+  }
 }
 
 function connectWebSocket() {
-  // TODO: implement WebSocket connection to four.meme
-  addLog('connectWebSocket() - to be implemented', 'info')
+  // four.meme doesn't seem to have websocket, use polling instead
+  addLog('Starting price polling (every 5 seconds)...', 'info')
+  if (priceUpdateInterval) {
+    clearInterval(priceUpdateInterval)
+  }
+  fetchLatestPrice()
+  priceUpdateInterval = setInterval(() => {
+    fetchLatestPrice()
+  }, 5000) as unknown as number
+  wsConnected.value = true
 }
 
 function disconnectWebSocket() {
-  if (ws) {
-    ws.close()
-    ws = null
+  if (priceUpdateInterval) {
+    clearInterval(priceUpdateInterval)
+    priceUpdateInterval = null
     wsConnected.value = false
-    addLog('WebSocket disconnected', 'info')
+    addLog('Price polling stopped', 'info')
   }
 }
 
