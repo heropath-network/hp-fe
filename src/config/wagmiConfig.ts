@@ -1,6 +1,8 @@
 import { createConfig, http } from "@wagmi/vue";
 import { bsc } from "@wagmi/vue/chains";
-import { injected } from "@wagmi/vue/connectors";
+import { injected, walletConnect } from "@wagmi/vue/connectors";
+
+const walletConnectProjectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
 
 declare module "@wagmi/vue" {
   interface Register {
@@ -10,7 +12,14 @@ declare module "@wagmi/vue" {
 
 export const wagmiConfig = createConfig({
   chains: [bsc],
-  connectors: [injected()],
+  connectors: [
+    injected(),
+    walletConnect({
+      projectId: walletConnectProjectId,
+      showQrModal: true,
+      qrModalOptions: { themeMode: "dark" },
+    }),
+  ],
   transports: {
     [bsc.id]: http(),
   },

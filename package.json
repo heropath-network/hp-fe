@@ -12,9 +12,11 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.23",
+    "@metamask/jazzicon": "^2.0.0",
     "@tanstack/vue-query": "^5.92.0",
     "@vueuse/core": "^14.1.0",
     "@wagmi/vue": "^0.4.2",
+    "@walletconnect/ethereum-provider": "~2.21.10",
     "lodash-es": "^4.17.21",
     "pinia": "^2.1.7",
     "viem": "~2.40.3",
