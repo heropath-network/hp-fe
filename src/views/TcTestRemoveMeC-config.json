@@ -1,10 +1,49 @@
 {
+  "apiBaseUrl": "https://four.meme/meme-api/v1",
+  "network": "BSC",
+  "listedPancake": true,
   "markets": [
     {
-      "id": "market1",
-      "symbol": "EXAMPLE/USD",
-      "name": "Example Market",
-      "address": "0x0000000000000000000000000000000000000000"
+      "id": "ALIF",
+      "symbol": "ALIF",
+      "name": "Ai Life",
+      "address": "0x4444095396f637f6ea43b19267cb8a572cf1c847"
+    },
+    {
+      "id": "BIBI",
+      "symbol": "Binance AI",
+      "name": "Bibi",
+      "address": "0x444437716c563a0604b63319caa754016568e66e"
+    },
+    {
+      "id": "BOL",
+      "symbol": "BNBOFLEGENDS",
+      "name": "BOL",
+      "address": "0x44444e15232ff6dfed49b550d672707a283b3910"
+    },
+    {
+      "id": "RCHV",
+      "symbol": "RCHV",
+      "name": "Archivas",
+      "address": "0x44442271e6ca7336a29032838d70675680adc7df"
+    },
+    {
+      "id": "GG",
+      "symbol": "GG",
+      "name": "RIP GIGGLE",
+      "address": "0x444484eecf4a4364ba026ade9577f19a807c6260"
+    },
+    {
+      "id": "AJC",
+      "symbol": "AJC",
+      "name": "AI Judge Companion",
+      "address": "0x4444eb8f7d173ba29e3a5bf3a9e57d5f234545d4"
+    },
+    {
+      "id": "AIF",
+      "symbol": "AIF",
+      "name": "AIfluence House",
+      "address": "0x4444202f285c188690780f6cdc5f6c27767a8ee2"
     }
   ]
 }
