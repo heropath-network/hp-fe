@@ -1,4 +1,4 @@
 export const runtimeConfig = {
-  env: import.meta.env.VITE_APP_ENV ?? 'development',
-  appTitle: 'HP FE Demo'
-}
+  env: import.meta.env.VITE_APP_ENV ?? "development",
+  appTitle: "Hero Path",
+};
