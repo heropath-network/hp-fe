@@ -9,41 +9,40 @@ ajv.addSchema(oracleScheme, 'oracleSchema')
 
 
 export function getGainsPairIndex(symbol: string): number | null {
-  const upperSymbol = symbol.toUpperCase()
-  if (GAINS_PAIR_INDEX_MAP[upperSymbol]) {
-    return GAINS_PAIR_INDEX_MAP[upperSymbol]
+  const upperSymbol = symbol.toUpperCase();
+  if (GAINS_PAIR_INDEX_MAP[upperSymbol] !== undefined) {
+    return GAINS_PAIR_INDEX_MAP[upperSymbol];
   }
-  
-  return null
+
+  return null;
 }
 
 export function convertGainsResolution(resolution: number): number {
   switch (resolution) {
     case 1:
     case 3:
-      return 1
+      return 1;
     case 5:
-      return 5
+      return 5;
     case 15:
     case 30:
     case 45:
-      return 15
+      return 15;
     case 60:
     case 120:
     case 180:
-      return 60
+      return 60;
     case 240:
-      return 240
+      return 240;
     case 60 * 24:
-      return 1440
+      return 1440;
     case 60 * 24 * 7:
     case 60 * 24 * 30:
-      return 60
+      return 60;
     default:
-      return 15
+      return 15;
   }
 }
-
 
 export async function queryGainsPairOracleCandle(
   resolution: number,
@@ -52,39 +51,42 @@ export async function queryGainsPairOracleCandle(
   pairIndex: number
 ): Promise<OracleCandle[]> {
   try {
-    const client = new APIClient(GAINS_PRICE_HTTP_SERVICE)
-    const gainsResolution = convertGainsResolution(resolution)
-    
+    const client = new APIClient(GAINS_PRICE_HTTP_SERVICE);
+    const gainsResolution = convertGainsResolution(resolution);
+
     const responseData = await client.request({
       url: `/charts/${pairIndex}/${from}/${to}/${gainsResolution}`,
-      method: 'get',
-    })
-    
-    const candles = (responseData.data?.table as any[]) || []
-    
-    const validate = ajv.getSchema('oracleSchema#/definitions/GainsOracleCandle')
+      method: "get",
+    });
+
+    const candles = (responseData.data?.table as any[]) || [];
+
+    const validate = ajv.getSchema(
+      "oracleSchema#/definitions/GainsOracleCandle"
+    );
+
     if (!validate) {
-      throw new Error('No validate schema for GainsOracleCandle')
+      throw new Error("No validate schema for GainsOracleCandle");
     }
 
     return candles
-        .filter((item: any) => {
-          if (typeof item === 'object' && item !== null) {
-            return validate(item)
-          }
+      .filter((item: any) => {
+        if (typeof item === "object" && item !== null) {
+          return validate(item);
+        }
 
-          return false
-        })
-        .map((item: any) => ({
-          timestamp: Number(item.time) / 1000,
-          open: String(item.open),
-          high: String(item.high),
-          low: String(item.low),
-          close: String(item.close),
-        }))
+        return false;
+      })
+      .map((item: any) => ({
+        timestamp: Number(item.time) / 1000,
+        open: String(item.open),
+        high: String(item.high),
+        low: String(item.low),
+        close: String(item.close),
+      }));
   } catch (error) {
-    console.error(error)
-    return []
+    console.error(error);
+    return [];
   }
 }
 
