@@ -88,30 +88,37 @@ export async function queryMuxOracleCandle(
   }
 }
 
+export type PriceAgoType = {
+  price: number;
+  symbol: string;
+};
 
-export async function getMux24hAgoPrices(symbols: string[]): Promise<any[]> {
-  const dataTypeValue = 'mux3'
-  const url = '/mux3/priceChart/price24hAgo'
-  
+export type PriceAgoResponseType = {
+  prices: PriceAgoType[];
+};
+
+export async function getMux24hAgoPrices(
+  symbols: string[]
+): Promise<PriceAgoType[]> {
+  const dataTypeValue = "mux3";
+  const url = "/mux3/priceChart/price24hAgo";
+
   const params = {
-    symbols: symbols.join(','),
+    symbols: symbols.join(","),
     dataType: dataTypeValue,
-  }
-  
+  };
+
   try {
     const responseData = await defaultOracleServerApiClient().request({
       url: url,
-      method: 'GET',
+      method: "GET",
       params,
-    })
-    
-    const priceAgos = (responseData as any).priceAgos || []
+    });
 
-    
-    return priceAgos
+    return (responseData as unknown as PriceAgoResponseType).prices || [];
   } catch (error: any) {
-    console.error('MUX V3: Failed to fetch 24h ago price:', error)
-    return []
+    console.error("MUX V3: Failed to fetch 24h ago price:", error);
+    return [];
   }
 }
 
