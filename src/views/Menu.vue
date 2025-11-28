@@ -152,14 +152,3 @@ tryOnBeforeMount(() => {
     </nav>
   </aside>
 </template>
-
-<style scoped>
-.icon-mask {
-  width: 20px;
-  height: 20px;
-  display: inline-block;
-  background-color: currentColor;
-  -webkit-mask: var(--icon-url) center/contain no-repeat;
-  mask: var(--icon-url) center/contain no-repeat;
-}
-</style>
