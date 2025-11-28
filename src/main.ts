@@ -1,3 +1,5 @@
+import "./style/var";
+
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 
