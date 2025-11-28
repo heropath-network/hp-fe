@@ -69,6 +69,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 
 interface Market {
   id: string
+  tokenId: number
   symbol: string
   name: string
   address: string
@@ -77,7 +78,22 @@ interface Market {
 interface Config {
   apiBaseUrl: string
   network: string
+  listedPancake: boolean
   markets: Market[]
+}
+
+interface WsMessage {
+  event: string
+  data: {
+    tokenId: number
+    price: string
+    symbol: string
+    increase: string
+    marketCap: string
+    trading: string
+    dayIncrease: string
+    dayTrading: string
+  }
 }
 
 interface TokenPrice {
@@ -167,24 +183,65 @@ async function fetchLatestPrice() {
 }
 
 function connectWebSocket() {
-  // four.meme doesn't seem to have websocket, use polling instead
-  addLog('Starting price polling (every 5 seconds)...', 'info')
-  if (priceUpdateInterval) {
-    clearInterval(priceUpdateInterval)
+  disconnectWebSocket()
+  const market = markets.value.find(m => m.id === selectedMarketId.value)
+  if (!market) {
+    addLog('Market not found', 'error')
+    return
   }
-  fetchLatestPrice()
-  priceUpdateInterval = setInterval(() => {
-    fetchLatestPrice()
-  }, 5000) as unknown as number
-  wsConnected.value = true
+  try {
+    addLog('Connecting to wss://ws.four.meme/ws...', 'info')
+    ws = new WebSocket('wss://ws.four.meme/ws')
+    ws.onopen = () => {
+      addLog('WebSocket connected', 'success')
+      wsConnected.value = true
+      // disable binary mode
+      ws?.send(JSON.stringify({ method: 'BINARY', params: 'false' }))
+      addLog('Sent: BINARY=false', 'info')
+      // subscribe to price events
+      ws?.send(JSON.stringify({ method: 'SUBSCRIBE', params: '@TOKEN_PRICE_EVENT@0' }))
+      addLog('Sent: SUBSCRIBE @TOKEN_PRICE_EVENT@0', 'info')
+      // subscribe to ticker events
+      ws?.send(JSON.stringify({ method: 'SUBSCRIBE', params: '@TICKER_EVENT' }))
+      addLog('Sent: SUBSCRIBE @TICKER_EVENT', 'info')
+    }
+    ws.onmessage = (event) => {
+      try {
+        const msg: WsMessage = JSON.parse(event.data)
+        // only log price events for our token, filter out noise
+        if (msg.event === '@TOKEN_PRICE_EVENT@0' && msg.data?.tokenId === market.tokenId) {
+          const price = parseFloat(msg.data.price).toFixed(10)
+          latestPrice.value = price
+          addLog(`WS price update: $${price} (${msg.data.dayIncrease > '0' ? '+' : ''}${(parseFloat(msg.data.dayIncrease) * 100).toFixed(2)}%)`, 'success')
+          updateCount.value++
+        }
+      } catch (error) {
+        addLog(`WS message parse error: ${error}`, 'error')
+      }
+    }
+    ws.onerror = (error) => {
+      addLog(`WebSocket error: ${error}`, 'error')
+      wsConnected.value = false
+    }
+    ws.onclose = () => {
+      addLog('WebSocket closed', 'info')
+      wsConnected.value = false
+    }
+  } catch (error) {
+    addLog(`Failed to connect WebSocket: ${error}`, 'error')
+  }
 }
 
 function disconnectWebSocket() {
+  if (ws) {
+    ws.close()
+    ws = null
+    wsConnected.value = false
+    addLog('WebSocket disconnected', 'info')
+  }
   if (priceUpdateInterval) {
     clearInterval(priceUpdateInterval)
     priceUpdateInterval = null
-    wsConnected.value = false
-    addLog('Price polling stopped', 'info')
   }
 }
 
