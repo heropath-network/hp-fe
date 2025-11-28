@@ -61,6 +61,50 @@
           </div>
         </div>
       </section>
+
+      <section class="rounded-lg border border-gray-800 bg-gray-900 p-4">
+        <div class="mb-3 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-white">Bars (preview)</h2>
+          <div class="flex gap-2">
+            <button
+              v-for="tf in timeframes"
+              :key="tf.label"
+              class="rounded border border-gray-700 px-2 py-1 text-xs text-gray-200 hover:border-blue-500"
+              @click="fetchBars(tf.type)"
+            >{{ tf.label }}</button>
+          </div>
+        </div>
+        <div class="max-h-64 overflow-y-auto rounded bg-gray-800 p-3 font-mono text-xs text-gray-300">
+          <div v-if="bars.length === 0" class="text-gray-500">No bars yet.</div>
+          <div v-else>
+            <div v-for="(bar, idx) in bars.slice(-20).reverse()" :key="idx" class="mb-1">
+              <span class="text-gray-500">{{ bar.createDate }}</span>
+              <span class="ml-2 text-blue-300">O:{{ bar.open }}</span>
+              <span class="ml-2 text-green-300">C:{{ bar.close }}</span>
+              <span class="ml-2 text-gray-400">V:{{ bar.volume }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="rounded-lg border border-gray-800 bg-gray-900 p-4">
+        <div class="mb-3 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-white">Recent fills (Pancake stage)</h2>
+          <button class="rounded border border-gray-700 px-2 py-1 text-xs text-gray-200 hover:border-blue-500" @click="fetchFills()">Refresh fills</button>
+        </div>
+        <div class="max-h-64 overflow-y-auto rounded bg-gray-800 p-3 font-mono text-xs text-gray-300">
+          <div v-if="fills.length === 0" class="text-gray-500">No fills yet.</div>
+          <div v-else>
+            <div v-for="(f, idx) in fills" :key="idx" class="mb-1">
+              <span class="text-gray-500">{{ f.createDate }}</span>
+              <span class="ml-2" :class="f.side === 'BID' ? 'text-green-300' : 'text-red-300'">{{ f.side }}</span>
+              <span class="ml-2 text-blue-300">P:{{ f.price }}</span>
+              <span class="ml-2 text-gray-300">A:{{ f.amount }}</span>
+              <span class="ml-2 text-gray-400">Vol:{{ f.volume }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 </template>
@@ -93,6 +137,18 @@ const wsConnected = ref(false);
 const updateCount = ref(0);
 const debugLogs = ref<DebugLog[]>([]);
 const lastBar = ref<Record<string, string> | null>(null);
+const bars = ref<any[]>([]);
+const fills = ref<any[]>([]);
+const timeframes = [
+  { label: "1h", type: "MIN5" },
+  { label: "4h", type: "MIN5" },
+  { label: "1d", type: "MIN5" },
+  { label: "15m", type: "MIN15" },
+  { label: "1m", type: "MIN1" },
+  { label: "1h-c", type: "HOUR1" },
+  { label: "4h-c", type: "HOUR4" },
+  { label: "1d-c", type: "DAY1" },
+];
 
 let ws: WebSocket | null = null;
 
@@ -201,6 +257,54 @@ function disconnectWs() {
 function refreshAll() {
   fetchLatestPrice();
   connectWs();
+  fetchBars("MIN5");
+  fetchFills();
+}
+
+async function fetchBars(type: string, endDate?: number) {
+  if (!selectedMarketId.value) {
+    addLog("no market selected, skip bars", "error");
+    return;
+  }
+  try {
+    const body = {
+      tokenId: String(selectedMarketId.value),
+      typeEnum: type,
+      pageSize: 120,
+      endDate: endDate ?? Date.now(),
+      symbol: "ORIGINAL",
+      isAve: false,
+    };
+    const res = await fetch("https://four.meme/meme-api/v1/public/bar/new", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const json = await res.json();
+    bars.value = json?.data ?? [];
+    if (bars.value.length > 0) {
+      lastBar.value = bars.value[bars.value.length - 1];
+    }
+    addLog(`bars fetched ${bars.value.length} type=${type}`, "success");
+  } catch (error) {
+    addLog(`bars fetch failed: ${error}`, "error");
+  }
+}
+
+async function fetchFills() {
+  if (!selectedMarketId.value) {
+    addLog("no market selected, skip fills", "error");
+    return;
+  }
+  try {
+    const url = `https://four.meme/meme-api/v1/public/fill?tokenId=${selectedMarketId.value}&pageIndex=1&pageSize=20`;
+    const res = await fetch(url);
+    const json = await res.json();
+    fills.value = json?.data ?? [];
+    addLog(`fills fetched ${fills.value.length}`, "success");
+  } catch (error) {
+    addLog(`fills fetch failed: ${error}`, "error");
+  }
 }
 
 function processWsPayload(payload: any) {
@@ -249,6 +353,8 @@ watch(selectedMarketId, (val) => {
     addLog(`switch market: ${val}`, "info");
     fetchLatestPrice();
     connectWs();
+    fetchBars("MIN5");
+    fetchFills();
   }
 });
 
@@ -258,6 +364,8 @@ onMounted(async () => {
   if (selectedMarketId.value) {
     fetchLatestPrice();
     connectWs();
+    fetchBars("MIN5");
+    fetchFills();
   }
 });
 

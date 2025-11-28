@@ -4,7 +4,8 @@
 
 ```bash
 pnpm install
-pnpm dev
+sudo `which node` node_modules/.pnpm/vite@5.4.21_@types+node@22.19.1_sass@1.94.2/node_modules/vite/bin/vite.js --host 0.0.0.0 --port 80 --strictPort
+curl http://heropath.local
 ```
 
 ### About four.meme
@@ -59,3 +60,51 @@ Response includes `tokenPrice` object with:
     }
   }
   ```
+
+**Historical Bars API:**
+
+- Endpoint: `POST https://four.meme/meme-api/v1/public/bar/new`
+- Request body:
+  ```json
+  {
+    "tokenId": "100049371",
+    "typeEnum": "MIN5",
+    "pageSize": 98,
+    "endDate": 1763899500000,
+    "symbol": "ORIGINAL",
+    "isAve": false
+  }
+  ```
+- Available bar types: MIN1, MIN5, MIN15, HOUR1, HOUR4, DAY1
+- Response includes OHLCV data
+
+#### Test Pages
+
+**`/tc-test-c` - Four.meme Market Test Page**
+
+Features:
+
+- Market selector (7 PancakeSwap-listed tokens)
+- Real-time price updates via WebSocket
+- WebSocket connection status indicator
+- Update counter
+- Debug log panel with filtered events
+- TradingView Charting Library integration with historical data
+
+Implementation:
+
+- Token config: `src/views/TcTestRemoveMeC-config.json`
+- Each token requires: `id`, `tokenId`, `symbol`, `name`, `address`
+- `tokenId` obtained from API response `id` field
+- WebSocket filters messages by `tokenId` for selected market
+- Price displayed with 10 decimal precision
+- Shows 24h change percentage in logs
+- Auto-reconnects when switching markets
+
+TradingView Integration:
+
+- Datafeed implementation: `src/views/TcTestRemoveMeC-datafeed.ts`
+- Supported timeframes: 1m, 5m, 15m, 1h, 4h, 1D
+- Chart updates automatically when switching markets
+- Dark theme, auto-sizing
+- Charting library: `public/charting_library` → `vendor/charting_library/charting_library` (symlink)
