@@ -78,7 +78,7 @@
     </div>
 
     <div class="flex items-center gap-3">
-      <div class="text-xs text-gray-400">Oracle</div>
+      <div class="text-xs text-gray-400">Chart Source</div>
       <select
         v-model="selectedOracleName"
         class="rounded-lg border border-gray-800 bg-gray-900 px-3 py-1.5 text-sm text-white transition hover:border-gray-700 focus:border-blue-500 focus:outline-none"
