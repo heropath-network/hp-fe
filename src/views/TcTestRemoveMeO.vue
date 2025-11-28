@@ -92,6 +92,7 @@ const latestPrice = ref<string>("");
 const wsConnected = ref(false);
 const updateCount = ref(0);
 const debugLogs = ref<DebugLog[]>([]);
+const lastBar = ref<Record<string, string> | null>(null);
 
 let ws: WebSocket | null = null;
 
@@ -143,27 +144,42 @@ function connectWs() {
     wsConnected.value = true;
     addLog("ws connected", "success");
     try {
-      const payload = { cmd: "sub", topic: "ticker", id: selectedMarketId.value };
-      ws?.send(JSON.stringify(payload));
-      addLog(`ws subscribe: ${JSON.stringify(payload)}`, "info");
+      const cmds = [
+        { method: "BINARY", params: "false" },
+        { method: "SUBSCRIBE", params: "@TICKER_EVENT" },
+        { method: "SUBSCRIBE", params: `${selectedMarketId.value}@TOKEN_EVENT@0` },
+        { method: "SUBSCRIBE", params: "@TOKEN_PRICE_EVENT@0" },
+        { method: "SUBSCRIBE", params: `${selectedMarketId.value}@BAR_EVENT-MIN5@0` },
+      ];
+      cmds.forEach((cmd) => {
+        ws?.send(JSON.stringify(cmd));
+        addLog(`ws send: ${JSON.stringify(cmd)}`, "info");
+      });
     } catch (err) {
       addLog(`ws subscribe failed: ${err}`, "error");
     }
   };
   ws.onmessage = (event) => {
     updateCount.value += 1;
-    const text = typeof event.data === "string" ? event.data : "[binary]";
-    if (updateCount.value <= 5) {
-      addLog(`ws message: ${text.slice(0, 120)}`, "info");
-    }
-    try {
-      const parsed = JSON.parse(text);
-      const price = parsed?.price ?? parsed?.lastPrice ?? parsed?.data?.price;
-      if (price) {
-        latestPrice.value = price;
+    const handleText = (text: string) => {
+      if (updateCount.value <= 5) {
+        addLog(`ws message: ${text.slice(0, 120)}`, "info");
       }
-    } catch (_err) {
-      /* ignore parse errors, log already captured */
+      try {
+        const parsed = JSON.parse(text);
+        processWsPayload(parsed);
+      } catch (_err) {
+        /* ignore parse errors, log already captured */
+      }
+    };
+
+    if (typeof event.data === "string") {
+      handleText(event.data);
+    } else if (event.data instanceof Blob) {
+      event.data.text().then(handleText).catch((err) => addLog(`blob to text failed: ${err}`, "error"));
+    } else if (event.data instanceof ArrayBuffer) {
+      const text = new TextDecoder().decode(event.data);
+      handleText(text);
     }
   };
   ws.onerror = (event) => {
@@ -185,6 +201,47 @@ function disconnectWs() {
 function refreshAll() {
   fetchLatestPrice();
   connectWs();
+}
+
+function processWsPayload(payload: any) {
+  // payload may be a direct ticker or wrapped in { event, data }
+  if (!payload) {
+    return;
+  }
+
+  const currentId = selectedMarketId.value;
+
+  // If it is a simple ticker structure
+  const directPrice = payload.price ?? payload.lastPrice ?? payload.data?.price;
+  const directId = payload.tokenId ?? payload.id ?? payload.data?.tokenId;
+  if (directPrice && directId && currentId && Number(directId) === Number(currentId)) {
+    latestPrice.value = directPrice;
+    return;
+  }
+
+  if (payload.event) {
+    const event = payload.event as string;
+    const data = payload.data;
+    switch (event) {
+      case "@TOKEN_PRICE_EVENT@0": {
+        const tokenId = data?.tokenId;
+        if (tokenId && currentId && Number(tokenId) === Number(currentId)) {
+          const price = data?.price ?? data?.lastPrice;
+          if (price) {
+            latestPrice.value = price;
+          }
+        }
+        break;
+      }
+      case `${currentId}@BAR_EVENT-MIN5@0`: {
+        lastBar.value = data || null;
+        break;
+      }
+      default:
+        // ignore other events
+        break;
+    }
+  }
 }
 
 watch(selectedMarketId, (val) => {
