@@ -1,7 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "IBM Plex Sans", "Inter", "SF Pro Display", "SF Pro Text",
+    system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+}
+
 body {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--hp-bg-dark);
 }
 
 html,
@@ -53,22 +66,27 @@ a {
   box-sizing: border-box;
 
   &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 2px;
+    height: 2px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #232b48;
+    background: #262626;
     border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -ms-border-radius: 6px;
+    -o-border-radius: 6px;
   }
 
   &::selection {
     color: #fff;
-    background-color: #27a2f8;
+    background-color: #262626;
   }
 
   &::-moz-selection {
     color: #fff;
-    background-color: #27a2f8;
+    background-color: #262626;
   }
 }
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
