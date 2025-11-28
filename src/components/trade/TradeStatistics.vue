@@ -75,13 +75,6 @@
           ></div>
         </div>
       </div>
-
-      <div class="h-8 w-px bg-gray-800"></div>
-
-      <div class="flex flex-col">
-        <div class="text-xs text-gray-400">24h Volume</div>
-        <div class="text-sm font-medium text-white">${{ volume24h }}</div>
-      </div>
     </div>
 
     <div class="flex items-center gap-3">
@@ -150,9 +143,6 @@ const low24h = computed(() => {
   return data?.low ? formatPrice(data.low, 0) : formattedPrice.value
 })
 
-const volume24h = computed(() => {
-  return '--'
-})
 
 defineEmits(['openMarketSelect'])
 </script>
