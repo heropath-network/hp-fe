@@ -4,4 +4,5 @@ export * from './api/oracle'
 
 export * from './composables/useMuxPrice24h'
 export * from './composables/useMuxRealtimePrice'
+export * from './compositions/mux3MqttPriceServiceComposition'
 

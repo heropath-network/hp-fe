@@ -1,6 +1,5 @@
 <template>
   <div class="relative flex h-full w-full flex-col bg-gray-950">
-    <!-- Loading State -->
     <div v-if="!showChart" class="absolute inset-0 flex items-center justify-center bg-gray-950">
       <div class="text-center">
         <div class="mb-2 text-sm text-gray-400">Loading chart...</div>
@@ -8,7 +7,6 @@
       </div>
     </div>
 
-    <!-- TradingView Chart Container -->
     <div id="TV-chart" class="h-full w-full" :class="{ 'opacity-0': !showChart }"></div>
   </div>
 </template>
@@ -20,7 +18,7 @@ import { useTradeStore } from '@/stores/tradeStore'
 import Widget from './chart/widget'
 import { convertResolutionStrToNum, alignTimeToResolution, fetchOracleCandles } from './chart/utils'
 import { useGainsWebSocketPrice, useGainsPrice24h, GAINS_PAIR_INDEX_MAP } from '@/packages/gains'
-import { useMuxPrice24h, useMuxRealtimePrice } from '@/packages/mux-v3'
+import { useMuxV3Price24h, useMuxRealtimePrice } from '@/packages/mux-v3'
 import { ProjectId } from '@/constants'
 import type { Bar } from '@/types/tradingview'
 
@@ -30,7 +28,7 @@ const selectedMarket = computed(() => tradeStore.selectedMarket)
 const selectedOracle = computed(() => tradeStore.selectedOracle)
 
 const gainsPrice24h = useGainsPrice24h()
-const muxPrice24h = useMuxPrice24h()
+const muxV3Price24h = useMuxV3Price24h()
 
 const showChart = ref(false)
 const widget = ref<Widget | null>(null)
@@ -48,7 +46,7 @@ const latestBarData = ref<{
   fetchCount: 0
 })
 
-const maxGetLatestBarCount = 3 // Max retry attempts to fetch latest bar
+const maxGetLatestBarCount = 3
 
 const updateRealtimePriceTimer = ref<number | null>(null)
 
@@ -85,7 +83,7 @@ function initChartWidget() {
       fetchCount: 0,
     }
 
-    widget.value = markRaw(new Widget(2)) // 2 decimal places
+    widget.value = markRaw(new Widget(2))
     
 
     widget.value.setCandlesGetter(
@@ -129,10 +127,9 @@ function initChartWidget() {
               change24hRate = gainsPrice24h.calculate24hChangeRate(latestBar.close, selectedMarket.value)
             } else {
               const symbolName = selectedMarket.value.split('/')[0]
-              change24hRate = muxPrice24h.calculate24hChangeRate(latestBar.close, symbolName)
+              change24hRate = muxV3Price24h.calculate24hChangeRate(latestBar.close, symbolName)
             }
 
-            // Update store with both price and change24h
             tradeStore.setCurrentPrice(latestBar.close, change24hRate)
           }
           
@@ -154,13 +151,11 @@ function initChartWidget() {
       const resolution = widget.value?.tvWidget?.activeChart().resolution()
       dataResolution.value = convertResolutionStrToNum(resolution ?? '5')
       
-      // Subscribe to resolution changes
       widget.value?.tvWidget
         ?.activeChart()
         .onIntervalChanged()
         .subscribe(null, (interval: string) => {
           dataResolution.value = convertResolutionStrToNum(interval)
-          // Reset latestBarData for new resolution
           latestBarData.value = {
             chartSymbol: undefined,
             bar: undefined,
@@ -169,33 +164,27 @@ function initChartWidget() {
           }
         })
       
-      // Start real-time price updates with oracle-specific logic
       startRealtimePriceUpdates(selectedOracle.value, selectedMarket.value)
     }
     
-    // Initialize the chart AFTER setting up the data fetcher
     widget.value.init(
       'TV-chart',
       selectedMarket.value,
       'en',
       'Etc/UTC',
-      '5' // default 5min resolution
+      '5'
     )
   } catch (e) {
     console.error('Failed to initialize chart:', e)
   }
 }
 
-/**
- * Build candle bar for TradingView chart (following mux-fe pattern)
- */
 function buildCandle(
   price: number,
   resolution: number,
   chartSymbol: string,
   timestamp?: number
 ): Bar | undefined {
-  // If no latest bar and not currently fetching, try to fetch it
   if (
     !latestBarData.value.bar &&
     !latestBarData.value.isFetching &&
@@ -205,7 +194,6 @@ function buildCandle(
     return undefined
   }
 
-  // Don't update while fetching
   if (latestBarData.value.isFetching) {
     return undefined
   }
@@ -214,21 +202,16 @@ function buildCandle(
   const newTime = alignTimeToResolution(resolution, timestamp)
   const lastBarData = latestBarData.value
 
-  // Validate chartSymbol matches and bar exists
   if (lastBarData.chartSymbol && lastBarData.chartSymbol === chartSymbol && lastBarData.bar) {
     const resolutionMs = resolution * 60 * 1000
     const lastBarTime = lastBarData.bar.time
     
-    // Ensure newTime is not in the past (should be >= last bar time)
     if (newTime < lastBarTime) {
       return undefined
     }
     
-    // Calculate the current expected bar time (current time aligned to resolution)
     const currentAlignedTime = alignTimeToResolution(resolution)
     
-    // Only allow updating the current bar or the immediate next bar
-    // This prevents sending bars that are too far ahead, which causes TradingView errors
     const allowedMaxTime = Math.max(currentAlignedTime, lastBarTime + resolutionMs)
     
     if (newTime > allowedMaxTime) {
@@ -241,15 +224,12 @@ function buildCandle(
     }
     
     if (newTime === lastBarTime) {
-      // Update existing bar (same candle period)
       barData.close = newPrice
       barData.low = Math.min(lastBarData.bar.low, newPrice)
       barData.high = Math.max(lastBarData.bar.high, newPrice)
     } else {
-      // New bar (new candle period) - must be exactly one period ahead
       const expectedNextTime = lastBarTime + resolutionMs
       
-      // Only allow the immediate next period
       if (newTime !== expectedNextTime && newTime !== currentAlignedTime) {
         return undefined
       }
@@ -260,7 +240,6 @@ function buildCandle(
       barData.close = newPrice
     }
     
-    // Update latestBarData
     latestBarData.value = {
       ...lastBarData,
       bar: barData
@@ -273,7 +252,6 @@ function buildCandle(
 }
 
 async function getLatestCandleBarData(resolution: number, chartSymbol: string) {
-  // Set fetching state
   latestBarData.value = {
     ...latestBarData.value,
     isFetching: true,
@@ -282,9 +260,8 @@ async function getLatestCandleBarData(resolution: number, chartSymbol: string) {
   let bar: Bar | undefined = undefined
   
   try {
-    // Fetch the most recent candles from oracle
     const now = Math.floor(Date.now() / 1000)
-    const from = now - resolution * 60 * 4 // Last 4 candle periods
+    const from = now - resolution * 60 * 4
     
     const candles = await fetchOracleCandles(resolution, from, now, chartSymbol, selectedOracle.value)
     
@@ -295,7 +272,6 @@ async function getLatestCandleBarData(resolution: number, chartSymbol: string) {
     console.error('Failed to fetch latest candle bar:', error)
   }
   
-  // Update latestBarData with all fields
   latestBarData.value = {
     chartSymbol: chartSymbol,
     bar: bar,
@@ -304,13 +280,10 @@ async function getLatestCandleBarData(resolution: number, chartSymbol: string) {
   }
 }
 
-/**
- * MUX V3 realtime price watcher (following mux-fe pattern)
- */
 function useMuxV3RealtimePrices(chartSymbol: string) {
   clearUpdateRealtimePriceTimer()
   
-  const marketSymbol = chartSymbol.split('/')[0] // BTC/USD -> BTC
+  const marketSymbol = chartSymbol.split('/')[0]
   const symbolRef = ref(chartSymbol)
   const { priceInfo } = useMuxRealtimePrice(symbolRef, 200)
 
@@ -327,24 +300,18 @@ function useMuxV3RealtimePrices(chartSymbol: string) {
       const priceNum = parseFloat(newPrice)
       const timestamp = Number(newPriceTime)
       
-      // Update chart with resolution
       updateRealtimePrice(priceNum, dataResolution.value, chartSymbol, timestamp)
       
-      // Calculate 24h change and update store
-      const change24hRate = muxPrice24h.calculate24hChangeRate(priceNum, marketSymbol)
+      const change24hRate = muxV3Price24h.calculate24hChangeRate(priceNum, marketSymbol)
       tradeStore.setCurrentPrice(priceNum, change24hRate)
     }
-  }, 300)
+  }, 1000)
 }
 
-/**
- * GTrade realtime price watcher (following mux-fe pattern)
- */
 function useGainsRealtimePrices(chartSymbol: string) {
   clearUpdateRealtimePriceTimer()
   
   const pairIndex = GAINS_PAIR_INDEX_MAP[chartSymbol]
-  // Check for undefined/null, but allow 0 (BTC is pair index 0!)
   if (pairIndex === undefined || pairIndex === null) {
     console.error(`GTrade: No pair index found for ${chartSymbol}`)
     console.error('GTrade: Available pairs:', Object.keys(GAINS_PAIR_INDEX_MAP))
@@ -359,19 +326,14 @@ function useGainsRealtimePrices(chartSymbol: string) {
       const priceNum = price.value
     
       
-      // Update chart with resolution (GTrade uses current timestamp)
       updateRealtimePrice(priceNum, dataResolution.value, chartSymbol)
       
-      // Calculate 24h change and update store
       const change24hRate = gainsPrice24h.calculate24hChangeRate(priceNum, chartSymbol)
       tradeStore.setCurrentPrice(priceNum, change24hRate)
     }
-  }, 300)
+  }, 1000)
 }
 
-/**
- * Update chart with realtime price (following mux-fe pattern)
- */
 function updateRealtimePrice(
   price: number,
   resolution: number,
@@ -387,15 +349,11 @@ function updateRealtimePrice(
   if (bar && widget.value) {
     try {
       widget.value.updateRealtimePrice(bar, chartSymbol)
-    } catch (e) {
-      // Silently handle realtime price update errors
+    } catch (e) { 
     }
   }
 }
 
-/**
- * Start realtime price updates based on oracle type (following mux-fe pattern)
- */
 function startRealtimePriceUpdates(projectId: ProjectId, chartSymbol: string) {
   if (realtimePricesScope.scope) {
     realtimePricesScope.scope.stop()
@@ -428,11 +386,9 @@ function stopRealtimePriceUpdates() {
   clearUpdateRealtimePriceTimer()
 }
 
-// Watch for market changes
 watch(selectedMarket, (newMarket, oldMarket) => {
   if (newMarket !== oldMarket && widget.value?.tvWidget) {
     widget.value.onMarketChanged(newMarket, () => {
-      // Reset latestBarData for new market
       latestBarData.value = {
         chartSymbol: undefined,
         bar: undefined,
@@ -441,25 +397,21 @@ watch(selectedMarket, (newMarket, oldMarket) => {
       }
     })
     
-    // Restart realtime updates for new market
     stopRealtimePriceUpdates()
     startRealtimePriceUpdates(selectedOracle.value, newMarket)
   }
 })
 
 onMounted(() => {
-  // Start auto-refresh of 24h ago prices only for selected oracle
-  // Stop the other oracle's fetching first
   if (selectedOracle.value === ProjectId.GAINS) {
-    muxPrice24h.stopAutoRefresh() // Stop MUX fetching
-    gainsPrice24h.startAutoRefresh() // Start GTrade fetching
+    muxV3Price24h.stopAutoRefresh()
+    gainsPrice24h.startAutoRefresh()
   } else if (selectedOracle.value === ProjectId.MUX_V3) {
-    gainsPrice24h.stopAutoRefresh() // Stop GTrade fetching
+    gainsPrice24h.stopAutoRefresh()
     const symbolName = selectedMarket.value.split('/')[0]
-    muxPrice24h.startAutoRefresh([symbolName]) // Start MUX fetching
+    muxV3Price24h.startAutoRefresh([symbolName])
   }
   
-  // Small delay to ensure DOM is ready
   setTimeout(() => {
     initChartWidget()
   }, 100)
@@ -468,48 +420,37 @@ onMounted(() => {
 onUnmounted(() => {
   stopRealtimePriceUpdates()
   gainsPrice24h.stopAutoRefresh()
-  muxPrice24h.stopAutoRefresh()
+  muxV3Price24h.stopAutoRefresh()
   
   if (widget.value) {
     widget.value.onDestroyed()
   }
 })
 
-// Watch for market changes and update 24h ago price symbols
 watch(selectedMarket, (newMarket) => {
-  // Only update if the oracle is selected
   if (selectedOracle.value === ProjectId.GAINS) {
-    // GTrade: already fetches all prices, no need to update
-    // But make sure MUX is stopped
-    muxPrice24h.stopAutoRefresh()
+    muxV3Price24h.stopAutoRefresh()
     gainsPrice24h.startAutoRefresh()
   } else if (selectedOracle.value === ProjectId.MUX_V3) {
-    // MUX V3: update specific symbol
-    // But make sure GTrade is stopped
     gainsPrice24h.stopAutoRefresh()
     const symbolName = newMarket.split('/')[0]
-    muxPrice24h.startAutoRefresh([symbolName])
+    muxV3Price24h.startAutoRefresh([symbolName])
   } else {
-    // No oracle selected, stop both
     gainsPrice24h.stopAutoRefresh()
-    muxPrice24h.stopAutoRefresh()
+    muxV3Price24h.stopAutoRefresh()
   }
 })
 
-// Watch for oracle changes and restart price updates
 watch(selectedOracle, (newOracle, oldOracle) => {
   if (newOracle !== oldOracle) {
-    // Stop fetching for the old oracle
     if (oldOracle === ProjectId.GAINS) {
       gainsPrice24h.stopAutoRefresh()
     } else if (oldOracle === ProjectId.MUX_V3) {
-      muxPrice24h.stopAutoRefresh()
+      muxV3Price24h.stopAutoRefresh()
     }
     
-    // Stop realtime price updates
     stopRealtimePriceUpdates()
     
-    // Reset latestBarData completely to clear old oracle's data
     latestBarData.value = {
       chartSymbol: undefined,
       bar: undefined,
@@ -517,29 +458,23 @@ watch(selectedOracle, (newOracle, oldOracle) => {
       fetchCount: 0,
     }
     
-    // Start fetching for the new oracle
     if (newOracle === ProjectId.GAINS) {
       gainsPrice24h.startAutoRefresh()
     } else if (newOracle === ProjectId.MUX_V3) {
       const symbolName = selectedMarket.value.split('/')[0]
-      muxPrice24h.startAutoRefresh([symbolName])
+      muxV3Price24h.startAutoRefresh([symbolName])
     }
     
-    // Reinitialize chart widget to force complete reload with new oracle data
-    // This ensures old data is cleared and fresh data is loaded
     if (widget.value?.tvWidget) {
-      // Destroy widget first, then wait a bit longer to ensure DOM is clean
       widget.value.onDestroyed()
       widget.value = null
       
-      // Longer delay to ensure old widget is fully destroyed and DOM is ready
       setTimeout(() => {
         if (selectedMarket.value) {
           initChartWidget()
         }
       }, 300)
     } else if (selectedMarket.value) {
-      // If widget doesn't exist yet, initialize it
       initChartWidget()
     }
   }
