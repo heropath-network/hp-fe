@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 
 export enum ROUTE_NAMES {
   Dashboard = 'dashboard',
@@ -12,7 +12,7 @@ export enum ROUTE_NAMES {
   Ecosystem = 'ecosystem',
 }
 
-const ROUTER_LIST = [
+const ROUTER_LIST: RouteRecordRaw[] = [
   {
     path: '/',
     redirect: '/dashboard',
@@ -65,11 +65,16 @@ const ROUTER_LIST = [
     name: ROUTE_NAMES.Ecosystem,
     component: () => import('@/templates/Ecosystem/Ecosystem.vue'),
   },
-]
+    {
+        path: "/trade",
+        name: "trade",
+        component: TradeView,
+    },
+];
 
 const router = createRouter({
-  history: createWebHashHistory(),
-  routes: ROUTER_LIST,
-})
+    history: createWebHistory(),
+    routes: ROUTER_LIST,
+});
 
 export default router
