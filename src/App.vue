@@ -8,10 +8,14 @@ import Menu from '@/views/Menu.vue'
 
 const route = useRoute()
 const showMenu = computed(() => !route.meta?.hideMenu)
+const isTradePage = computed(() => route.path === "/trade");
 </script>
 
 <template>
-  <div class="min-h-screen bg-[var(--hp-bg-dark)] text-[var(--hp-white-color)]">
+  <div v-if="isTradePage" class="min-h-screen bg-[var(--hp-bg-dark)] text-[var(--hp-white-color)]">
+    <RouterView />
+  </div>
+  <div v-else class="min-h-screen bg-[var(--hp-bg-dark)] text-[var(--hp-white-color)]">
     <Header />
     <div class="flex">
       <Menu v-if="showMenu" />
