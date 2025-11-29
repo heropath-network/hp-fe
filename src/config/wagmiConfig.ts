@@ -17,7 +17,9 @@ export const wagmiConfig = createConfig({
     walletConnect({
       projectId: walletConnectProjectId,
       showQrModal: true,
-      qrModalOptions: { themeMode: "dark" },
+      qrModalOptions: {
+        themeMode: "dark",
+      },
     }),
   ],
   transports: {
