@@ -80,13 +80,13 @@
             <div class="h-px mx-4 bg-gray-800"></div>
 
             <div class="flex-1 overflow-y-auto p-2 mx-2 mb-2 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent hover:scrollbar-thumb-gray-700">
-              <template v-if="filteredMarkets.length === 0">
+              <template v-if="sortedMarkets.length === 0">
                 <div class="flex items-center justify-center py-10 px-4 min-h-[200px]">
                   <span class="text-sm leading-5 text-gray-400">No markets found</span>
                 </div>
               </template>
               <button
-                v-for="market in filteredMarkets"
+                v-for="market in sortedMarkets"
                 :key="market"
                 @click="selectMarket(market)"
                 :class="[
@@ -104,10 +104,34 @@
                       : 'bg-gray-900 border border-gray-800'
                   ]"
                 >
-                  <div class="flex items-center flex-1">
-                    <span class="text-base font-semibold leading-6 text-white">{{ market }}</span>
+                  <div class="flex items-center flex-1 gap-3">
+                    <button
+                      @click.stop="toggleFavorite(market)"
+                      class="flex-shrink-0 w-4 h-4 flex items-center justify-center text-gray-400 hover:text-yellow-400 transition-colors"
+                    >
+                      <svg
+                        v-if="isFavorite(market)"
+                        class="w-4 h-4 fill-current text-yellow-400"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                      <svg
+                        v-else
+                        class="w-4 h-4 stroke-current fill-none"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                      >
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                    </button>
+                    <MarketIcon :symbol="market" :size="32" />
+                    <div class="flex flex-col text-left">
+                      <span class="text-base font-semibold leading-6 text-white">{{ market }}</span>
+                      <span class="text-sm leading-5 text-gray-400">{{ getMarketName(market) }}</span>
+                    </div>
                   </div>
-                  <div class="flex items-end">
+                  <div class="flex flex-col items-end">
                     <span
                       v-if="marketPrices[market]"
                       :class="[
@@ -139,7 +163,11 @@ import {
   MEME_MARKETS,
   FOREX_MARKETS,
   STOCKS_MARKETS,
+  CRYPTO_MARKETS,
 } from '@/constants/markets'
+import MarketIcon from '@/components/common/MarketIcon.vue'
+import { isFavorite, toggleFavorite } from '@/utils/favorites'
+import { getMarketName } from '@/utils/marketNames'
 
 interface Props {
   show: boolean
@@ -189,11 +217,38 @@ const filteredMarkets = computed(() => {
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase().trim()
     markets = markets.filter((market: string) => 
-      market.toLowerCase().includes(query)
+      market.toLowerCase().includes(query) || getMarketName(market).toLowerCase().includes(query)
     )
   }
   
   return markets
+})
+
+const sortedMarkets = computed(() => {
+  const markets = [...filteredMarkets.value]
+  
+  function getCategoryOrder(market: string): number {
+    if (CRYPTO_MARKETS.includes(market as any)) return 1
+    if (FOREX_MARKETS.includes(market as any)) return 2
+    if (STOCKS_MARKETS.includes(market as any)) return 3
+    return 4
+  }
+  
+  return markets.sort((a, b) => {
+    const aCategory = getCategoryOrder(a)
+    const bCategory = getCategoryOrder(b)
+    
+    if (aCategory !== bCategory) {
+      return aCategory - bCategory
+    }
+    
+    const aIsFavorite = isFavorite(a)
+    const bIsFavorite = isFavorite(b)
+    if (aIsFavorite && !bIsFavorite) return -1
+    if (!aIsFavorite && bIsFavorite) return 1
+    
+    return a.localeCompare(b)
+  })
 })
 
 function selectMarket(market: string) {
