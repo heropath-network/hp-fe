@@ -4,5 +4,6 @@ import LoadingIcon from './LoadingIcon.vue'
 import HpTabs from './Tabs.vue'
 import HpSwitch from './Switch.vue'
 import BaseIcon from './BaseIcon.vue'
+import TabButton from "./common/TabButton.vue";
 
-export { HpDialog, ConnectWalletDialog, LoadingIcon, HpTabs, HpSwitch, BaseIcon }
+export { HpDialog, ConnectWalletDialog, LoadingIcon, HpTabs, HpSwitch, BaseIcon, TabButton }
