@@ -1,0 +1,33 @@
+<template>
+  <div class="w-full max-w-md px-2 py-16 sm:px-0">
+    <TabGroup>
+      <TabList class="flex bg-[var(--hp-bg-light)]">
+        <Tab v-for="tab in tabs" as="template" :key="tab.id">
+          <div
+            class="flex items-center justify-center cursor-pointer h-[44px] w-[166px] text-[16px] font-[500] leading-6 text-[var(--hp-text-color)]"
+            :style="[
+              selectId === tab.id ? 'background-color: var(--hp-primary-green); color:var(--hp-black-color)' : '',
+            ]"
+            @click="$emit('update:selectId', tab.id)"
+          >
+            {{ tab.label }}
+          </div>
+        </Tab>
+      </TabList>
+    </TabGroup>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import { TabGroup, TabList, Tab } from '@headlessui/vue'
+
+interface Props {
+  tabs: {
+    id: number | string
+    label: string
+  }[]
+  selectId: number | string
+}
+
+withDefaults(defineProps<Props>(), {})
+</script>
