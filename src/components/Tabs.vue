@@ -1,8 +1,8 @@
 <template>
-  <div class="w-full max-w-md px-2 py-16 sm:px-0">
+  <div class="flex items-center justify-center">
     <TabGroup>
       <TabList class="flex bg-[var(--hp-bg-light)]">
-        <Tab v-for="tab in tabs" as="template" :key="tab.id">
+        <Tab v-for="tab in tabs" as="template" :key="tab.id" :id="tab.id">
           <div
             class="flex items-center justify-center cursor-pointer h-[44px] w-[166px] text-[16px] font-[500] leading-6 text-[var(--hp-text-color)]"
             :style="[
@@ -23,10 +23,10 @@ import { TabGroup, TabList, Tab } from '@headlessui/vue'
 
 interface Props {
   tabs: {
-    id: number | string
+    id: string
     label: string
   }[]
-  selectId: number | string
+  selectId: string
 }
 
 withDefaults(defineProps<Props>(), {})

@@ -52,7 +52,7 @@ const menuItems = [
   },
   {
     id: MenuItem.TradingEducation,
-    label: 'Trading Education',
+    label: 'Trading & Education',
     icon: questionIcon,
     routeName: ROUTE_NAMES.TradingEducation,
   },
@@ -64,7 +64,7 @@ const menuItems = [
   },
   {
     id: MenuItem.Ecosystem,
-    label: 'Ecosystem',
+    label: 'Ecosystem & Dashboard',
     icon: questionIcon,
     routeName: ROUTE_NAMES.Ecosystem,
   },
@@ -99,7 +99,7 @@ tryOnBeforeMount(() => {
 
 <template>
   <aside
-    class="fixed left-0 top-16 z-20 h-[calc(100vh-64px)] w-[248px] overflow-y-auto border-r border-[var(--hp-line-color)] bg-[var(--hp-bg-dark)] px-6 pt-10 text-sm text-[var(--hp-text-color)]"
+    class="fixed left-0 top-16 z-20 h-[calc(100vh-64px)] w-[262px] overflow-y-auto bg-[var(--hp-bg-dark)] px-6 pt-10 text-sm text-[var(--hp-text-color)]"
   >
     <nav class="space-y-2">
       <button
@@ -107,10 +107,10 @@ tryOnBeforeMount(() => {
         :key="item.id"
         @click="switchActiveItem(item.id)"
         type="button"
-        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition"
+        class="flex w-full items-center gap-3 px-3 py-3 text-left transition"
         :class="
           item.id === activeItemId
-            ? 'bg-[var(--hp-line-color)] text-[var(--hp-primary-green)]'
+            ? 'text-[var(--hp-primary-green)]'
             : 'hover:bg-[var(--hp-line-color)] hover:text-[var(--hp-white-color)]'
         "
       >
