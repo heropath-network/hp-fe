@@ -1,3 +1,3 @@
 <template>
-  <div>Setting</div>
+  <div>Ecosystem</div>
 </template>

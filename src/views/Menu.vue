@@ -1,114 +1,100 @@
 <script setup lang="ts">
-import { ref, Ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import privateIcon from "@/assets/icons/menu/privateProfit.svg";
-import publicIcon from "@/assets/icons/menu/publicProfile.svg";
-import dashboardIcon from "@/assets/icons/menu/dashboard.svg";
-import certificatesIcon from "@/assets/icons/menu/certificates.svg";
-import buyEvaluationIcon from "@/assets/icons/menu/buyEvaluation.svg";
-import settingsIcon from "@/assets/icons/menu/setting.svg";
-import payoutsIcon from "@/assets/icons/menu/payouts.svg";
-import faqIcon from "@/assets/icons/menu/faq.svg";
-import leaderboardIcon from "@/assets/icons/menu/leaderboard.svg";
-import { ROUTE_NAMES } from "@/router";
-import { tryOnBeforeMount } from "@vueuse/core";
+import { ref, Ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ROUTE_NAMES } from '@/router'
+import { tryOnBeforeMount } from '@vueuse/core'
+import dashboardIcon from '@/assets/icons/menu/dashboard.svg'
+import leaderboardIcon from '@/assets/icons/menu/leaderboard.svg'
+import profitIcon from '@/assets/icons/menu/profit.svg'
+import evaluationIcon from '@/assets/icons/menu/evaluation.svg'
+import payoutsIcon from '@/assets/icons/menu/payouts.svg'
+import questionIcon from '@/assets/icons/menu/question.svg'
 
 enum MenuItem {
-  PrivateProfile = "Private Profile",
-  PublicProfile = "Public Profile",
-  Dashboard = "Dashboard",
-  Certificates = "Certificates",
-  BuyEvaluation = "Buy Evaluation",
-  Settings = "Settings",
-  Payouts = "Payouts",
-  FAQ = "FAQ",
-  Leaderboard = "Leaderboard",
+  Dashboard = 'Dashboard',
+  Profile = 'Profile',
+  Evaluation = 'Evaluation',
+  Payouts = 'Payouts',
+  TradingEducation = 'TradingEducation',
+  Leaderboard = 'Leaderboard',
+  Ecosystem = 'Ecosystem',
 }
 
-const DefaultMenuItemId = MenuItem.PrivateProfile;
+const DefaultMenuItemId = MenuItem.Dashboard
 
-const router = useRouter();
-const route = useRoute();
+const router = useRouter()
+const route = useRoute()
 
 const menuItems = [
   {
-    id: MenuItem.PrivateProfile,
-    label: "Private Profile",
-    icon: privateIcon,
-    routeName: ROUTE_NAMES.PrivateProfile,
-  },
-  {
-    id: MenuItem.PublicProfile,
-    label: "Public Profile",
-    icon: publicIcon,
-    routeName: ROUTE_NAMES.PublicProfile,
-  },
-  {
     id: MenuItem.Dashboard,
-    label: "Dashboard",
+    label: 'Dashboard',
     icon: dashboardIcon,
     routeName: ROUTE_NAMES.Dashboard,
   },
   {
-    id: MenuItem.Certificates,
-    label: "Certificates",
-    icon: certificatesIcon,
-    routeName: ROUTE_NAMES.Certificates,
+    id: MenuItem.Profile,
+    label: 'Profile',
+    icon: profitIcon,
+    routeName: ROUTE_NAMES.Profile,
   },
   {
-    id: MenuItem.BuyEvaluation,
-    label: "Buy Evaluation",
-    icon: buyEvaluationIcon,
-    routeName: ROUTE_NAMES.BuyCredits,
-  },
-  {
-    id: MenuItem.Settings,
-    label: "Settings",
-    icon: settingsIcon,
-    routeName: ROUTE_NAMES.Settings,
+    id: MenuItem.Evaluation,
+    label: 'Evaluation',
+    icon: evaluationIcon,
+    routeName: ROUTE_NAMES.Evaluation,
   },
   {
     id: MenuItem.Payouts,
-    label: "Payouts",
+    label: 'Payouts',
     icon: payoutsIcon,
     routeName: ROUTE_NAMES.Payouts,
   },
-  { id: MenuItem.FAQ, label: "FAQ", icon: faqIcon, routeName: ROUTE_NAMES.FAQ },
+  {
+    id: MenuItem.TradingEducation,
+    label: 'Trading Education',
+    icon: questionIcon,
+    routeName: ROUTE_NAMES.TradingEducation,
+  },
   {
     id: MenuItem.Leaderboard,
-    label: "Leaderboard",
+    label: 'Leaderboard',
     icon: leaderboardIcon,
     routeName: ROUTE_NAMES.Leaderboard,
   },
-];
+  {
+    id: MenuItem.Ecosystem,
+    label: 'Ecosystem',
+    icon: questionIcon,
+    routeName: ROUTE_NAMES.Ecosystem,
+  },
+]
 
-const activeItemId: Ref<MenuItem> = ref(MenuItem.PrivateProfile);
+const activeItemId: Ref<MenuItem> = ref(MenuItem.Dashboard)
 
 function switchActiveItem(itemId: MenuItem) {
-  const selectedItem = menuItems.find((item) => item.id === itemId);
+  const selectedItem = menuItems.find((item) => item.id === itemId)
   if (selectedItem) {
-    activeItemId.value = itemId;
-    router.push({ name: selectedItem.routeName });
+    activeItemId.value = itemId
+    router.push({ name: selectedItem.routeName })
   }
 }
 
 function initializeActiveItem() {
-  const routeName = route.name;
-  const foundItem = menuItems.find((item) => item.routeName === routeName);
+  const routeName = route.name
+  const foundItem = menuItems.find((item) => item.routeName === routeName)
   if (foundItem) {
-    activeItemId.value = foundItem.id;
+    activeItemId.value = foundItem.id
   } else {
-    activeItemId.value = DefaultMenuItemId;
-    const defaultMenuItem = menuItems.find(
-      (item) => item.id === DefaultMenuItemId
-    );
-    router.push({ name: defaultMenuItem!.routeName });
+    activeItemId.value = DefaultMenuItemId
+    const defaultMenuItem = menuItems.find((item) => item.id === DefaultMenuItemId)
+    router.push({ name: defaultMenuItem!.routeName })
   }
 }
 
 tryOnBeforeMount(() => {
-  initializeActiveItem();
-});
+  initializeActiveItem()
+})
 </script>
 
 <template>
@@ -132,19 +118,12 @@ tryOnBeforeMount(() => {
           class="icon-mask"
           :style="{
             '--icon-url': `url(${item.icon})`,
-            color:
-              item.id === activeItemId
-                ? 'var(--hp-primary-green)'
-                : 'var(--hp-text-color)',
+            color: item.id === activeItemId ? 'var(--hp-primary-green)' : 'var(--hp-text-color)',
           }"
         />
         <span
           class="text-[14px] font-semibold"
-          :class="
-            item.id === activeItemId
-              ? 'text-[var(--hp-primary-green)]'
-              : 'text-[var(--hp-text-color)]'
-          "
+          :class="item.id === activeItemId ? 'text-[var(--hp-primary-green)]' : 'text-[var(--hp-text-color)]'"
         >
           {{ item.label }}
         </span>
