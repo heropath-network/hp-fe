@@ -48,34 +48,32 @@ export async function queryGainsPairOracleCandle(
   resolution: number,
   from: number,
   to: number,
-  pairIndex: number
+  pairIndex: number,
 ): Promise<OracleCandle[]> {
   try {
-    const client = new APIClient(GAINS_PRICE_HTTP_SERVICE);
-    const gainsResolution = convertGainsResolution(resolution);
+    const client = new APIClient(GAINS_PRICE_HTTP_SERVICE)
+    const gainsResolution = convertGainsResolution(resolution)
 
     const responseData = await client.request({
       url: `/charts/${pairIndex}/${from}/${to}/${gainsResolution}`,
-      method: "get",
-    });
+      method: 'get',
+    })
 
-    const candles = (responseData.data?.table as any[]) || [];
+    const candles = (responseData.data?.table as any[]) || []
 
-    const validate = ajv.getSchema(
-      "oracleSchema#/definitions/GainsOracleCandle"
-    );
+    const validate = ajv.getSchema('oracleSchema#/definitions/GainsOracleCandle')
 
     if (!validate) {
-      throw new Error("No validate schema for GainsOracleCandle");
+      throw new Error('No validate schema for GainsOracleCandle')
     }
 
     return candles
       .filter((item: any) => {
-        if (typeof item === "object" && item !== null) {
-          return validate(item);
+        if (typeof item === 'object' && item !== null) {
+          return validate(item)
         }
 
-        return false;
+        return false
       })
       .map((item: any) => ({
         timestamp: Number(item.time) / 1000,
@@ -83,10 +81,10 @@ export async function queryGainsPairOracleCandle(
         high: String(item.high),
         low: String(item.low),
         close: String(item.close),
-      }));
+      }))
   } catch (error) {
-    console.error(error);
-    return [];
+    console.error(error)
+    return []
   }
 }
 
@@ -113,6 +111,64 @@ export async function getGainsLatestChartPrices(): Promise<(number | null)[]> {
     return response.data.closes as Array<number | null>
   } catch (error) {
     return []
+  }
+}
+
+export interface GainsMarketPrice {
+  symbol: string
+  price: number | null
+  price24hAgo: number | null
+  change24h: number
+}
+
+
+export async function getAllGainsMarketPrices(): Promise<Map<string, GainsMarketPrice>> {
+  try {
+    const [currentPrices, prices24hAgo] = await Promise.all([getGainsLatestChartPrices(), getGains24hAgoPrices()])
+
+
+    if (!Array.isArray(currentPrices) || !Array.isArray(prices24hAgo)) {
+      console.error('Invalid response format from Gains API:', {
+        currentPrices: Array.isArray(currentPrices),
+        prices24hAgo: Array.isArray(prices24hAgo),
+        currentPricesLength: currentPrices?.length,
+        prices24hAgoLength: prices24hAgo?.length,
+      })
+      return new Map()
+    }
+
+    const pricesMap = new Map<string, GainsMarketPrice>()
+    const maxIndex = Math.max(
+      currentPrices.length > 0 ? currentPrices.length - 1 : 0,
+      prices24hAgo.length > 0 ? prices24hAgo.length - 1 : 0,
+    )
+
+    for (const [symbol, pairIndex] of Object.entries(GAINS_PAIR_INDEX_MAP)) {
+      if (pairIndex < 0 || pairIndex > maxIndex) {
+        console.warn(`Pair index ${pairIndex} for ${symbol} is out of bounds (max: ${maxIndex})`)
+        continue
+      }
+
+      const currentPrice = currentPrices[pairIndex] ?? null
+      const price24hAgo = prices24hAgo[pairIndex] ?? null
+
+      let change24h = 0
+      if (currentPrice !== null && price24hAgo !== null && price24hAgo > 0) {
+        change24h = ((currentPrice - price24hAgo) / price24hAgo) * 100
+      }
+
+      pricesMap.set(symbol, {
+        symbol,
+        price: currentPrice,
+        price24hAgo,
+        change24h,
+      })
+    }
+
+    return pricesMap
+  } catch (error) {
+    console.error('Failed to fetch all Gains market prices:', error)
+    return new Map()
   }
 }
 

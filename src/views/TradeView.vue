@@ -33,6 +33,9 @@ import PriceChart from '@/components/trade/PriceChart.vue'
 import TradingForm from '@/components/trade/TradingForm.vue'
 import PositionsAndOrders from '@/components/trade/PositionsAndOrders.vue'
 import MarketSelect from '@/components/trade/MarketSelect.vue'
+import { useAllGainsPrices } from '@/packages/gains/composables/useAllGainsPrices'
+
+useAllGainsPrices()
 
 const showMarketSelect = ref(false)
 </script>
