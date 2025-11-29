@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import TradeView from "@/views/TradeView.vue";
-import TcTestRemoveMeG from '@/views/TcTestRemoveMeG.vue'
-import TcTestRemoveMeCFourMeme from '@/views/TcTestRemoveMeCFourMeme.vue'
-import TcTestRemoveMeO from '@/views/TcTestRemoveMeO.vue'
+import TcTestRemoveMeCFourMeme from "@/views/TcTestRemoveMeCFourMeme.vue";
 
 export enum ROUTE_NAMES {
   Dashboard = 'dashboard',
@@ -76,21 +74,11 @@ const ROUTER_LIST: RouteRecordRaw[] = [
     component: TradeView,
   },
   {
-    path: '/tc-g',
-    name: "tc-g",
-    component: TcTestRemoveMeG,
-  },
-  {
-    path: '/tc-c',
+    path: "/tc-c",
     name: "tc-c",
     component: TcTestRemoveMeCFourMeme,
   },
-  {
-    path: '/tc-o',
-    name: "tc-o",
-    component: TcTestRemoveMeO,
-  },
-]
+];
 
 const router = createRouter({
     history: createWebHistory(),
