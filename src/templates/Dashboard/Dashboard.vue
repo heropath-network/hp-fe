@@ -4,43 +4,6 @@ import copyIcon from '@/assets/icons/copy.svg'
 import { ellipsisMiddle } from '@/utils/common'
 
 const { address, isConnected } = useConnection()
-
-const goalCards = [
-  {
-    title: 'Profit Target',
-    subtitleSegments: [],
-    rows: [
-      { label: 'Current Equity', value: '$0.00', valueClass: 'text-[var(--hp-white-color)]' },
-      { label: 'Target Equity', value: '$0.00', valueClass: 'text-[var(--hp-text-green)]' },
-    ],
-  },
-  {
-    title: 'Maximum Drawdown',
-    subtitleSegments: [
-      { text: 'High Water Mark: (', class: 'text-[var(--hp-text-color)]' },
-      { text: '$0.00', class: 'text-[var(--hp-white-color)]' },
-      { text: ')', class: 'text-[var(--hp-text-color)]' },
-    ],
-    rows: [
-      { label: 'Current Equity', value: '$0.00', valueClass: 'text-[var(--hp-white-color)]' },
-      { label: 'Equity Limit', value: '$0.00', valueClass: 'text-[var(--hp-text-red)]' },
-    ],
-  },
-  {
-    title: 'Maximum Daily Loss',
-    subtitleSegments: [
-      { text: 'Prior Day Balance: (', class: 'text-[var(--hp-text-color)]' },
-      { text: '$0.00', class: 'text-[var(--hp-white-color)]' },
-      { text: ' / ', class: 'text-[var(--hp-text-color)]' },
-      { text: '10:31:07', class: 'text-[var(--hp-white-color)]' },
-      { text: ')', class: 'text-[var(--hp-text-color)]' },
-    ],
-    rows: [
-      { label: 'Current Equity', value: '$0.00', valueClass: 'text-[var(--hp-white-color)]' },
-      { label: 'Equity Limit', value: '$0.00', valueClass: 'text-[var(--hp-text-red)]' },
-    ],
-  },
-]
 </script>
 
 <template>
@@ -135,81 +98,62 @@ const goalCards = [
     <div class="space-y-4">
       <div class="flex items-center justify-between">
         <p class="text-2xl font-semibold leading-[30px]">Goals Overview</p>
-        <div class="text-[var(--hp-white-color)]">
-          <svg class="h-6 w-6 rotate-180" fill="none" viewBox="0 0 16 16" stroke="currentColor">
-            <path d="M3.5 6 8 10.5 12.5 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </div>
       </div>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         <article class="flex h-full flex-col gap-6 bg-[var(--hp-bg-normal)] p-6">
           <div class="space-y-1">
-            <p class="text-xl font-semibold leading-7">{{ goalCards[0].title }}</p>
-            <p v-if="goalCards[0].subtitleSegments && goalCards[0].subtitleSegments.length" class="text-sm leading-5">
-              <span
-                v-for="(segment, index) in goalCards[0].subtitleSegments"
-                :key="`${goalCards[0].title}-${index}-${segment.text}`"
-                :class="segment.class"
-              >
-                {{ segment.text }}
-              </span>
-            </p>
+            <p class="text-xl font-semibold leading-7">Profit Target</p>
+            <p class="text-sm leading-5 text-[var(--hp-text-color)] mt-1">&nbsp;</p>
           </div>
           <div class="flex flex-col gap-4 bg-[var(--hp-bg-light)] p-4">
-            <div v-for="(row, index) in goalCards[0].rows" :key="row.label" class="space-y-1">
-              <p class="text-xl font-semibold leading-7" :class="row.valueClass">
-                {{ row.value }}
-              </p>
-              <p class="text-sm leading-5 text-[var(--hp-text-color)]">{{ row.label }}</p>
-              <div v-if="index === 0" class="mt-2 h-px w-full bg-[#373737]" />
+            <div class="space-y-1">
+              <p class="text-xl font-semibold leading-7">$0.00</p>
+              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Current Equity</p>
+              <div class="!mt-4 h-px w-full bg-[var(--hp-line-light-color)]" />
+            </div>
+            <div class="space-y-1">
+              <p class="text-xl font-semibold leading-7 text-[var(--hp-text-green)]">$0.00</p>
+              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Total Equity</p>
             </div>
           </div>
         </article>
 
         <article class="flex h-full flex-col gap-6 bg-[var(--hp-bg-normal)] p-6">
           <div class="space-y-1">
-            <p class="text-xl font-semibold leading-7">{{ goalCards[1].title }}</p>
-            <p v-if="goalCards[1].subtitleSegments && goalCards[1].subtitleSegments.length" class="text-sm leading-5">
-              <span
-                v-for="(segment, index) in goalCards[1].subtitleSegments"
-                :key="`${goalCards[1].title}-${index}-${segment.text}`"
-                :class="segment.class"
-              >
-                {{ segment.text }}
-              </span>
+            <p class="text-xl font-semibold leading-7">Maximum Drawdown</p>
+            <p class="text-sm leading-5 text-[var(--hp-text-color)] mt-1">
+              High Water Mark: (<span class="text-[var(--hp-white-color)]">$0.00</span>)
             </p>
           </div>
           <div class="flex flex-col gap-4 bg-[var(--hp-bg-light)] p-4">
-            <div v-for="(row, index) in goalCards[1].rows" :key="row.label" class="space-y-1">
-              <p class="text-xl font-semibold leading-7" :class="row.valueClass">
-                {{ row.value }}
-              </p>
-              <p class="text-sm leading-5 text-[var(--hp-text-color)]">{{ row.label }}</p>
-              <div v-if="index === 0" class="mt-2 h-px w-full bg-[#373737]" />
+            <div class="space-y-1">
+              <p class="text-xl font-semibold leading-7">$0.00</p>
+              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Current Equity</p>
+              <div class="!mt-4 h-px w-full bg-[var(--hp-line-light-color)]" />
+            </div>
+            <div class="space-y-1">
+              <p class="text-xl font-semibold leading-7 text-[var(--hp-text-red)]">$0.00</p>
+              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Equity Limit</p>
             </div>
           </div>
         </article>
 
         <article class="flex h-full flex-col gap-6 bg-[var(--hp-bg-normal)] p-6">
           <div class="space-y-1">
-            <p class="text-xl font-semibold leading-7">{{ goalCards[2].title }}</p>
-            <p v-if="goalCards[2].subtitleSegments && goalCards[2].subtitleSegments.length" class="text-sm leading-5">
-              <span
-                v-for="(segment, index) in goalCards[2].subtitleSegments"
-                :key="`${goalCards[2].title}-${index}-${segment.text}`"
-                :class="segment.class"
-              >
-                {{ segment.text }}
-              </span>
+            <p class="text-xl font-semibold leading-7">Maximum Daily Loss</p>
+            <p class="text-sm leading-5 text-[var(--hp-text-color)] mt-1">
+              Prior Day Balance (<span class="text-[var(--hp-white-color)]">$0.00</span>)/10:31:07
             </p>
           </div>
           <div class="flex flex-col gap-4 bg-[var(--hp-bg-light)] p-4">
-            <div v-for="(row, index) in goalCards[2].rows" :key="row.label" class="space-y-1">
-              <p class="text-xl font-semibold leading-7" :class="row.valueClass">
-                {{ row.value }}
-              </p>
-              <p class="text-sm leading-5 text-[var(--hp-text-color)]">{{ row.label }}</p>
-              <div v-if="index === 0" class="mt-2 h-px w-full bg-[#373737]" />
+            <div class="space-y-1">
+              <p class="text-xl font-semibold leading-7">$0.00</p>
+              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Current Equity</p>
+              <div class="!mt-4 h-px w-full bg-[var(--hp-line-light-color)]" />
+            </div>
+            <div class="space-y-1">
+              <p class="text-xl font-semibold leading-7 text-[var(--hp-text-red)]">$0.00</p>
+              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Equity Limit</p>
             </div>
           </div>
         </article>
