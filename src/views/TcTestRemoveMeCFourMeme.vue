@@ -65,36 +65,26 @@
       <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
         <div class="rounded-lg border border-gray-800 bg-gray-900 p-4">
           <div class="mb-2 flex items-center justify-between">
-            <div class="text-sm text-gray-400">
-              API Price
-              <span v-if="tokenPhase" class="ml-1 text-xs text-gray-500">
-                (Phase {{ tokenPhase }}: {{ tokenPhase === 1 ? 'BNB' : 'USD' }})
-              </span>
-            </div>
+            <div class="text-sm text-gray-400">Price (USD)</div>
           </div>
           <div class="text-2xl font-bold text-white">
-            {{ latestPrice ? (tokenPhase === 1 ? `${latestPrice} BNB` : `$${latestPrice}`) : 'Loading...' }}
+            {{ latestPriceUsd ? `$${latestPriceUsd}` : 'Loading...' }}
           </div>
         </div>
 
         <div class="rounded-lg border border-gray-800 bg-gray-900 p-4">
           <div class="mb-2 flex items-center justify-between">
-            <div class="text-sm text-gray-400">
-              Converted Price
-              <span v-if="tokenPhase" class="ml-1 text-xs text-gray-500">
-                ({{ tokenPhase === 1 ? 'USD' : 'BNB' }})
-              </span>
-            </div>
+            <div class="text-sm text-gray-400">Price (BNB)</div>
           </div>
           <div class="text-2xl font-bold text-gray-300">
-            {{ convertedPrice || 'Loading...' }}
+            {{ latestPriceBnb ? `${latestPriceBnb} BNB` : 'Loading...' }}
           </div>
         </div>
       </div>
 
       <!-- chart -->
       <div class="mb-6 rounded-lg border border-gray-800 bg-gray-900 p-4">
-        <h2 class="mb-4 text-xl font-semibold text-white">Price Chart (TradingView)</h2>
+        <h2 class="mb-4 text-xl font-semibold text-white">Price Chart (BNB)</h2>
         <div id="tv_chart_container" class="h-96"></div>
       </div>
 
@@ -179,8 +169,9 @@ interface DebugLog {
 const config = ref<Config | null>(null)
 const markets = ref<Market[]>([])
 const selectedMarketId = ref<string>('')
-const latestPrice = ref<string>('')
-const bnbPrice = ref<string>('')
+const latestPriceBnb = ref<string>('') // Always in BNB
+const latestPriceUsd = ref<string>('') // Always in USD
+const bnbPrice = ref<string>('') // BNB/USD rate
 const tokenPhase = ref<number>(0) // 1 = Bonding Curve (BNB), 2 = PancakeSwap (USD)
 const tokenStatus = ref<string>('')
 const tokenProgress = ref<string>('')
@@ -190,23 +181,6 @@ const debugLogs = ref<DebugLog[]>([])
 
 const selectedMarket = computed(() => {
   return markets.value.find(m => m.id === selectedMarketId.value)
-})
-
-const convertedPrice = computed(() => {
-  if (!latestPrice.value || !bnbPrice.value) return null
-
-  const price = parseFloat(latestPrice.value)
-  const bnbUsd = parseFloat(bnbPrice.value)
-
-  if (tokenPhase.value === 1) {
-    // Phase 1: API returns BNB, convert to USD
-    return `$${(price * bnbUsd).toFixed(10)}`
-  } else if (tokenPhase.value === 2) {
-    // Phase 2: API returns USD, convert to BNB
-    return `${(price / bnbUsd).toFixed(18)} BNB`
-  }
-
-  return null
 })
 
 let ws: WebSocket | null = null
@@ -256,13 +230,17 @@ async function loadMarketsConfig() {
     const configModule = await import('./TcTestRemoveMeC-config.json')
     config.value = configModule.default
     markets.value = config.value.markets || []
+    addLog(`Loaded ${markets.value.length} markets from config`, 'success')
+
+    // Fetch BNB price FIRST before loading token data
+    await fetchBnbPrice()
+
+    // Now set the selected market (this will trigger fetchLatestPrice via watch)
     if (markets.value.length > 0) {
       selectedMarketId.value = markets.value[0].id
     }
-    addLog(`Loaded ${markets.value.length} markets from config`, 'success')
-    // fetch BNB price
-    fetchBnbPrice()
-    // initialize TradingView after config is loaded
+
+    // Initialize TradingView after config is loaded
     initTradingView()
   } catch (error) {
     addLog(`Failed to load markets config: ${error}`, 'error')
@@ -316,7 +294,7 @@ async function fetchLatestPrice() {
     const data = await response.json()
     if (data.code === 0 && data.data) {
       const tokenData: TokenData = data.data
-      latestPrice.value = parseFloat(tokenData.tokenPrice.price).toFixed(10)
+      const apiPrice = parseFloat(tokenData.tokenPrice.price)
 
       // Detect token phase
       tokenStatus.value = tokenData.status || ''
@@ -325,17 +303,31 @@ async function fetchLatestPrice() {
 
       // Phase 1: Bonding curve (API returns BNB)
       // Phase 2: PancakeSwap mature token (API returns USD)
-      // Logic: status=PUBLISH and progress=0 means just migrated (still BNB)
-      //        dexType=PANCAKE_SWAP and progress>0 means mature (USD)
       if (tokenStatus.value === 'PUBLISH' && parseFloat(tokenProgress.value) === 0) {
         tokenPhase.value = 1 // New token, API returns BNB
-        addLog(`Phase 1 (Bonding Curve): Price ${latestPrice.value} BNB`, 'success')
       } else if (dexType === 'PANCAKE_SWAP') {
         tokenPhase.value = 2 // Mature token, API returns USD
-        addLog(`Phase 2 (PancakeSwap): Price $${latestPrice.value}`, 'success')
       } else {
         tokenPhase.value = 1 // Default to phase 1
-        addLog(`Phase 1 (Bonding Curve): Price ${latestPrice.value} BNB`, 'info')
+      }
+
+      // Set prices based on phase
+      if (!bnbPrice.value) {
+        addLog('Error: BNB price not available yet', 'error')
+        return
+      }
+
+      const bnbUsd = parseFloat(bnbPrice.value)
+      if (tokenPhase.value === 1) {
+        // Phase 1: API returns BNB
+        latestPriceBnb.value = apiPrice.toFixed(18)
+        latestPriceUsd.value = (apiPrice * bnbUsd).toFixed(10)
+        addLog(`Phase 1: ${latestPriceBnb.value} BNB = $${latestPriceUsd.value}`, 'success')
+      } else {
+        // Phase 2: API returns USD
+        latestPriceUsd.value = apiPrice.toFixed(10)
+        latestPriceBnb.value = (apiPrice / bnbUsd).toFixed(18)
+        addLog(`Phase 2: $${latestPriceUsd.value} = ${latestPriceBnb.value} BNB`, 'success')
       }
 
       updateCount.value++
@@ -345,6 +337,32 @@ async function fetchLatestPrice() {
   } catch (error) {
     addLog(`Failed to fetch price: ${error}`, 'error')
   }
+}
+
+async function decompressGzip(data: Uint8Array): Promise<Uint8Array> {
+  const ds = new DecompressionStream('gzip')
+  const writer = ds.writable.getWriter()
+  writer.write(data)
+  writer.close()
+
+  const chunks: Uint8Array[] = []
+  const reader = ds.readable.getReader()
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    chunks.push(value)
+  }
+
+  const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0)
+  const result = new Uint8Array(totalLength)
+  let offset = 0
+  for (const chunk of chunks) {
+    result.set(chunk, offset)
+    offset += chunk.length
+  }
+
+  return result
 }
 
 function connectWebSocket() {
@@ -360,28 +378,72 @@ function connectWebSocket() {
     ws.onopen = () => {
       addLog('WebSocket connected', 'success')
       wsConnected.value = true
-      // disable binary mode
-      ws?.send(JSON.stringify({ method: 'BINARY', params: 'false' }))
-      addLog('Sent: BINARY=false', 'info')
-      // subscribe to price events
-      ws?.send(JSON.stringify({ method: 'SUBSCRIBE', params: '@TOKEN_PRICE_EVENT@0' }))
-      addLog('Sent: SUBSCRIBE @TOKEN_PRICE_EVENT@0', 'info')
+      // enable binary mode (gzip compressed)
+      ws?.send(JSON.stringify({ method: 'BINARY', params: 'true' }))
+      addLog('Sent: BINARY=true', 'info')
       // subscribe to ticker events
       ws?.send(JSON.stringify({ method: 'SUBSCRIBE', params: '@TICKER_EVENT' }))
       addLog('Sent: SUBSCRIBE @TICKER_EVENT', 'info')
+      // subscribe to specific token events
+      ws?.send(JSON.stringify({ method: 'SUBSCRIBE', params: `${market.tokenId}@TOKEN_EVENT@0` }))
+      addLog(`Sent: SUBSCRIBE ${market.tokenId}@TOKEN_EVENT@0`, 'info')
+      // subscribe to price events
+      ws?.send(JSON.stringify({ method: 'SUBSCRIBE', params: '@TOKEN_PRICE_EVENT@0' }))
+      addLog('Sent: SUBSCRIBE @TOKEN_PRICE_EVENT@0', 'info')
     }
-    ws.onmessage = (event) => {
+    ws.onmessage = async (event) => {
       try {
-        const msg: WsMessage = JSON.parse(event.data)
-        // only log price events for our token, filter out noise
+        let msg: any
+
+        // Handle binary (gzip compressed) messages
+        if (event.data instanceof Blob) {
+          const arrayBuffer = await event.data.arrayBuffer()
+          const decompressed = await decompressGzip(new Uint8Array(arrayBuffer))
+          msg = JSON.parse(new TextDecoder().decode(decompressed))
+        } else {
+          // Handle text messages
+          msg = JSON.parse(event.data)
+        }
+
+        // Log all received messages
+        if (msg.event === '@TICKER_EVENT' && msg.data?.symbol) {
+          addLog(`WS Ticker: ${msg.data.symbol} = ${msg.data.price}`, 'info')
+        } else if (msg.event === '@TOKEN_PRICE_EVENT@0' && msg.data?.tokenId) {
+          const isCurrentToken = msg.data.tokenId === market.tokenId
+          addLog(`WS Token ${msg.data.tokenId}${isCurrentToken ? ' ★' : ''}: ${msg.data.price}`, isCurrentToken ? 'success' : 'info')
+        } else if (msg.event === `${market.tokenId}@TOKEN_EVENT@0`) {
+          addLog(`WS TokenEvent: ${JSON.stringify(msg.data).slice(0, 40)}`, 'info')
+        } else if (msg.event) {
+          addLog(`WS: ${msg.event}`, 'info')
+        }
+
+        // Handle ticker events (BNB/USD rate updates)
+        if (msg.event === '@TICKER_EVENT' && msg.data?.symbol === 'BNBUSDT') {
+          const newBnbPrice = parseFloat(msg.data.price)
+          bnbPrice.value = newBnbPrice.toFixed(2)
+
+          // Recalculate USD price if we have BNB price
+          if (latestPriceBnb.value) {
+            latestPriceUsd.value = (parseFloat(latestPriceBnb.value) * newBnbPrice).toFixed(10)
+          }
+        }
+
+        // Handle price events for our token
         if (msg.event === '@TOKEN_PRICE_EVENT@0' && msg.data?.tokenId === market.tokenId) {
-          const price = parseFloat(msg.data.price).toFixed(10)
-          latestPrice.value = price
-          addLog(`WS price update: $${price} (${msg.data.dayIncrease > '0' ? '+' : ''}${(parseFloat(msg.data.dayIncrease) * 100).toFixed(2)}%)`, 'success')
+          const wsPriceBnb = parseFloat(msg.data.price)
+
+          // WebSocket ALWAYS returns BNB prices
+          latestPriceBnb.value = wsPriceBnb.toFixed(18)
+
+          // Calculate USD price
+          if (bnbPrice.value) {
+            latestPriceUsd.value = (wsPriceBnb * parseFloat(bnbPrice.value)).toFixed(10)
+          }
+
           updateCount.value++
         }
       } catch (error) {
-        addLog(`WS message parse error: ${error}`, 'error')
+        addLog(`WS message error: ${error}`, 'error')
       }
     }
     ws.onerror = (error) => {
