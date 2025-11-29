@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import {
   TransitionRoot,
   TransitionChild,
@@ -27,26 +27,36 @@ defineSlots<{
   default?: () => any;
 }>();
 
-const _isOpen = ref(props.show);
+const visible = ref(props.show);
 
-const isOpen = computed({
+const currentVisible = computed({
   get() {
-    return _isOpen.value;
+    return visible.value;
   },
   set(value: boolean) {
-    _isOpen.value = value;
+    visible.value = value;
   },
 });
 
 function closeModal() {
-  isOpen.value = false;
+  currentVisible.value = false;
   emit("close");
 }
+
+watch(
+  () => props.show,
+  (newVal) => {
+    visible.value = newVal;
+    if (!visible.value) {
+      closeModal();
+    }
+  }
+);
 </script>
 
 <template>
-  <TransitionRoot appear :show="isOpen" as="template">
-    <Dialog as="div" @close="closeModal" class="relative z-[999]">
+  <TransitionRoot appear :show="currentVisible" as="template">
+    <Dialog as="div" @close="closeModal" class="relative z-[99]">
       <TransitionChild
         as="template"
         enter="duration-300 ease-out"
@@ -87,7 +97,7 @@ function closeModal() {
                   </span>
                   <span
                     class="icon-mask !bg-[var(--hp-white-color)] cursor-pointer hover:!bg-[var(--hp-text-color)] h-[14px] w-[14px]"
-                    @click="isOpen = false"
+                    @click="currentVisible = false"
                     :style="{
                       '--icon-url': `url(${CloseIcon})`,
                     }"
