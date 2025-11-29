@@ -131,7 +131,14 @@
                       <span class="text-sm leading-5 text-gray-400">{{ getMarketName(market) }}</span>
                     </div>
                   </div>
-                  <div class="flex flex-col items-end">
+                  <div class="flex flex-col items-end gap-1">
+                    <span
+                      v-if="marketPrices[market]"
+                      class="text-base leading-6 font-semibold text-white"
+                    >
+                      {{ formatPrice(marketPrices[market].price) }}
+                    </span>
+                    <span v-else class="text-base leading-6 font-semibold text-gray-400">--</span>
                     <span
                       v-if="marketPrices[market]"
                       :class="[
@@ -258,6 +265,29 @@ function selectMarket(market: string) {
 
 function clearSearch() {
   searchQuery.value = ''
+}
+
+function formatPrice(price: bigint): string {
+  if (!price || price === BigInt(0)) return '--'
+  
+  const priceNumber = Number(price) / (10 ** 18)
+  
+  if (priceNumber >= 1000) {
+    return priceNumber.toLocaleString('en-US', { 
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2
+    })
+  } else if (priceNumber >= 1) {
+    return priceNumber.toLocaleString('en-US', { 
+      maximumFractionDigits: 4,
+      minimumFractionDigits: 2
+    })
+  } else {
+    return priceNumber.toLocaleString('en-US', { 
+      maximumFractionDigits: 6,
+      minimumFractionDigits: 2
+    })
+  }
 }
 
 watch(() => props.show, (newValue) => {
