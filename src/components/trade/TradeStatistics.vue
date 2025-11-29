@@ -19,9 +19,15 @@
         <div class="text-xs text-gray-400">Mark Price</div>
         <div class="flex items-baseline gap-2">
           <div
-            v-if="isLoadingMarkPrice"
+            v-if="isLoadingMarkPrice && !isMarketClosed"
             class="h-7 w-24 animate-pulse rounded bg-gray-700"
           ></div>
+          <span
+            v-else-if="isMarketClosed"
+            class="text-xl font-semibold text-gray-400"
+          >
+            Closed
+          </span>
           <span
             v-else
             class="text-xl font-semibold text-white"
@@ -29,7 +35,7 @@
             ${{ formattedPrice }}
           </span>
           <span
-            v-if="!isLoadingPriceChange && !isLoadingMarkPrice"
+            v-if="!isMarketClosed && !isLoadingPriceChange && !isLoadingMarkPrice"
             :class="[
               'text-sm font-medium',
               priceChange24h >= 0 ? 'text-green-500' : 'text-red-500'
@@ -38,7 +44,7 @@
             {{ priceChange24h >= 0 ? '+' : '' }}{{ priceChange24h.toFixed(2) }}%
           </span>
           <div
-            v-else-if="isLoadingPriceChange"
+            v-else-if="!isMarketClosed && isLoadingPriceChange"
             class="h-4 w-12 animate-pulse rounded bg-gray-700"
           ></div>
         </div>
@@ -92,11 +98,14 @@ import { useTradeStore } from '@/stores/tradeStore'
 import { formatPrice } from '@/utils/bigint'
 import { useMarketPrice24hRate } from '@/composables/useMarketPrice24h'
 import { usePrice24hHighLow } from '@/composables/usePrice24hHighLow'
+import { useMarketStatus } from '@/composables/useMarketStatus'
 import OracleSelect from './OracleSelect.vue'
 
 const tradeStore = useTradeStore()
+const marketStatus = useMarketStatus()
 
 const selectedMarket = computed(() => tradeStore.selectedMarket)
+const isMarketClosed = computed(() => marketStatus.checkMarketClosed(selectedMarket.value))
 const oracleSources = computed(() => tradeStore.oracleSources)
 
 const selectedOracleName = computed(() => tradeStore.currentOracleName)
