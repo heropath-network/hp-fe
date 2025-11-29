@@ -77,17 +77,12 @@
       </div>
     </div>
 
-    <div class="flex items-center gap-3">
-      <div class="text-xs text-gray-400">Chart Source</div>
-      <select
-        v-model="selectedOracleName"
-        class="rounded-lg border border-gray-800 bg-gray-900 px-3 py-1.5 text-sm text-white transition hover:border-gray-700 focus:border-blue-500 focus:outline-none"
-      >
-        <option v-for="oracle in oracleSources" :key="oracle" :value="oracle">
-          {{ oracle }}
-        </option>
-      </select>
-    </div>
+    <OracleSelect
+      :options="allOracleOptions"
+      :selected-value="selectedOracleName"
+      label="Chart Source"
+      @select="handleOracleSelect"
+    />
   </div>
 </template>
 
@@ -97,16 +92,28 @@ import { useTradeStore } from '@/stores/tradeStore'
 import { formatPrice } from '@/utils/bigint'
 import { useMarketPrice24hRate } from '@/composables/useMarketPrice24h'
 import { usePrice24hHighLow } from '@/composables/usePrice24hHighLow'
+import OracleSelect from './OracleSelect.vue'
 
 const tradeStore = useTradeStore()
 
 const selectedMarket = computed(() => tradeStore.selectedMarket)
 const oracleSources = computed(() => tradeStore.oracleSources)
 
-const selectedOracleName = computed({
-  get: () => tradeStore.currentOracleName,
-  set: (value) => { tradeStore.setOracleByName(value) }
+const selectedOracleName = computed(() => tradeStore.currentOracleName)
+
+const allOracleOptions = computed(() => {
+  return oracleSources.value.map(oracle => {
+    return {
+      label: oracle,
+      value: oracle,
+      disabled: false
+    }
+  })
 })
+
+function handleOracleSelect(value: string) {
+  tradeStore.setOracleByName(value)
+}
 
 const selectedOracleId = computed(() => tradeStore.selectedOracle)
 

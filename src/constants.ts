@@ -11,6 +11,6 @@ export enum ProjectId {
 // Oracle Display Names
 export const ORACLE_NAMES: Record<ProjectId, string> = {
   [ProjectId.NULL_PROJECT]: 'Unknown',
-  [ProjectId.GAINS]: 'GTrade',
-  [ProjectId.MUX_V3]: 'Asterdex',
+  [ProjectId.GAINS]: 'gTrade',
+  [ProjectId.MUX_V3]: 'Aster',
 }
