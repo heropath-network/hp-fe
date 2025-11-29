@@ -14,6 +14,7 @@ export enum ROUTE_NAMES {
   TradingEducation = 'trading-education',
   Leaderboard = 'leaderboard',
   Ecosystem = 'ecosystem',
+  Trade = "trade",
 }
 
 const ROUTER_LIST: RouteRecordRaw[] = [
@@ -70,23 +71,23 @@ const ROUTER_LIST: RouteRecordRaw[] = [
     component: () => import('@/templates/Ecosystem/Ecosystem.vue'),
   },
   {
-    path: "/trade",
-    name: "trade",
+    path: '/trade',
+    name: ROUTE_NAMES.Trade,
     component: TradeView,
   },
   {
     path: '/tc-g',
-    name: 'tc-g',
+    name: "tc-g",
     component: TcTestRemoveMeG,
   },
   {
     path: '/tc-c',
-    name: 'tc-c',
+    name: "tc-c",
     component: TcTestRemoveMeCFourMeme,
   },
   {
     path: '/tc-o',
-    name: 'tc-o',
+    name: "tc-o",
     component: TcTestRemoveMeO,
   },
 ]

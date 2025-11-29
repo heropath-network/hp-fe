@@ -94,9 +94,15 @@ function initializeActiveItem() {
   }
 }
 
-tryOnBeforeMount(() => {
-  initializeActiveItem()
-})
+watch(
+    () => route.name,
+    (routeName) => {
+      if (routeName && routeName !== ROUTE_NAMES.Trade) {
+        initializeActiveItem();
+      }
+    },
+    { immediate: true }
+);
 </script>
 
 <template>
