@@ -133,14 +133,26 @@
                   </div>
                   <div class="flex flex-col items-end gap-1">
                     <span
-                      v-if="marketPrices[market]"
+                      v-if="isMarketClosed(market)"
+                      class="text-base leading-6 font-semibold text-gray-400"
+                    >
+                      Closed
+                    </span>
+                    <span
+                      v-else-if="marketPrices[market]"
                       class="text-base leading-6 font-semibold text-white"
                     >
                       {{ formatPrice(marketPrices[market].price) }}
                     </span>
                     <span v-else class="text-base leading-6 font-semibold text-gray-400">--</span>
                     <span
-                      v-if="marketPrices[market]"
+                      v-if="isMarketClosed(market)"
+                      class="text-sm leading-5 font-medium text-gray-400"
+                    >
+                      --
+                    </span>
+                    <span
+                      v-else-if="marketPrices[market]"
                       :class="[
                         'text-sm leading-5 font-medium',
                         marketPrices[market].change24h >= 0 ? 'text-green-500' : 'text-red-500'
@@ -175,6 +187,7 @@ import {
 import MarketIcon from '@/components/common/MarketIcon.vue'
 import { isFavorite, toggleFavorite } from '@/utils/favorites'
 import { getMarketName } from '@/utils/marketNames'
+import { useMarketStatus } from '@/composables/useMarketStatus'
 
 interface Props {
   show: boolean
@@ -186,6 +199,7 @@ const emit = defineEmits<{
 }>()
 
 const tradeStore = useTradeStore()
+const marketStatus = useMarketStatus()
 
 type CategoryType = 'All' | 'Perps' | 'Meme' | 'Forex' | 'Stocks'
 
@@ -194,6 +208,10 @@ const selectedCategory = ref<CategoryType>('All')
 
 const selectedMarket = computed(() => tradeStore.selectedMarket)
 const marketPrices = computed(() => tradeStore.marketPrices)
+
+function isMarketClosed(market: string): boolean {
+  return marketStatus.checkMarketClosed(market)
+}
 
 const availableMarkets = computed(() => [...AVAILABLE_MARKETS])
 
