@@ -10,25 +10,55 @@ curl http://heropath.local
 
 ### About four.meme
 
-A spot market that deploys ERC20 tokens on BSC with constant totalSupply. Tokens trade on the platform and then transfer to PancakeSwap after certain conditions. We shall choose the tokens after pancake stage.
+A spot market that deploys ERC20 tokens on BSC with constant totalSupply. There are 2 phases:
 
-CAUTION: prevent negated position in paper trading simulator.
+- Bonding Curve phase: Trade on four.meme platform, prices in BNB, wallet transfers restricted
+- Graduation phase (≥18 BNB raised): Pool migrates to PancakeSwap. Trade on PancakeSwap only. API price unit transitions from BNB to USD as token matures
+
+Note that:
+
+- prevent negated position in paper trading simulator.
 
 #### API Endpoints
 
-Token markets are hardcoded in `src/views/TcTestRemoveMeC-config.json`. But you can check API as a start point.
+Token markets are hardcoded in `src/views/TcTestRemoveMeC-config.json`.
 
 **REST APIs:**
 
-- Token List (PancakeSwap listed tokens): https://four.meme/meme-api/v1/private/token/query?orderBy=BnTimeDesc&queryMode=Binance&tokenName=&listedPancake=true&pageIndex=1&pageSize=30&symbol=&labels=
+- Token List (phase 2): https://four.meme/meme-api/v1/private/token/query?orderBy=BnTimeDesc&queryMode=Binance&tokenName=&listedPancake=true&pageIndex=1&pageSize=30&symbol=&labels=
+- Token List (phase 1): ...listedPancake=false...
 - Token Details by Address: https://four.meme/meme-api/v1/private/token/get?address={tokenAddress}
 
 Response includes `tokenPrice` object with:
 
-- `price`: current price in USD
+- `price`: current price (unit varies by token maturity - see below)
 - `maxPrice`: all-time high price
 - `increase`: price change percentage
 - `marketCap`: market capitalization
+
+Price unit behavior
+
+| Token Type                       | Four.meme API Unit | K-line API Unit |
+| -------------------------------- | ------------------ | --------------- |
+| Mature tokens (ALIF, RIP GIGGLE) | USD                | BNB             |
+| New tokens                       | BNB                | BNB             |
+
+TradingView chart always displays BNB prices correctly for all tokens
+
+**Ticker API (Get BNB/USD and other exchange rates):**
+
+- Endpoint: `POST https://four.meme/meme-api/v1/public/ticker`
+- Request body: `{}`
+- Returns array of trading pairs with USD prices
+- Example response:
+  ```json
+  [
+    {"symbol": "BNBUSDT", "price": "880.65"},
+    {"symbol": "CAKEUSDT", "price": "2.373"},
+    ...
+  ]
+  ```
+- Use `BNBUSDT` to convert BNB prices to USD
 
 **WebSocket:**
 
@@ -76,35 +106,5 @@ Response includes `tokenPrice` object with:
   }
   ```
 - Available bar types: MIN1, MIN5, MIN15, HOUR1, HOUR4, DAY1
-- Response includes OHLCV data
-
-#### Test Pages
-
-**`/tc-test-c` - Four.meme Market Test Page**
-
-Features:
-
-- Market selector (7 PancakeSwap-listed tokens)
-- Real-time price updates via WebSocket
-- WebSocket connection status indicator
-- Update counter
-- Debug log panel with filtered events
-- TradingView Charting Library integration with historical data
-
-Implementation:
-
-- Token config: `src/views/TcTestRemoveMeC-config.json`
-- Each token requires: `id`, `tokenId`, `symbol`, `name`, `address`
-- `tokenId` obtained from API response `id` field
-- WebSocket filters messages by `tokenId` for selected market
-- Price displayed with 10 decimal precision
-- Shows 24h change percentage in logs
-- Auto-reconnects when switching markets
-
-TradingView Integration:
-
-- Datafeed implementation: `src/views/TcTestRemoveMeC-datafeed.ts`
-- Supported timeframes: 1m, 5m, 15m, 1h, 4h, 1D
-- Chart updates automatically when switching markets
-- Dark theme, auto-sizing
-- Charting library: `public/charting_library` → `vendor/charting_library/charting_library` (symlink)
+- Response includes OHLCV data in BNB price
+- For tokens with `dexType: "PANCAKE_SWAP"`, this API returns PancakeSwap market prices (quote = BNB)

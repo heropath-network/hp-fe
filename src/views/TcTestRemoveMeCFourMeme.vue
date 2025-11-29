@@ -11,17 +11,38 @@
           class="w-full rounded-md border border-gray-700 bg-gray-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
         >
           <option v-for="market in markets" :key="market.id" :value="market.id">
-            {{ market.symbol }} - {{ market.name }}
+            {{ market.symbol }}/BNB
           </option>
         </select>
+        <a
+          v-if="selectedMarket"
+          :href="`https://four.meme/token/${selectedMarket.address}`"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-3 inline-flex items-center text-sm text-blue-400 hover:text-blue-300"
+        >
+          View on four.meme →
+        </a>
       </div>
 
       <!-- current price display -->
-      <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div class="rounded-lg border border-gray-800 bg-gray-900 p-4">
-          <div class="text-sm text-gray-400">Latest Price</div>
-          <div class="mt-2 text-2xl font-bold text-white">
-            {{ latestPrice ? `$${latestPrice}` : 'Loading...' }}
+          <div class="text-sm text-gray-400">BNB/USD Rate</div>
+          <div class="mt-2 text-2xl font-bold text-yellow-500">
+            {{ bnbPrice ? `$${bnbPrice}` : 'Loading...' }}
+          </div>
+        </div>
+
+        <div class="rounded-lg border border-gray-800 bg-gray-900 p-4">
+          <div class="text-sm text-gray-400">
+            Token Phase
+            <span v-if="tokenPhase" class="ml-1 text-xs">
+              ({{ tokenPhase === 1 ? 'Bonding Curve' : 'PancakeSwap' }})
+            </span>
+          </div>
+          <div class="mt-2 text-2xl font-bold" :class="tokenPhase === 1 ? 'text-blue-500' : 'text-green-500'">
+            {{ tokenPhase ? `Phase ${tokenPhase}` : 'Loading...' }}
           </div>
         </div>
 
@@ -36,6 +57,37 @@
           <div class="text-sm text-gray-400">Updates Received</div>
           <div class="mt-2 text-2xl font-bold text-white">
             {{ updateCount }}
+          </div>
+        </div>
+      </div>
+
+      <!-- price details -->
+      <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div class="rounded-lg border border-gray-800 bg-gray-900 p-4">
+          <div class="mb-2 flex items-center justify-between">
+            <div class="text-sm text-gray-400">
+              API Price
+              <span v-if="tokenPhase" class="ml-1 text-xs text-gray-500">
+                (Phase {{ tokenPhase }}: {{ tokenPhase === 1 ? 'BNB' : 'USD' }})
+              </span>
+            </div>
+          </div>
+          <div class="text-2xl font-bold text-white">
+            {{ latestPrice ? (tokenPhase === 1 ? `${latestPrice} BNB` : `$${latestPrice}`) : 'Loading...' }}
+          </div>
+        </div>
+
+        <div class="rounded-lg border border-gray-800 bg-gray-900 p-4">
+          <div class="mb-2 flex items-center justify-between">
+            <div class="text-sm text-gray-400">
+              Converted Price
+              <span v-if="tokenPhase" class="ml-1 text-xs text-gray-500">
+                ({{ tokenPhase === 1 ? 'USD' : 'BNB' }})
+              </span>
+            </div>
+          </div>
+          <div class="text-2xl font-bold text-gray-300">
+            {{ convertedPrice || 'Loading...' }}
           </div>
         </div>
       </div>
@@ -102,6 +154,7 @@ interface TokenPrice {
   maxPrice: string
   increase: string
   marketCap: string
+  progress?: string
 }
 
 interface TokenData {
@@ -113,6 +166,8 @@ interface TokenData {
   trading: string
   dayIncrease: string
   tradingUsd: string
+  status?: string
+  dexType?: string
 }
 
 interface DebugLog {
@@ -125,9 +180,34 @@ const config = ref<Config | null>(null)
 const markets = ref<Market[]>([])
 const selectedMarketId = ref<string>('')
 const latestPrice = ref<string>('')
+const bnbPrice = ref<string>('')
+const tokenPhase = ref<number>(0) // 1 = Bonding Curve (BNB), 2 = PancakeSwap (USD)
+const tokenStatus = ref<string>('')
+const tokenProgress = ref<string>('')
 const wsConnected = ref(false)
 const updateCount = ref(0)
 const debugLogs = ref<DebugLog[]>([])
+
+const selectedMarket = computed(() => {
+  return markets.value.find(m => m.id === selectedMarketId.value)
+})
+
+const convertedPrice = computed(() => {
+  if (!latestPrice.value || !bnbPrice.value) return null
+
+  const price = parseFloat(latestPrice.value)
+  const bnbUsd = parseFloat(bnbPrice.value)
+
+  if (tokenPhase.value === 1) {
+    // Phase 1: API returns BNB, convert to USD
+    return `$${(price * bnbUsd).toFixed(10)}`
+  } else if (tokenPhase.value === 2) {
+    // Phase 2: API returns USD, convert to BNB
+    return `${(price / bnbUsd).toFixed(18)} BNB`
+  }
+
+  return null
+})
 
 let ws: WebSocket | null = null
 let priceUpdateInterval: number | null = null
@@ -142,6 +222,35 @@ function addLog(message: string, type: 'info' | 'success' | 'error' = 'info') {
   }
 }
 
+async function fetchBnbPrice() {
+  if (!config.value) return
+
+  try {
+    addLog('Fetching BNB/USD price...', 'info')
+    const url = `${config.value.apiBaseUrl}/public/ticker`
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}'
+    })
+    const data = await response.json()
+
+    if (data.code === 0 && data.data) {
+      const bnbUsdPair = data.data.find((item: any) => item.symbol === 'BNBUSDT')
+      if (bnbUsdPair) {
+        bnbPrice.value = parseFloat(bnbUsdPair.price).toFixed(2)
+        addLog(`BNB price: $${bnbPrice.value}`, 'success')
+      } else {
+        addLog('BNBUSDT pair not found', 'error')
+      }
+    } else {
+      addLog(`Ticker API error: ${data.msg || 'Unknown'}`, 'error')
+    }
+  } catch (error) {
+    addLog(`Failed to fetch BNB price: ${error}`, 'error')
+  }
+}
+
 async function loadMarketsConfig() {
   try {
     const configModule = await import('./TcTestRemoveMeC-config.json')
@@ -151,6 +260,8 @@ async function loadMarketsConfig() {
       selectedMarketId.value = markets.value[0].id
     }
     addLog(`Loaded ${markets.value.length} markets from config`, 'success')
+    // fetch BNB price
+    fetchBnbPrice()
     // initialize TradingView after config is loaded
     initTradingView()
   } catch (error) {
@@ -206,7 +317,27 @@ async function fetchLatestPrice() {
     if (data.code === 0 && data.data) {
       const tokenData: TokenData = data.data
       latestPrice.value = parseFloat(tokenData.tokenPrice.price).toFixed(10)
-      addLog(`Price updated: $${latestPrice.value}`, 'success')
+
+      // Detect token phase
+      tokenStatus.value = tokenData.status || ''
+      tokenProgress.value = tokenData.tokenPrice.progress || '0'
+      const dexType = tokenData.dexType || ''
+
+      // Phase 1: Bonding curve (API returns BNB)
+      // Phase 2: PancakeSwap mature token (API returns USD)
+      // Logic: status=PUBLISH and progress=0 means just migrated (still BNB)
+      //        dexType=PANCAKE_SWAP and progress>0 means mature (USD)
+      if (tokenStatus.value === 'PUBLISH' && parseFloat(tokenProgress.value) === 0) {
+        tokenPhase.value = 1 // New token, API returns BNB
+        addLog(`Phase 1 (Bonding Curve): Price ${latestPrice.value} BNB`, 'success')
+      } else if (dexType === 'PANCAKE_SWAP') {
+        tokenPhase.value = 2 // Mature token, API returns USD
+        addLog(`Phase 2 (PancakeSwap): Price $${latestPrice.value}`, 'success')
+      } else {
+        tokenPhase.value = 1 // Default to phase 1
+        addLog(`Phase 1 (Bonding Curve): Price ${latestPrice.value} BNB`, 'info')
+      }
+
       updateCount.value++
     } else {
       addLog(`API error: ${data.msg || 'Unknown error'}`, 'error')
