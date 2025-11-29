@@ -1,6 +1,7 @@
 export const CRYPTO_MARKETS = [
   'BTC/USD',
   'ETH/USD',
+  'WLFI/USD',
   'LINK/USD',
   'BNB/USD',
   'ADA/USD',

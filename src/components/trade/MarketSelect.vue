@@ -252,7 +252,7 @@ const sortedMarkets = computed(() => {
 })
 
 function selectMarket(market: string) {
-  tradeStore.selectedMarket = market
+  tradeStore.setMarket(market)
   emit('close')
 }
 
