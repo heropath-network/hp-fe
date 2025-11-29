@@ -5,5 +5,6 @@ import HpTabs from './Tabs.vue'
 import HpSwitch from './Switch.vue'
 import BaseIcon from './BaseIcon.vue'
 import TabButton from "./common/TabButton.vue";
+import Tooltip from "./common/Tooltip.vue";
 
-export { HpDialog, ConnectWalletDialog, LoadingIcon, HpTabs, HpSwitch, BaseIcon, TabButton }
+export { HpDialog, ConnectWalletDialog, LoadingIcon, HpTabs, HpSwitch, BaseIcon, TabButton, Tooltip }
