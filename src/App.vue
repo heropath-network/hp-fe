@@ -11,8 +11,10 @@ import Menu from "@/views/Menu.vue";
     <Header />
     <div class="flex">
       <Menu />
-      <main class="ml-[224px] h-screen overflow-auto px-8 pb-12 pt-20">
-        <RouterView />
+      <main class="ml-[248px] h-screen flex-1 overflow-auto px-8 pb-12 pt-20">
+        <div class="mx-auto w-full max-w-[1160px]">
+          <RouterView />
+        </div>
       </main>
     </div>
   </div>
