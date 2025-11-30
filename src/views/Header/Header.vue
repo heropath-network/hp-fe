@@ -1,5 +1,13 @@
 <script lang="ts" setup>
-import ConnectWalletButton from "./ConnectWalletButton.vue";
+import { useRouter, useRoute } from 'vue-router'
+import ConnectWalletButton from './ConnectWalletButton.vue'
+import { ROUTE_NAMES } from '@/router'
+
+const router = useRouter()
+
+function goNewEvaluation() {
+  router.push({ name: ROUTE_NAMES.Evaluation })
+}
 </script>
 
 <template>
@@ -13,6 +21,7 @@ import ConnectWalletButton from "./ConnectWalletButton.vue";
       <button
         type="button"
         class="rounded bg-[var(--hp-primary-green)] h-[32px] px-2 py-1.5 text-[var(--hp-black-color)] text-[14px] font-[500] leading-none transition hover:bg-[var(--hp-primary-green-hover)] active:bg-[var(--hp-primary-green-hover)]"
+        @click="goNewEvaluation"
       >
         New Evaluation
       </button>

@@ -4,6 +4,10 @@ import Avatar from '@/components/Wallet/Avatar.vue'
 import { EMPTY_ADDRESS } from '@/constants'
 import { ellipsisMiddle } from '@/utils/common'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { ROUTE_NAMES } from '@/router'
+
+const router = useRouter()
 
 const { address, isConnected } = useConnection()
 
@@ -42,7 +46,7 @@ const accounts = ref([
 <template>
   <section class="flex flex-col gap-12 text-[var(--hp-white-color)]">
     <div class="flex flex-col gap-4">
-      <div class="relative h-[168px] w-full overflow-hidden" :style="patternStyle">
+      <div v-if="isConnected" class="relative h-[168px] w-full overflow-hidden" :style="patternStyle">
         <div class="absolute left-6 top-6 flex items-center gap-4">
           <Avatar :address="address ?? EMPTY_ADDRESS" :size="101" />
           <p v-if="isConnected" class="text-xl font-semibold leading-[30px] text-[var(--hp-black-color)]">
@@ -102,7 +106,7 @@ const accounts = ref([
           class="flex items-center justify-center px-4 py-[14px] text-[16px] font-medium leading-6 transition"
           :class="[
             filter.id === selectedAccountFilter
-              ? 'bg-[var(--hp-bg-normal)] text-[var(--hp-white-color)]'
+              ? 'bg-[var(--hp-primary-green)] text-[var(--hp-black-color)]'
               : 'text-[var(--hp-text-color)] hover:text-[var(--hp-white-color)]',
           ]"
           type="button"
@@ -150,6 +154,7 @@ const accounts = ref([
       <button
         type="button"
         class="bg-[var(--hp-primary-green)] px-6 py-[14px] text-[16px] font-medium leading-6 text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)]"
+        @click="router.push({ name: ROUTE_NAMES.Evaluation })"
       >
         New Evaluation
       </button>

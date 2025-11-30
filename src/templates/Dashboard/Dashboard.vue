@@ -7,10 +7,11 @@ const { address, isConnected } = useConnection()
 </script>
 
 <template>
-  <section class="mx-auto flex w-full max-w-[1160px] flex-col gap-8 px-4 text-[var(--hp-white-color)] sm:px-6">
+  <section class="mt-4 mx-auto flex w-full max-w-[1160px] flex-col gap-8 px-4 text-[var(--hp-white-color)] sm:px-6">
     <header class="flex flex-col gap-1">
       <h1 class="text-2xl font-semibold leading-8">
         <template v-if="isConnected">Welcome Back, {{ ellipsisMiddle(address) }}</template>
+        <template v-else>Welcome Back, Guest</template>
       </h1>
       <p class="text-sm leading-5 text-[var(--hp-text-color)]">
         {{
