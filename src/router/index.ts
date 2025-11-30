@@ -11,6 +11,7 @@ export enum ROUTE_NAMES {
   Dashboard = 'dashboard',
   Profile = 'profile',
   Evaluation = 'evaluation',
+  PurchaseEvaluation = 'purchase-evaluation',
   Payouts = 'payouts',
   TradingEducation = 'trading-education',
   Leaderboard = 'leaderboard',
@@ -36,6 +37,14 @@ const ROUTER_LIST = [
     path: '/evaluation',
     name: ROUTE_NAMES.Evaluation,
     component: Evaluation,
+  },
+  {
+    path: '/purchase-evaluation',
+    name: ROUTE_NAMES.PurchaseEvaluation,
+    component: () => import('@/templates/Evaluation/PurchaseEvaluation.vue'),
+    meta: {
+      hideMenu: true,
+    },
   },
   {
     path: '/payouts',

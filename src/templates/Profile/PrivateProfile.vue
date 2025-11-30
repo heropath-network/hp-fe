@@ -77,7 +77,7 @@ const leaderboardVisible = ref(true)
             class="flex items-center justify-center px-4 py-[14px] text-[16px] font-medium leading-6 transition"
             :class="[
               filter.id === selectedAccountFilter
-                ? 'bg-[var(--hp-bg-normal)] text-[var(--hp-white-color)]'
+                ? 'bg-[var(--hp-primary-green)] text-[var(--hp-black-color)]'
                 : 'text-[var(--hp-text-color)] hover:text-[var(--hp-white-color)]',
             ]"
             type="button"
