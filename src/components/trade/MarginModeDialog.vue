@@ -85,9 +85,6 @@
           <p>
             Cross Margin Mode: All cross positions under the same margin asset share the same asset cross margin balance. In the event of liquidation, your assets full margin balance along with any remaining open positions under the asset may be forfeited.
           </p>
-          <p>
-            The Cross Margin Mode is currently only available for MUX V3 positions.
-          </p>
         </div>
       </div>
 
