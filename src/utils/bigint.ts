@@ -127,7 +127,85 @@ export function formatPrice(value: number | bigint | string, decimals: number = 
   }).format(num)
 }
 
-// TODO
 export function formatSmallPrice(value: number | bigint | string): string {
-  return value.toString()
+  const { numericValue, plainValue } = (() => {
+    if (typeof value === 'bigint') {
+      const decimalString = bigIntToDecimalString(value)
+      return { numericValue: parseFloat(decimalString), plainValue: decimalString }
+    }
+    const str = toPlainString(value)
+    return { numericValue: Number(str), plainValue: str }
+  })()
+
+  if (!Number.isFinite(numericValue)) return '0'
+
+  const negative = plainValue.startsWith('-')
+  const normalized = negative ? plainValue.slice(1) : plainValue
+  const [wholePartRaw, fractionPartRaw = ''] = normalized.split('.')
+  const wholePart = wholePartRaw || '0'
+
+  if (Math.abs(numericValue) >= 1) {
+    const trimmedFraction = fractionPartRaw.replace(/0+$/, '')
+    const maxFractionDigits = Math.min(trimmedFraction.length, 8)
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: maxFractionDigits,
+    }).format(numericValue)
+  }
+
+  if (numericValue === 0) return '0'
+
+  let leadingZeros = 0
+  while (leadingZeros < fractionPartRaw.length && fractionPartRaw.charCodeAt(leadingZeros) === 48) {
+    leadingZeros++
+  }
+
+  if (leadingZeros >= 4) {
+    const remainingFraction = fractionPartRaw.slice(leadingZeros) || '0'
+    const truncated = remainingFraction.slice(0, 4) || '0'
+    return `${negative ? '-' : ''}${wholePart}.0{${leadingZeros}}${truncated}`
+  }
+
+  const trimmedFraction = fractionPartRaw.replace(/0+$/, '')
+  const fraction = trimmedFraction || '0'
+  return `${negative ? '-' : ''}${wholePart}.${fraction}`
+}
+
+function bigIntToDecimalString(value: bigint): string {
+  const negative = value < 0n
+  const absValue = negative ? -value : value
+  const padded = absValue.toString().padStart(DECIMALS + 1, '0')
+  const whole = padded.slice(0, -DECIMALS) || '0'
+  const fractionRaw = padded.slice(-DECIMALS)
+  const fraction = fractionRaw.replace(/0+$/, '')
+  const result = fraction ? `${whole}.${fraction}` : whole
+  return negative ? `-${result}` : result
+}
+
+function toPlainString(value: number | bigint | string): string {
+  if (typeof value === 'string') return value
+  if (typeof value === 'bigint') return value.toString()
+
+  const str = value.toString()
+  if (!str.includes('e') && !str.includes('E')) return str
+
+  const [mantissa, exponentPart] = str.split(/[eE]/)
+  const exp = parseInt(exponentPart, 10)
+  const isNegative = mantissa.startsWith('-')
+  const cleanMantissa = isNegative ? mantissa.slice(1) : mantissa
+  const [intPart, fracPart = ''] = cleanMantissa.split('.')
+  const digits = intPart + fracPart
+
+  if (exp >= 0) {
+    const zerosNeeded = exp - fracPart.length
+    const shifted =
+      zerosNeeded >= 0
+        ? digits + '0'.repeat(zerosNeeded)
+        : `${digits.slice(0, intPart.length + exp)}.${digits.slice(intPart.length + exp)}`
+    return isNegative ? `-${shifted}` : shifted
+  }
+
+  const zeros = -exp - 1
+  const shifted = `0.${'0'.repeat(zeros)}${digits}`
+  return isNegative ? `-${shifted}` : shifted
 }
