@@ -12,21 +12,21 @@
           v-for="source in sources"
           :key="source.id"
           type="button"
-          class="flex w-full items-center justify-between rounded-xl border border-gray-800 bg-gray-900 px-4 py-3 text-left transition hover:border-gray-700"
+          class="flex w-full items-center justify-between gap-3 rounded-2xl border border-gray-800 bg-gray-900 px-4 py-3 text-left transition hover:border-gray-700"
           @click="handleToggle(source.id)"
         >
-          <div>
+          <div class="space-y-1.5">
             <div class="text-sm font-semibold text-white">
               {{ source.name }}
             </div>
-            <div class="mt-1 text-xs text-gray-500">
-              Max to Long:
-              <span class="font-medium text-white">{{ formatMaxLong(source.maxLongAmount, source.assetSymbol) }}</span>
+            <div class="text-xs text-gray-500">
+              {{ capacityLabel }}:
+              <span class="font-medium text-white">{{ formatCapacity(source) }}</span>
             </div>
           </div>
 
           <div
-            class="flex h-7 w-7 items-center justify-center rounded-full border transition"
+            class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition"
             :class="
               source.enabled
                 ? 'border-teal-400 bg-teal-500 text-white'
@@ -56,16 +56,24 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import Dialog from '@/components/Dialog.vue'
 import type { LiquiditySourceId } from '@/constants/liquiditySources'
 
 interface Props {
   show: boolean
+  tradeSide: 'long' | 'short'
   sources: Array<{
     id: LiquiditySourceId
     name: string
-    maxLongAmount: number | null
-    assetSymbol: string
+    maxLong: {
+      amount: number | null
+      assetSymbol: string
+    }
+    maxShort: {
+      amount: number | null
+      assetSymbol: string
+    }
     enabled: boolean
   }>
 }
@@ -79,17 +87,26 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
+const capacityLabel = computed(() => (props.tradeSide === 'short' ? 'Max to Short' : 'Max to Long'))
+
 function handleToggle(id: LiquiditySourceId) {
   emit('toggle', id)
 }
 
-function formatMaxLong(amount: number | null, assetSymbol: string) {
+function formatCapacity(source: Props['sources'][number]) {
+  const capacity = props.tradeSide === 'short' ? source.maxShort : source.maxLong
+  return formatAmount(capacity.amount, capacity.assetSymbol)
+}
+
+function formatAmount(amount: number | null, assetSymbol: string) {
   if (amount === null) {
     return 'N/A'
   }
 
-  return `${new Intl.NumberFormat('en-US', {
-    maximumFractionDigits: 0,
-  }).format(amount)} ${assetSymbol}`
+  const formatter = new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: amount < 100 ? 5 : 0,
+  })
+
+  return `${formatter.format(amount)} ${assetSymbol}`
 }
 </script>

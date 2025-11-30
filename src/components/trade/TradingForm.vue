@@ -174,6 +174,7 @@
     />
     <LiquiditySourcesDialog
       :show="showLiquiditySourcesDialog"
+      :trade-side="tradeSide"
       :sources="liquiditySources"
       @close="showLiquiditySourcesDialog = false"
       @toggle="handleLiquiditySourceToggle"
