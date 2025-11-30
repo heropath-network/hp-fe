@@ -6,7 +6,11 @@
           @click="$emit('openMarketSelect')"
           class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-white transition hover:bg-gray-800"
         >
-          <span class="text-lg font-semibold">{{ selectedMarket }}</span>
+          <MarketIcon :symbol="selectedMarket" :size="32" />
+          <div class="flex flex-col">
+            <span class="text-lg font-semibold">{{ selectedMarket }}</span>
+            <span class="text-sm text-gray-400 text-left">Up to 100X</span>
+          </div>
           <svg class="h-4 w-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
@@ -100,6 +104,7 @@ import { useMarket24hRates } from '@/composables/useMarket24hRates'
 import { usePrice24hHighLow } from '@/composables/usePrice24hHighLow'
 import { useMarketStatus } from '@/composables/useMarketStatus'
 import OracleSelect from './OracleSelect.vue'
+import MarketIcon from '@/components/common/MarketIcon.vue'
 
 const tradeStore = useTradeStore()
 const marketStatus = useMarketStatus()
