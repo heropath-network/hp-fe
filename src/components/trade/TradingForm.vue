@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-full flex-col bg-gray-950">
+  <div class="flex h-full flex-col bg-gray-950 pb-8">
     <div class="flex items-center border-b border-gray-800">
       <button
         @click="tradeSide = 'long'"
@@ -162,6 +162,8 @@
             : `Place ${orderType} Order`
         }}
       </button>
+
+      <AccountDataCard class="mt-4" />
     </div>
 
     <MarginModeDialog
@@ -184,13 +186,22 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useTradeStore } from '@/stores/tradeStore'
 import { toBigInt, fromBigInt, formatCurrency } from '@/utils/bigint'
 import MarginModeDialog from '@/components/trade/MarginModeDialog.vue'
 import LiquiditySourcesDialog from '@/components/trade/LiquiditySourcesDialog.vue'
+import AccountDataCard from '@/components/trade/AccountDataCard.vue'
 import type { LiquiditySourceId } from '@/constants/liquiditySources'
 
 const tradeStore = useTradeStore()
+const {
+  selectedMarket,
+  accountBalance,
+  currentMarketPrice,
+  liquiditySources,
+  activeLiquiditySources
+} = storeToRefs(tradeStore)
 
 const tradeSide = ref<'long' | 'short'>('long')
 const orderType = ref<'market' | 'limit' | 'stop'>('market')
@@ -201,19 +212,12 @@ const collateral = ref('')
 const showMarginModeDialog = ref(false)
 const showLiquiditySourcesDialog = ref(false)
 
-const selectedMarket = computed(() => tradeStore.selectedMarket)
-const accountBalance = computed(() => tradeStore.accountBalance)
-const currentMarketPrice = computed(() => tradeStore.currentMarketPrice)
-
 const marginSetting = computed(() => tradeStore.getMarginSetting(selectedMarket.value))
-const liquiditySources = computed(() => tradeStore.liquiditySources)
-const activeLiquiditySources = computed(() => tradeStore.activeLiquiditySources)
 const activeLiquiditySourcesCount = computed(() => activeLiquiditySources.value.length)
 const liquiditySourcesTotal = computed(() => liquiditySources.value.length)
 
 const currentMarginModeType = computed(() => marginSetting.value.mode)
 const currentLeverageFromMode = computed(() => marginSetting.value.leverage ?? leverage.value ?? 5)
-
 const marginModeLabel = computed(() => {
   if (marginSetting.value.mode === 'cross') {
     const lev = marginSetting.value.leverage ?? 5
