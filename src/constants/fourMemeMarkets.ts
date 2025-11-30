@@ -1,0 +1,62 @@
+export interface FourMemeMarket {
+  id: string
+  tokenId: number
+  symbol: string
+  name: string
+  address: string
+}
+
+export const FOUR_MEME_MARKETS: FourMemeMarket[] = [
+  {
+    id: 'ALIF',
+    tokenId: 101343471,
+    symbol: 'ALIF',
+    name: 'ALIF',
+    address: '0x4444095396f637f6ea43b19267cb8a572cf1c847',
+  },
+  {
+    id: 'BIBI',
+    tokenId: 101342925,
+    symbol: 'Binance AI',
+    name: 'Binance AI',
+    address: '0x444437716c563a0604b63319caa754016568e66e',
+  },
+  {
+    id: 'BOL',
+    tokenId: 101323611,
+    symbol: 'BNBOFLEGENDS',
+    name: 'BNBOFLEGENDS',
+    address: '0x44444e15232ff6dfed49b550d672707a283b3910',
+  },
+  {
+    id: 'RCHV',
+    tokenId: 101305256,
+    symbol: 'Archivas',
+    name: 'Archivas',
+    address: '0x44442271e6ca7336a29032838d70675680adc7df',
+  },
+  {
+    id: 'GG',
+    tokenId: 101287649,
+    symbol: 'RIP GIGGLE',
+    name: 'RIP GIGGLE',
+    address: '0x444484eecf4a4364ba026ade9577f19a807c6260',
+  },
+  {
+    id: 'AJC',
+    tokenId: 101282081,
+    symbol: 'AJC',
+    name: 'Ai Judge Companion',
+    address: '0x4444eb8f7d173ba29e3a5bf3a9e57d5f234545d4',
+  },
+  {
+    id: 'AIF',
+    tokenId: 101273998,
+    symbol: 'AIF',
+    name: 'AIfluence House',
+    address: '0x4444202f285c188690780f6cdc5f6c27767a8ee2',
+  },
+]
+
+export const FOUR_MEME_API_BASE_URL = 'https://four.meme/meme-api/v1'
+export const FOUR_MEME_WS_URL = 'wss://ws.four.meme/ws'

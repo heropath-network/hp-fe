@@ -23,14 +23,7 @@ export const PERP_MARKETS = [
   'OP/USD',
 ] as const
 
-export const MEME_MARKETS = [
-  'BTC/USD',
-  'ETH/USD',
-  'ARB/USD',
-  'AVAX/USD',
-  'MATIC/USD',
-  'OP/USD',
-] as const
+export const FOUR_MEME_MARKETS = ['ALIF', 'BIBI', 'BOL', 'RCHV', 'GG', 'AJC', 'AIF'] as const
 
 export const FOREX_MARKETS = [
   'EUR/USD',
@@ -95,11 +88,7 @@ export const STOCKS_MARKETS = [
   'MARA/USD',
 ] as const
 
-export const AVAILABLE_MARKETS = [
-  ...CRYPTO_MARKETS,
-  ...FOREX_MARKETS,
-  ...STOCKS_MARKETS,
-] as const
+export const AVAILABLE_MARKETS = [...CRYPTO_MARKETS, ...FOREX_MARKETS, ...STOCKS_MARKETS, ...FOUR_MEME_MARKETS] as const
 
 export type MarketSymbol = typeof AVAILABLE_MARKETS[number]
 

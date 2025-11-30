@@ -29,10 +29,32 @@ export function convertResolutionStrToNum(resolution: string): number {
   }
 }
 
+export function convertResolutionToFourMemeBarType(resolution: string): string {
+  switch (resolution) {
+    case '1':
+      return 'MIN1'
+    case '5':
+      return 'MIN5'
+    case '15':
+      return 'MIN15'
+    case '60':
+    case '1H':
+      return 'HOUR1'
+    case '240':
+    case '4H':
+      return 'HOUR4'
+    case 'D':
+    case '1D':
+      return 'DAY1'
+    default:
+      return 'MIN5'
+  }
+}
+
 export function alignTimeToResolution(dataResolution: number, timestamp?: number): number {
   const r = dataResolution
   let t: 'minutes' | 'hours' | 'days' | 'weeks' = 'minutes'
-  
+
   if (r === 1 || r === 3 || r === 5 || r === 15 || r === 30) {
     t = 'minutes'
   } else if (r === 60 || r === 240) {
@@ -45,7 +67,9 @@ export function alignTimeToResolution(dataResolution: number, timestamp?: number
 
   let v = moment().utc().startOf(t)
   if (!!timestamp) {
-    v = moment(timestamp * 1000).utc().startOf(t)
+    v = moment(timestamp * 1000)
+      .utc()
+      .startOf(t)
   }
 
   if (t === 'minutes') {
@@ -62,21 +86,21 @@ export function alignTimeToResolution(dataResolution: number, timestamp?: number
   return v.valueOf()
 }
 
-
 export async function fetchOracleCandles(
   resolution: number,
   from: number,
   to: number,
   symbol: string,
-  projectId: ProjectId = ProjectId.MUX_V3
+  projectId: ProjectId = ProjectId.MUX_V3,
 ): Promise<Bar[]> {
   try {
     let symbolToQuery = symbol
-    if (projectId !== ProjectId.GAINS) {
+    if (projectId === ProjectId.FOUR_MEME) {
+      symbolToQuery = symbol
+    } else if (projectId !== ProjectId.GAINS) {
       // MUX V3: Extract just base symbol (e.g., "BTC/USD" -> "BTC")
       symbolToQuery = symbol.split('/')[0] || symbol
     }
-    // GTrade: Keep full symbol (e.g., "BTC/USD")
 
     let adjustedFrom = from
     if (projectId === ProjectId.GAINS) {
@@ -84,7 +108,7 @@ export async function fetchOracleCandles(
     }
 
     const candles = await queryAssetOracleCandle(resolution, adjustedFrom, to, symbolToQuery, projectId)
-    
+
     const bars: Bar[] = candles
       .map((candle) => {
         const time = Number(candle.timestamp) * 1000 // Convert to milliseconds for TradingView
@@ -92,12 +116,12 @@ export async function fetchOracleCandles(
         const close = parseFloat(candle.close)
         const low = parseFloat(candle.low)
         const high = parseFloat(candle.high)
-        
+
         // Validate all values are valid numbers
         if (isNaN(time) || isNaN(open) || isNaN(close) || isNaN(low) || isNaN(high)) {
           return null
         }
-        
+
         return {
           time,
           open,
@@ -107,7 +131,6 @@ export async function fetchOracleCandles(
         }
       })
       .filter((bar): bar is Bar => bar !== null) // Filter out invalid candles
-    
 
     return bars.sort((a, b) => a.time - b.time)
   } catch (error) {
