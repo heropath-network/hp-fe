@@ -7,9 +7,9 @@
           class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-white transition hover:bg-gray-800"
         >
           <MarketIcon :symbol="selectedMarket" :size="32" />
-          <div class="flex flex-col">
+          <div class="flex flex-col text-left">
             <span class="text-lg font-semibold">{{ selectedMarket }}</span>
-            <span class="text-sm text-gray-400 text-left">Up to 100X</span>
+            <span class="text-sm text-gray-400 ">Up to 100X</span>
           </div>
           <svg class="h-4 w-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -99,7 +99,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useTradeStore } from '@/stores/tradeStore'
-import { formatPrice } from '@/utils/bigint'
+import { formatSmallPrice } from '@/utils/bigint'
 import { useMarket24hRates } from '@/composables/useMarket24hRates'
 import { usePrice24hHighLow } from '@/composables/usePrice24hHighLow'
 import { useMarketStatus } from '@/composables/useMarketStatus'
@@ -138,7 +138,8 @@ const isLoadingMarkPrice = computed(() => {
 
 const formattedPrice = computed(() => {
   const price = tradeStore.currentMarketPrice
-  return price ? formatPrice(price, 0) : '0'
+  if (!price) return '0'
+  return formatSmallPrice(price)
 })
 
 
@@ -159,12 +160,14 @@ const isLoadingHighLow = computed(() => price24hHighLowState.isLoading.value)
 
 const high24h = computed(() => {
   const data = price24hHighLowState.data.value
-  return data?.high ? formatPrice(data.high, 0) : formattedPrice.value
+  if (!data?.high) return formattedPrice.value
+  return formatSmallPrice(data.high)
 })
 
 const low24h = computed(() => {
   const data = price24hHighLowState.data.value
-  return data?.low ? formatPrice(data.low, 0) : formattedPrice.value
+  if (!data?.low) return formattedPrice.value
+  return formatSmallPrice(data.low)
 })
 
 

@@ -179,10 +179,10 @@ import { useTradeStore } from '@/stores/tradeStore'
 import {
   AVAILABLE_MARKETS,
   PERP_MARKETS,
-  MEME_MARKETS,
   FOREX_MARKETS,
   STOCKS_MARKETS,
   CRYPTO_MARKETS,
+  FOUR_MEME_MARKETS,
 } from '@/constants/markets'
 import MarketIcon from '@/components/common/MarketIcon.vue'
 import { isFavorite, toggleFavorite } from '@/utils/favorites'
@@ -225,9 +225,9 @@ const marketCategories = computed<Record<CategoryType, string[]>>(() => {
   return {
     'All': availableMarkets.value,
     'Perps': [...PERP_MARKETS],
-    'Meme': [...MEME_MARKETS],
+    'Meme': [ ...FOUR_MEME_MARKETS],
     'Forex': [...FOREX_MARKETS],
-    'Stocks': [...STOCKS_MARKETS]
+    'Stocks': [...STOCKS_MARKETS],
   }
 })
 
@@ -237,7 +237,7 @@ const categoryTags = computed(() => {
     { label: 'Perps', value: 'Perps' as CategoryType, count: marketCategories.value['Perps'].length },
     { label: 'Meme', value: 'Meme' as CategoryType, count: marketCategories.value['Meme'].length },
     { label: 'Forex', value: 'Forex' as CategoryType, count: marketCategories.value['Forex'].length },
-    { label: 'Stocks', value: 'Stocks' as CategoryType, count: marketCategories.value['Stocks'].length }
+    { label: 'Stocks', value: 'Stocks' as CategoryType, count: marketCategories.value['Stocks'].length },
   ]
 })
 
@@ -262,7 +262,8 @@ const sortedMarkets = computed(() => {
     if (CRYPTO_MARKETS.includes(market as any)) return 1
     if (FOREX_MARKETS.includes(market as any)) return 2
     if (STOCKS_MARKETS.includes(market as any)) return 3
-    return 4
+    if (FOUR_MEME_MARKETS.includes(market as any)) return 4
+    return 5
   }
   
   return markets.sort((a, b) => {

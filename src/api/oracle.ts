@@ -6,6 +6,7 @@ import {
 import { 
   queryMuxOracleCandle,
 } from '@/packages/mux-v3'
+import { getFourMemeBars, resolutionToBarType, getFourMemeMarket } from '@/packages/four-meme'
 
 export interface OracleCandle {
   timestamp: number
@@ -33,6 +34,28 @@ export async function queryAssetOracleCandle(
   symbol: string,
   dataType: ProjectId = ProjectId.MUX_V3
 ): Promise<OracleCandle[]> {
+  if (dataType === ProjectId.FOUR_MEME) {
+    const market = getFourMemeMarket(symbol)
+    if (!market) {
+      return []
+    }
+
+    const barType = resolutionToBarType(resolution.toString())
+    const endDate = to * 1000 // Convert to milliseconds
+    const pageSize = 300
+
+    const bars = await getFourMemeBars(market.tokenId, barType, pageSize, endDate)
+
+    // Convert four.meme bar format to OracleCandle format
+    return bars.map((bar) => ({
+      timestamp: parseInt(bar.createDate) / 1000, 
+      open: bar.open,
+      close: bar.close,
+      low: bar.low,
+      high: bar.high,
+    }))
+  }
+
   if (dataType === ProjectId.GAINS) {
     const pairIndex = getGainsPairIndex(symbol)
     if (pairIndex === null) {

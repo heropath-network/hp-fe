@@ -19,6 +19,7 @@ import Widget from './chart/widget'
 import { convertResolutionStrToNum, alignTimeToResolution, fetchOracleCandles } from './chart/utils'
 import { useGainsWebSocketPrice, useGainsPrice24h, GAINS_PAIR_INDEX_MAP } from '@/packages/gains'
 import { useMuxV3Price24h, useMuxRealtimePrice } from '@/packages/mux-v3'
+import { useFourMemeWebSocketPrice, useFourMemePrice24h, getFourMemeMarket } from '@/packages/four-meme'
 import { ProjectId } from '@/constants'
 import type { Bar } from '@/types/tradingview'
 
@@ -29,6 +30,7 @@ const selectedOracle = computed(() => tradeStore.selectedOracle)
 
 const gainsPrice24h = useGainsPrice24h()
 const muxV3Price24h = useMuxV3Price24h()
+const fourMemePrice24h = useFourMemePrice24h()
 
 const showChart = ref(false)
 const widget = ref<Widget | null>(null)
@@ -123,7 +125,12 @@ function initChartWidget() {
             }
             
             let change24hRate = 0
-            if (selectedOracle.value === ProjectId.GAINS) {
+            if (selectedOracle.value === ProjectId.FOUR_MEME) {
+              const market = getFourMemeMarket(selectedMarket.value)
+              if (market) {
+                change24hRate = fourMemePrice24h.calculate24hChangeRate(latestBar.close, market.tokenId)
+              }
+            } else if (selectedOracle.value === ProjectId.GAINS) {
               change24hRate = gainsPrice24h.calculate24hChangeRate(latestBar.close, selectedMarket.value)
             } else {
               const symbolName = selectedMarket.value.split('/')[0]
@@ -334,6 +341,30 @@ function useGainsRealtimePrices(chartSymbol: string) {
   }, 1000)
 }
 
+function useFourMemeRealtimePrices(chartSymbol: string) {
+  clearUpdateRealtimePriceTimer()
+  
+  const market = getFourMemeMarket(chartSymbol)
+  if (!market) {
+    console.error(`Four.meme: Market not found for ${chartSymbol}`)
+    return
+  }
+  
+  const marketRef = ref(market)
+  const { price } = useFourMemeWebSocketPrice(marketRef, 200)
+
+  updateRealtimePriceTimer.value = window.setInterval(() => {
+    if (price.value) {
+      const priceNum = price.value
+      
+      updateRealtimePrice(priceNum, dataResolution.value, chartSymbol)
+      
+      const change24hRate = fourMemePrice24h.calculate24hChangeRate(priceNum, market.tokenId)
+      tradeStore.setCurrentPrice(priceNum, change24hRate)
+    }
+  }, 1000)
+}
+
 function updateRealtimePrice(
   price: number,
   resolution: number,
@@ -367,7 +398,9 @@ function startRealtimePriceUpdates(projectId: ProjectId, chartSymbol: string) {
   
   if (realtimePricesScope.scope) {
     realtimePricesScope.scope.run(() => {
-      if (projectId === ProjectId.MUX_V3) {
+      if (projectId === ProjectId.FOUR_MEME) {
+        useFourMemeRealtimePrices(chartSymbol)
+      } else if (projectId === ProjectId.MUX_V3) {
         useMuxV3RealtimePrices(chartSymbol)
       } else if (projectId === ProjectId.GAINS) {
         useGainsRealtimePrices(chartSymbol)
@@ -403,11 +436,20 @@ watch(selectedMarket, (newMarket, oldMarket) => {
 })
 
 onMounted(() => {
-  if (selectedOracle.value === ProjectId.GAINS) {
+  if (selectedOracle.value === ProjectId.FOUR_MEME) {
     muxV3Price24h.stopAutoRefresh()
+    gainsPrice24h.stopAutoRefresh()
+    const market = getFourMemeMarket(selectedMarket.value)
+    if (market) {
+      fourMemePrice24h.fetchPrice24hAgo(market)
+    }
+  } else if (selectedOracle.value === ProjectId.GAINS) {
+    muxV3Price24h.stopAutoRefresh()
+    fourMemePrice24h.stopAutoRefresh()
     gainsPrice24h.startAutoRefresh()
   } else if (selectedOracle.value === ProjectId.MUX_V3) {
     gainsPrice24h.stopAutoRefresh()
+    fourMemePrice24h.stopAutoRefresh()
     const symbolName = selectedMarket.value.split('/')[0]
     muxV3Price24h.startAutoRefresh([symbolName])
   }
@@ -421,6 +463,7 @@ onUnmounted(() => {
   stopRealtimePriceUpdates()
   gainsPrice24h.stopAutoRefresh()
   muxV3Price24h.stopAutoRefresh()
+  fourMemePrice24h.stopAutoRefresh()
   
   if (widget.value) {
     widget.value.onDestroyed()

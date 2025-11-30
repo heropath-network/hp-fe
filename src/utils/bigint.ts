@@ -126,3 +126,8 @@ export function formatPrice(value: number | bigint | string, decimals: number = 
     maximumFractionDigits: decimals
   }).format(num)
 }
+
+// TODO
+export function formatSmallPrice(value: number | bigint | string): string {
+  return value.toString()
+}
