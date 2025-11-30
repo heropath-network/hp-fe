@@ -142,7 +142,7 @@
                       v-else-if="marketPrices[market]"
                       class="text-base leading-6 font-semibold text-white"
                     >
-                      {{ formatPrice(marketPrices[market].price) }}
+                      {{ formatSmallPrice(marketPrices[market].price) }}
                     </span>
                     <span v-else class="text-base leading-6 font-semibold text-gray-400">--</span>
                     <span
@@ -189,6 +189,7 @@ import { isFavorite, toggleFavorite } from '@/utils/favorites'
 import { getMarketName } from '@/utils/marketNames'
 import { useMarketStatus } from '@/composables/useMarketStatus'
 import { useMarket24hRates } from '@/composables/useMarket24hRates'
+import { formatSmallPrice } from '@/utils/bigint'
 
 interface Props {
   show: boolean
@@ -292,29 +293,6 @@ function clearSearch() {
   searchQuery.value = ''
 }
 
-function formatPrice(price: bigint): string {
-  if (!price || price === BigInt(0)) return '--'
-  
-  const priceNumber = Number(price) / (10 ** 18)
-  
-  if (priceNumber >= 1000) {
-    return priceNumber.toLocaleString('en-US', { 
-      maximumFractionDigits: 2,
-      minimumFractionDigits: 2
-    })
-  } else if (priceNumber >= 1) {
-    return priceNumber.toLocaleString('en-US', { 
-      maximumFractionDigits: 4,
-      minimumFractionDigits: 2
-    })
-  } else {
-    return priceNumber.toLocaleString('en-US', { 
-      maximumFractionDigits: 6,
-      minimumFractionDigits: 2
-    })
-  }
-}
-
 watch(() => props.show, (newValue) => {
   if (!newValue) {
     searchQuery.value = ''
@@ -344,4 +322,3 @@ watch(() => props.show, (newValue) => {
   background: rgb(55 65 81);
 }
 </style>
-
