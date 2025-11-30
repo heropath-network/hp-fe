@@ -96,7 +96,7 @@
 import { computed } from 'vue'
 import { useTradeStore } from '@/stores/tradeStore'
 import { formatPrice } from '@/utils/bigint'
-import { useMarketPrice24hRate } from '@/composables/useMarketPrice24h'
+import { useMarket24hRates } from '@/composables/useMarket24hRates'
 import { usePrice24hHighLow } from '@/composables/usePrice24hHighLow'
 import { useMarketStatus } from '@/composables/useMarketStatus'
 import OracleSelect from './OracleSelect.vue'
@@ -136,13 +136,16 @@ const formattedPrice = computed(() => {
   return price ? formatPrice(price, 0) : '0'
 })
 
-const price24hState = useMarketPrice24hRate(selectedMarket)
 
-const isLoadingPriceChange = computed(() => price24hState.value.isLoading)
+const { rates: market24hRates, isLoading: isLoadingPriceChange } = useMarket24hRates(computed(() => [selectedMarket.value]), {
+  autoRefresh: true,
+  onMounted: true,
+})
 
 const priceChange24h = computed(() => {
-  const rate = price24hState.value.price24hRate
-  return rate !== null ? rate * 100 : 0
+  const market = selectedMarket.value
+  if (!market) return 0
+  return market24hRates.value[market] || 0
 })
 
 const price24hHighLowState = usePrice24hHighLow(selectedMarket, selectedOracleId)
