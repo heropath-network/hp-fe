@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-full flex-col bg-gray-950">
-    <div class="flex border-b border-gray-800">
+    <div class="flex items-center border-b border-gray-800">
       <button
         @click="tradeSide = 'long'"
         :class="[
@@ -22,6 +22,13 @@
         ]"
       >
         Short
+      </button>
+      <div class="mx-3 h-6 w-px bg-gray-800"></div>
+      <button
+        @click="showMarginModeDialog = true"
+        class="flex items-center gap-1 py-3 px-4 text-sm font-medium text-white transition hover:text-gray-300"
+      >
+        <span>{{ marginModeLabel }}</span>
       </button>
     </div>
 
@@ -70,7 +77,7 @@
         </div>
       </div>
 
-      <div class="mb-4">
+      <div v-if="marginSetting.mode !== 'cross'" class="mb-4">
         <div class="mb-2 flex items-center justify-between">
           <label class="text-xs font-medium text-gray-400">Leverage</label>
           <span class="text-sm font-semibold text-white">{{ leverage }}x</span>
@@ -146,13 +153,23 @@
         }}
       </button>
     </div>
+
+    <MarginModeDialog
+      :show="showMarginModeDialog"
+      :market="selectedMarket"
+      :margin-mode="currentMarginModeType"
+      :leverage="currentLeverageFromMode"
+      @close="showMarginModeDialog = false"
+      @confirm="handleMarginModeConfirm"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useTradeStore } from '@/stores/tradeStore'
 import { toBigInt, fromBigInt, formatCurrency } from '@/utils/bigint'
+import MarginModeDialog from '@/components/trade/MarginModeDialog.vue'
 
 const tradeStore = useTradeStore()
 
@@ -162,10 +179,43 @@ const price = ref('')
 const size = ref('')
 const leverage = ref(10)
 const collateral = ref('')
+const showMarginModeDialog = ref(false)
 
 const selectedMarket = computed(() => tradeStore.selectedMarket)
 const accountBalance = computed(() => tradeStore.accountBalance)
 const currentMarketPrice = computed(() => tradeStore.currentMarketPrice)
+
+const marginSetting = computed(() => tradeStore.getMarginSetting(selectedMarket.value))
+
+const currentMarginModeType = computed(() => marginSetting.value.mode)
+const currentLeverageFromMode = computed(() => marginSetting.value.leverage ?? leverage.value ?? 5)
+
+const marginModeLabel = computed(() => {
+  if (marginSetting.value.mode === 'cross') {
+    const lev = marginSetting.value.leverage ?? 5
+    return `Cross ${lev}x`
+  }
+  return 'Isolated'
+})
+
+function handleMarginModeConfirm(data: { marginMode: 'isolated' | 'cross'; leverage: number }) {
+  const setting = {
+    mode: data.marginMode,
+    leverage: data.leverage
+  }
+
+  tradeStore.setMarginSetting(selectedMarket.value, setting)
+
+  if (data.marginMode === 'cross') {
+    leverage.value = data.leverage
+  }
+}
+
+watch(marginSetting, (setting) => {
+  if (setting.mode === 'cross') {
+    leverage.value = setting.leverage ?? leverage.value
+  }
+})
 
 const displayPrice = computed(() => {
   if (orderType.value === 'market') {
