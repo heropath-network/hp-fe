@@ -30,6 +30,16 @@
       >
         <span>{{ marginModeLabel }}</span>
       </button>
+      <div class="mx-1 h-6 w-px bg-gray-800"></div>
+      <button
+        @click="showLiquiditySourcesDialog = true"
+        class="flex items-center gap-2 py-3 px-4 text-sm font-medium text-white transition hover:text-gray-300"
+      >
+        <span>Settings</span>
+        <span class="rounded-full bg-gray-800 px-2 py-0.5 text-xs font-normal text-gray-300">
+          {{ activeLiquiditySourcesCount }} / {{ liquiditySourcesTotal }}
+        </span>
+      </button>
     </div>
 
     <div class="flex-1 overflow-y-auto p-4">
@@ -162,6 +172,12 @@
       @close="showMarginModeDialog = false"
       @confirm="handleMarginModeConfirm"
     />
+    <LiquiditySourcesDialog
+      :show="showLiquiditySourcesDialog"
+      :sources="liquiditySources"
+      @close="showLiquiditySourcesDialog = false"
+      @toggle="handleLiquiditySourceToggle"
+    />
   </div>
 </template>
 
@@ -170,6 +186,8 @@ import { ref, computed, watch } from 'vue'
 import { useTradeStore } from '@/stores/tradeStore'
 import { toBigInt, fromBigInt, formatCurrency } from '@/utils/bigint'
 import MarginModeDialog from '@/components/trade/MarginModeDialog.vue'
+import LiquiditySourcesDialog from '@/components/trade/LiquiditySourcesDialog.vue'
+import type { LiquiditySourceId } from '@/constants/liquiditySources'
 
 const tradeStore = useTradeStore()
 
@@ -180,12 +198,17 @@ const size = ref('')
 const leverage = ref(10)
 const collateral = ref('')
 const showMarginModeDialog = ref(false)
+const showLiquiditySourcesDialog = ref(false)
 
 const selectedMarket = computed(() => tradeStore.selectedMarket)
 const accountBalance = computed(() => tradeStore.accountBalance)
 const currentMarketPrice = computed(() => tradeStore.currentMarketPrice)
 
 const marginSetting = computed(() => tradeStore.getMarginSetting(selectedMarket.value))
+const liquiditySources = computed(() => tradeStore.liquiditySources)
+const activeLiquiditySources = computed(() => tradeStore.activeLiquiditySources)
+const activeLiquiditySourcesCount = computed(() => activeLiquiditySources.value.length)
+const liquiditySourcesTotal = computed(() => liquiditySources.value.length)
 
 const currentMarginModeType = computed(() => marginSetting.value.mode)
 const currentLeverageFromMode = computed(() => marginSetting.value.leverage ?? leverage.value ?? 5)
@@ -197,6 +220,10 @@ const marginModeLabel = computed(() => {
   }
   return 'Isolated'
 })
+
+function handleLiquiditySourceToggle(id: LiquiditySourceId) {
+  tradeStore.toggleLiquiditySource(id)
+}
 
 function handleMarginModeConfirm(data: { marginMode: 'isolated' | 'cross'; leverage: number }) {
   const setting = {
@@ -292,11 +319,22 @@ function handleTrade() {
 
 <style scoped>
 input[type='range']::-webkit-slider-thumb {
-  @apply h-4 w-4 cursor-pointer appearance-none rounded-full bg-blue-600;
+  height: 1rem;
+  width: 1rem;
+  cursor: pointer;
+  appearance: none;
+  border-radius: 9999px;
+  background-color: #2563eb;
 }
 
 input[type='range']::-moz-range-thumb {
-  @apply h-4 w-4 cursor-pointer appearance-none rounded-full border-0 bg-blue-600;
+  height: 1rem;
+  width: 1rem;
+  cursor: pointer;
+  appearance: none;
+  border: none;
+  border-radius: 9999px;
+  background-color: #2563eb;
 }
 </style>
 
