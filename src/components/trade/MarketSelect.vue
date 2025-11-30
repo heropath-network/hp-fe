@@ -152,14 +152,14 @@
                       --
                     </span>
                     <span
-                      v-else-if="marketPrices[market]"
+                      v-else-if="marketPrices[market] && market24hRates[market] !== undefined"
                       :class="[
                         'text-sm leading-5 font-medium',
-                        marketPrices[market].change24h >= 0 ? 'text-green-500' : 'text-red-500'
+                        market24hRates[market] >= 0 ? 'text-green-500' : 'text-red-500'
                       ]"
                     >
-                      {{ marketPrices[market].change24h >= 0 ? '+' : '' }}
-                      {{ marketPrices[market].change24h.toFixed(2) }}%
+                      {{ market24hRates[market] >= 0 ? '+' : '' }}
+                      {{ market24hRates[market].toFixed(2) }}%
                     </span>
                     <span v-else class="text-sm leading-5 font-medium text-gray-400">--</span>
                   </div>
@@ -188,6 +188,7 @@ import MarketIcon from '@/components/common/MarketIcon.vue'
 import { isFavorite, toggleFavorite } from '@/utils/favorites'
 import { getMarketName } from '@/utils/marketNames'
 import { useMarketStatus } from '@/composables/useMarketStatus'
+import { useMarket24hRates } from '@/composables/useMarket24hRates'
 
 interface Props {
   show: boolean
@@ -214,6 +215,11 @@ function isMarketClosed(market: string): boolean {
 }
 
 const availableMarkets = computed(() => [...AVAILABLE_MARKETS])
+
+const { rates: market24hRates, startAutoRefresh, stopAutoRefresh } = useMarket24hRates(availableMarkets, {
+  autoRefresh: false,
+  onMounted: false,
+})
 
 const marketCategories = computed<Record<CategoryType, string[]>>(() => {
   return {
@@ -312,8 +318,11 @@ watch(() => props.show, (newValue) => {
   if (!newValue) {
     searchQuery.value = ''
     selectedCategory.value = 'All'
+    stopAutoRefresh()
+  } else {
+    startAutoRefresh()
   }
-})
+}, { immediate: true })
 </script>
 
 <style scoped>
