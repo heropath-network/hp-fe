@@ -24,7 +24,7 @@ My thoughts:
 | Token Type          | Four.meme API Unit | K-line API Unit | WebSocket Unit |
 | ------------------- | ------------------ | --------------- | -------------- |
 | Bonding Curve phase | BNB                | BNB             | BNB            |
-| Graduation phase    | USD                | BNB             | BNB            |
+| Graduation phase    | USD                | BNB             | USD            |
 
 Recommended Flow:
 
