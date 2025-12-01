@@ -79,7 +79,7 @@
                 </div>
               </template>
               <div class="flex flex-col gap-2">
-                <button
+                <div
                   v-for="market in sortedMarkets"
                   :key="market"
                   @click="selectMarket(market)"
@@ -92,7 +92,7 @@
                 >
                   <button
                     @click.stop="toggleFavorite(market)"
-                    class="flex-shrink-0 w-4 h-4 flex items-center justify-center transition-colors"
+                    class="flex-shrink-0 w-4 h-4 flex items-center justify-center transition-colors bg-transparent border-none cursor-pointer p-0"
                   >
                     <svg
                       v-if="isFavorite(market)"
@@ -172,7 +172,7 @@
                     </span>
                     <span v-else class="text-sm leading-5 font-normal text-[#9b9b9b]">--</span>
                   </div>
-                </button>
+                </div>
               </div>
             </div>
           </div>
