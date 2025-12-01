@@ -120,3 +120,37 @@ export async function getBnbUsdPrice(): Promise<number | null> {
     return null
   }
 }
+
+export async function getAllFourMemeMarketPrices(
+  markets: Array<{ address: string; id: string; tokenId: number }>,
+  bnbUsdPrice: number,
+): Promise<Map<string, { price: number; change24h: number }>> {
+  const result = new Map<string, { price: number; change24h: number }>()
+
+  if (!bnbUsdPrice || bnbUsdPrice <= 0) {
+    return result
+  }
+
+  try {
+    const promises = markets.map(async (market) => {
+      const tokenData = await getFourMemeTokenData(market.address)
+      if (tokenData && tokenData.tokenPrice && tokenData.tokenPrice.price) {
+        const priceInBnb = parseFloat(tokenData.tokenPrice.price)
+        if (!isNaN(priceInBnb) && priceInBnb > 0) {
+          const priceInUsd = priceInBnb * bnbUsdPrice
+          const dayIncrease = parseFloat(tokenData.dayIncrease || '0')
+          result.set(market.id, {
+            price: priceInUsd,
+            change24h: dayIncrease * 100, // Convert to percentage
+          })
+        }
+      }
+    })
+
+    await Promise.all(promises)
+  } catch (error) {
+    console.error('Four.meme: Failed to fetch all market prices:', error)
+  }
+
+  return result
+}

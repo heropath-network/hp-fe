@@ -208,6 +208,29 @@ function closeWebSocket() {
   isClosing = false
 }
 
+export function getAllFourMemePricesFromCache(): Map<number, FourMemePriceUpdate> {
+  return new Map(priceCache)
+}
+
+export function ensureWebSocketInitialized(): void {
+  if (!wsInstance || wsInstance.readyState === WebSocket.CLOSED) {
+    initWebSocket()
+  }
+}
+
+export function subscribeToAllTokenIds(tokenIds: number[]): void {
+  ensureWebSocketInitialized()
+  tokenIds.forEach((tokenId) => {
+    if (!activeSubscriptions.has(tokenId)) {
+      if (wsInstance && wsInstance.readyState === WebSocket.OPEN) {
+        subscribeToTokenId(tokenId)
+      } else {
+        pendingSubscriptions.add(tokenId)
+      }
+    }
+  })
+}
+
 export function useFourMemeWebSocketPrice(market: Ref<FourMemeMarket | null | undefined>, refreshInterval = 200) {
   const currentPrice = ref<number | null>(null)
   const priceUpdate = ref<FourMemePriceUpdate | null>(null)
