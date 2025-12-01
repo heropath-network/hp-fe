@@ -10,6 +10,11 @@ import {
   type EvaluationStep2Config,
 } from '@/types/evaluation'
 import DownArrowIcon from '@/assets/icons/downArrow.svg'
+import { useConnection, useSignTypedData } from '@wagmi/vue'
+import { MOCK_TOKEN_PRICES, PaymentTokens } from '@/config/paymentTokens'
+import { useUserEvaluationsStorage } from '@/storages/heroPath'
+import { generateTimeBasedSixDigitId } from '@/utils/common'
+import { LoadingIcon } from '@/components'
 
 type AccountOption = EvaluationStep1Config | EvaluationStep2Config
 
@@ -28,11 +33,14 @@ const planTabs = [
   { label: 'Turbo Plan', value: EvaluationPlan.Turbo },
 ]
 
-const paymentTokens = [
-  { symbol: 'USDC', balance: '1,500.88' },
-  { symbol: 'USDT', balance: '0.00' },
-  { symbol: 'BNB', balance: '0.00' },
-]
+const { signTypedDataAsync } = useSignTypedData()
+const { isConnected, address } = useConnection()
+
+const signing = ref(false)
+
+const { addEvaluation } = useUserEvaluationsStorage(address)
+
+const paymentTokens = PaymentTokens
 
 const route = useRoute()
 const router = useRouter()
@@ -65,6 +73,12 @@ watch(
   },
   { immediate: true },
 )
+
+const selectedTokenUsdBalance = computed(() => {
+  const balance = Number(selectedToken.value.balance ?? 0)
+  const price = MOCK_TOKEN_PRICES[selectedToken.value.symbol] ?? 0
+  return balance * price
+})
 
 const selectedAccount = computed(() => accountOptions.value[selectedAccountIndex.value])
 
@@ -148,7 +162,16 @@ function handleBack() {
   router.push({ name: ROUTE_NAMES.Evaluation })
 }
 
-function handlePurchase() {
+const isInsufficientBalance = computed(() => {
+  const balanceUsd = selectedTokenUsdBalance.value
+  return balanceUsd < Number(purchaseTotal.value)
+})
+
+const confirmButtonDisabled = computed(() => {
+  return !isConnected.value || !agreeRefund.value || !agreeProgram.value || isInsufficientBalance.value || signing.value
+})
+
+async function handlePurchase() {
   const payload = {
     step: activeStep.value,
     plan: activeStep.value === EvaluationSteps.Step1 ? activePlan.value : undefined,
@@ -160,8 +183,56 @@ function handlePurchase() {
     agreeRefund: agreeRefund.value,
     total: purchaseTotal.value,
   }
-  // eslint-disable-next-line no-console
-  console.log('[PurchaseEvaluation] submit', payload)
+
+  const evaluationId = generateTimeBasedSixDigitId()
+  const signMsg = `Purchase Evaluation Order\n\nEvaluation ID: ${evaluationId}\nProduct: ${productLabel.value}\nTotal: $${purchaseTotal.value}\n\nBy signing this message, you agree to the Evaluation Agreement and Refund Policy.`
+
+  try {
+    const evaluationConfig = payload.account
+    if (!evaluationConfig) {
+      throw new Error('No evaluation account configuration found')
+    }
+    signing.value = true
+    await signTypedDataAsync({
+      types: {
+        Person: [{ name: 'wallet', type: 'address' }],
+        Purchase: [
+          { name: 'account', type: 'Person' },
+          { name: 'token', type: 'string' },
+          { name: 'address', type: 'string' },
+          { name: 'contents', type: 'string' },
+        ],
+      },
+      primaryType: 'Purchase',
+      message: {
+        account: {
+          wallet: address.value!,
+        },
+        token: selectedToken.value.symbol!,
+        address: selectedToken.value.address!,
+        contents: signMsg,
+      },
+    })
+
+    addEvaluation({
+      accountId: evaluationId,
+      evaluationConfig,
+      accountType: 'evaluation',
+      accountStatus: 'active',
+      displayStatus: {
+        showDrawdown: true,
+        showPublic: true,
+      },
+      timestamp: Date.now(),
+    })
+
+    router.push({ name: ROUTE_NAMES.Dashboard })
+  } catch (error) {
+    // handle error (e.g., user rejected signing)
+    console.error('Purchase failed:', error)
+  } finally {
+    signing.value = false
+  }
 }
 </script>
 
@@ -263,7 +334,15 @@ function handlePurchase() {
           <div class="space-y-2 border border-[var(--hp-line-light-color)] p-4">
             <div class="flex items-center justify-between text-sm text-[var(--hp-text-color)]">
               <span>Pay <span class="text-[var(--hp-primary-green)]">*</span></span>
-              <span>Balance: {{ selectedToken.balance }}</span>
+              <span>
+                Balance:
+                {{
+                  Number(selectedToken.balance ?? 0).toLocaleString(undefined, {
+                    minimumFractionDigits: Number(selectedToken.formatDecimals ?? 0),
+                    maximumFractionDigits: Number(selectedToken.formatDecimals ?? 0),
+                  })
+                }}
+              </span>
             </div>
             <div class="relative">
               <button
@@ -384,9 +463,12 @@ function handlePurchase() {
         <button
           type="button"
           class="flex w-full items-center justify-center bg-[var(--hp-primary-green)] px-6 py-3 text-base font-medium text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)]"
+          :class="[confirmButtonDisabled ? 'opacity-50 cursor-not-allowed' : '']"
+          :disabled="confirmButtonDisabled"
           @click="handlePurchase"
         >
-          Purchase
+          {{ isInsufficientBalance ? 'Insufficient Balance' : 'Purchase' }}
+          <LoadingIcon v-if="signing" class="ml-2" :isBlack="true" />
         </button>
       </div>
     </div>
