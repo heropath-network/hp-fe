@@ -60,3 +60,5 @@ export const FOUR_MEME_MARKETS: FourMemeMarket[] = [
 
 export const FOUR_MEME_API_BASE_URL = 'https://four.meme/meme-api/v1'
 export const FOUR_MEME_WS_URL = 'wss://ws.four.meme/ws'
+
+

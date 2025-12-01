@@ -41,3 +41,5 @@ import ConnectWalletButton from '@/views/Header/ConnectWalletButton.vue'
 const tradeStore = useTradeStore()
 const accountBalance = computed(() => tradeStore.accountBalance)
 </script>
+
+

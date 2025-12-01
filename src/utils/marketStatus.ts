@@ -106,3 +106,5 @@ export function isMarketClosed(market: string, dateToCheck: Date = new Date()): 
   return false
 }
 
+
+

@@ -142,3 +142,5 @@ const effectiveLeverageDisplay = computed(() => `${effectiveLeverage.value.toFix
 const formattedMarginUsage = computed(() => `${marginUsagePercent.value.toFixed(2)}%`)
 const formattedMarginRatio = computed(() => `${marginRatioPercent.value.toFixed(2)}%`)
 </script>
+
+
