@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useConnection } from '@wagmi/vue'
-import copyIcon from '@/assets/icons/copy.svg'
 import { ellipsisMiddle } from '@/utils/common'
 
 const { address, isConnected } = useConnection()
@@ -38,56 +37,18 @@ const { address, isConnected } = useConnection()
 
           <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
             <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">$0.00</p>
-            <p class="text-sm leading-5 text-[var(--hp-text-color)]">Total Volume</p>
+            <p class="text-sm leading-5 text-[var(--hp-text-color)]">PNL</p>
           </div>
 
           <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
             <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">$0.00</p>
-            <p class="text-sm leading-5 text-[var(--hp-text-color)]">Evaluation</p>
+            <p class="text-sm leading-5 text-[var(--hp-text-color)]">Total Volume</p>
           </div>
         </div>
       </div>
 
       <div class="space-y-4 bg-[var(--hp-bg-normal)] p-6">
         <p class="text-xl font-semibold leading-7">Terminal Details</p>
-        <div class="space-y-3">
-          <div class="flex items-center justify-between bg-[var(--hp-bg-light)] px-4 py-[14px] text-sm">
-            <span class="text-[var(--hp-text-color)]">Login</span>
-            <div class="flex items-center gap-2">
-              <span class="text-base font-medium leading-6 text-[var(--hp-white-color)]">TBD</span>
-              <button
-                type="button"
-                class="flex items-center text-[var(--hp-text-color)] transition hover:text-[var(--hp-white-color)]"
-                aria-label="Copy"
-              >
-                <span
-                  class="icon-mask bg-[var(--hp-text-color)] !w-4 !h-4 hover:!bg-[var(--hp-primary-green)]"
-                  :style="{
-                    '--icon-url': `url(${copyIcon})`,
-                  }"
-                ></span>
-              </button>
-            </div>
-          </div>
-          <div class="flex items-center justify-between bg-[var(--hp-bg-light)] px-4 py-[14px] text-sm">
-            <span class="text-[var(--hp-text-color)]">Password</span>
-            <div class="flex items-center gap-2">
-              <span class="text-base font-medium leading-6 text-[var(--hp-white-color)]">******</span>
-              <button
-                type="button"
-                class="flex items-center text-[var(--hp-text-color)] transition hover:text-[var(--hp-white-color)]"
-                aria-label="Copy"
-              >
-                <span
-                  class="icon-mask bg-[var(--hp-text-color)] !w-4 !h-4 hover:!bg-[var(--hp-primary-green)]"
-                  :style="{
-                    '--icon-url': `url(${copyIcon})`,
-                  }"
-                ></span>
-              </button>
-            </div>
-          </div>
-        </div>
         <div
           class="flex h-[52px] w-full items-center justify-center cursor-pointer border border-[var(--hp-primary-green)] text-[15px] font-medium text-[var(--hp-primary-green)] transition hover:bg-[rgba(108,233,158,0.08)]"
         >
@@ -114,7 +75,7 @@ const { address, isConnected } = useConnection()
             </div>
             <div class="space-y-1">
               <p class="text-xl font-semibold leading-7 text-[var(--hp-text-green)]">$0.00</p>
-              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Total Equity</p>
+              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Target Equity</p>
             </div>
           </div>
         </article>
