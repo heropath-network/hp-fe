@@ -6,7 +6,7 @@ import {
 import { 
   queryMuxOracleCandle,
 } from '@/packages/mux-v3'
-import { getFourMemeBars, resolutionToBarType, getFourMemeMarket } from '@/packages/four-meme'
+import { getFourMemeBars, resolutionToBarType, getFourMemeMarket, getBnbUsdPrice } from '@/packages/four-meme'
 
 export interface OracleCandle {
   timestamp: number
@@ -43,16 +43,20 @@ export async function queryAssetOracleCandle(
     const barType = resolutionToBarType(resolution.toString())
     const endDate = to * 1000 // Convert to milliseconds
     const pageSize = 300
+    const bnbUsdPrice = await getBnbUsdPrice()
+    if (!bnbUsdPrice || bnbUsdPrice <= 0) {
+      console.warn('Four.meme: Missing BNB/USD price, returning raw bars')
+    }
 
     const bars = await getFourMemeBars(market.tokenId, barType, pageSize, endDate)
 
     // Convert four.meme bar format to OracleCandle format
     return bars.map((bar) => ({
       timestamp: parseInt(bar.createDate) / 1000, 
-      open: bar.open,
-      close: bar.close,
-      low: bar.low,
-      high: bar.high,
+      open: bnbUsdPrice && bnbUsdPrice > 0 ? (parseFloat(bar.open) * bnbUsdPrice).toString() : bar.open,
+      close: bnbUsdPrice && bnbUsdPrice > 0 ? (parseFloat(bar.close) * bnbUsdPrice).toString() : bar.close,
+      low: bnbUsdPrice && bnbUsdPrice > 0 ? (parseFloat(bar.low) * bnbUsdPrice).toString() : bar.low,
+      high: bnbUsdPrice && bnbUsdPrice > 0 ? (parseFloat(bar.high) * bnbUsdPrice).toString() : bar.high,
     }))
   }
 
@@ -66,4 +70,3 @@ export async function queryAssetOracleCandle(
 
   return await queryMuxOracleCandle(resolution, from, to, symbol)
 }
-

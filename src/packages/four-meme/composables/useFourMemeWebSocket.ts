@@ -2,6 +2,7 @@ import { ref, computed, watch, type Ref } from 'vue'
 import { tryOnScopeDispose } from '@vueuse/core'
 import { FOUR_MEME_WS_URL } from '../constants'
 import type { FourMemeMarket } from '../constants'
+import { useBnbUsdPrice } from '@/packages/gains'
 
 export interface FourMemePriceUpdate {
   tokenId: number
@@ -139,6 +140,7 @@ export function useFourMemeWebSocketPrice(
   const priceUpdate = ref<FourMemePriceUpdate | null>(null)
   const isConnected = ref(false)
   let localTimer: ReturnType<typeof setInterval> | null = null
+  const { price: bnbUsdPrice } = useBnbUsdPrice(refreshInterval)
 
   activeUsers++
   const ws = initWebSocket()
@@ -156,11 +158,23 @@ export function useFourMemeWebSocketPrice(
     }
 
     const update = priceCache.get(m.tokenId)
-    if (update) {
-      const price = parseFloat(update.price)
-      if (!isNaN(price) && price > 0) {
-        currentPrice.value = price
-        priceUpdate.value = update
+    const bnbPrice = bnbUsdPrice.value
+
+    if (!bnbPrice || bnbPrice <= 0) {
+      currentPrice.value = null
+      priceUpdate.value = null
+      return
+    }
+
+    if (update && bnbPrice && bnbPrice > 0) {
+      const priceInBnb = parseFloat(update.price)
+      if (!isNaN(priceInBnb) && priceInBnb > 0) {
+        const priceInUsd = priceInBnb * bnbPrice
+        currentPrice.value = priceInUsd
+        priceUpdate.value = {
+          ...update,
+          price: priceInUsd.toString(),
+        }
       }
     }
   }
