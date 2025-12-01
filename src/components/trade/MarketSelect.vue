@@ -10,7 +10,7 @@
     >
       <div
         v-if="props.show"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
         @click.self="$emit('close')"
       >
         <Transition
@@ -21,34 +21,34 @@
           leave-from-class="opacity-100 scale-100"
           leave-to-class="opacity-0 scale-95"
         >
-          <div class="w-full max-w-[400px] max-h-[624px] rounded-2xl border border-gray-800 bg-[var(--hp-bg-dark)] shadow-2xl flex flex-col overflow-hidden">
-            <div class="flex items-center justify-between p-4 border-b border-gray-800">
+          <div class="w-full max-w-[400px] max-h-[624px] bg-[#1d1d1d] shadow-2xl flex flex-col overflow-hidden">
+            <div class="flex h-14 items-center justify-between px-4 py-4">
               <h3 class="text-base font-semibold leading-6 text-white m-0">Select Market</h3>
               <button
                 @click="$emit('close')"
-                class="text-white/70 bg-transparent border-none cursor-pointer p-1 flex items-center justify-center transition-colors hover:text-white"
+                class="text-white bg-transparent border-none cursor-pointer p-0 flex items-center justify-center transition-opacity hover:opacity-75 h-4 w-4"
               >
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 16 16">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4L4 12M4 4L12 12" />
                 </svg>
               </button>
             </div>
 
-            <div class="p-4 border-b border-gray-800">
-              <div class="relative flex items-center">
-                <svg class="absolute left-4 w-[18px] h-[18px] text-gray-400 pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="px-4 pb-4">
+              <div class="relative flex items-center gap-2 bg-[#272727] px-4 py-2">
+                <svg class="w-[18px] h-[18px] text-[#9b9b9b] pointer-events-none shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
                   v-model="searchQuery"
                   type="text"
-                  class="w-full h-10 pl-11 pr-10 bg-gray-900 border border-transparent rounded-xl text-base leading-5 text-white transition-all placeholder:text-gray-400/75 hover:border-gray-800 focus:outline-none focus:border-gray-800"
-                  placeholder="Search market..."
+                  class="flex-1 bg-transparent border-none outline-none text-base leading-6 text-white placeholder:text-[#9b9b9b] placeholder:opacity-75"
+                  placeholder="Search Market"
                 />
                 <button
                   v-if="searchQuery"
                   @click="clearSearch"
-                  class="absolute right-3 w-5 h-5 flex items-center justify-center bg-transparent border-none cursor-pointer text-gray-400 opacity-75 transition-opacity hover:opacity-100 z-10"
+                  class="w-4 h-4 flex items-center justify-center bg-transparent border-none cursor-pointer text-[#9b9b9b] opacity-75 transition-opacity hover:opacity-100 shrink-0"
                 >
                   <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -57,114 +57,123 @@
               </div>
             </div>
 
-            <div class="flex flex-wrap gap-2 p-4 border-b border-gray-800">
-              <button
-                v-for="tag in categoryTags"
-                :key="tag.value"
-                @click="selectedCategory = tag.value"
-                class="border-none bg-transparent cursor-pointer p-0 transition-all"
-              >
-                <span
-                  :class="[
-                    'inline-block px-2 py-1.5 rounded-xl text-xs leading-4 font-medium text-white whitespace-nowrap transition-all',
-                    selectedCategory === tag.value
-                      ? 'bg-gray-800 border border-blue-500'
-                      : 'bg-gray-900 border border-gray-800 hover:bg-gray-800'
-                  ]"
+            <div class="px-4 pb-4">
+              <div class="flex flex-wrap gap-2">
+                <CategoryTag
+                  v-for="tag in categoryTags"
+                  :key="tag.value"
+                  :active="selectedCategory === tag.value"
+                  @click="selectedCategory = tag.value"
                 >
                   {{ tag.label }} <span v-if="tag.label === 'All'">({{ tag.count }})</span>
-                </span>
-              </button>
+                </CategoryTag>
+              </div>
             </div>
 
-            <div class="h-px mx-4 bg-gray-800"></div>
+            <div class="h-px bg-[#272727]"></div>
 
-            <div class="flex-1 overflow-y-auto p-2 mx-2 mb-2 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent hover:scrollbar-thumb-gray-700">
+            <div class="flex-1 overflow-y-auto px-4 pb-4 scrollbar-thin">
               <template v-if="sortedMarkets.length === 0">
                 <div class="flex items-center justify-center py-10 px-4 min-h-[200px]">
-                  <span class="text-sm leading-5 text-gray-400">No markets found</span>
+                  <span class="text-sm leading-5 text-[#9b9b9b]">No markets found</span>
                 </div>
               </template>
-              <button
-                v-for="market in sortedMarkets"
-                :key="market"
-                @click="selectMarket(market)"
-                :class="[
-                  'w-full min-h-[60px] rounded-xl border-none bg-transparent cursor-pointer p-0 mb-2 relative transition-all last:mb-0',
-                  selectedMarket === market
-                    ? 'bg-gradient-to-r from-cyan-500 to-blue-500 p-[1px]'
-                    : 'hover:bg-gray-900'
-                ]"
-              >
-                <div
+              <div class="flex flex-col gap-2">
+                <button
+                  v-for="market in sortedMarkets"
+                  :key="market"
+                  @click="selectMarket(market)"
+                  class="w-full flex items-center gap-4 px-4 py-2 bg-[#272727] border cursor-pointer transition-all"
                   :class="[
-                    'w-full min-h-[60px] rounded-xl flex items-center justify-between transition-all px-4 py-2',
                     selectedMarket === market
-                      ? 'bg-[var(--hp-bg-dark)] border-none'
-                      : 'bg-[var(--hp-bg-dark)] border border-gray-800'
+                      ? 'border-[#6ce99e]'
+                      : 'border-[#373737]'
                   ]"
                 >
-                  <div class="flex items-center flex-1 gap-3">
-                    <button
-                      @click.stop="toggleFavorite(market)"
-                      class="flex-shrink-0 w-4 h-4 flex items-center justify-center text-gray-400 hover:text-yellow-400 transition-colors"
+                  <button
+                    @click.stop="toggleFavorite(market)"
+                    class="flex-shrink-0 w-4 h-4 flex items-center justify-center transition-colors"
+                  >
+                    <svg
+                      v-if="isFavorite(market)"
+                      class="w-4 h-4"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      <svg
-                        v-if="isFavorite(market)"
-                        class="w-4 h-4 fill-current text-yellow-400"
-                        viewBox="0 0 24 24"
+                      <path
+                        d="M8 1.5L9.545 5.818L14 6.318L10.5 9.182L11.09 13.682L8 11.682L4.91 13.682L5.5 9.182L2 6.318L6.455 5.818L8 1.5Z"
+                        fill="#FFB110"
+                        stroke="#FFB110"
+                        stroke-width="0.5"
+                      />
+                    </svg>
+                    <svg
+                      v-else
+                      class="w-4 h-4"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8 1.5L9.545 5.818L14 6.318L10.5 9.182L11.09 13.682L8 11.682L4.91 13.682L5.5 9.182L2 6.318L6.455 5.818L8 1.5Z"
+                        fill="none"
+                        stroke="#9b9b9b"
+                        stroke-width="1"
+                      />
+                    </svg>
+                  </button>
+                  <MarketIcon :symbol="market" :size="32" />
+                  <div class="flex flex-col items-start justify-center flex-1 min-w-0">
+                    <div class="flex items-center gap-1">
+                      <span class="text-base font-semibold leading-6 text-white whitespace-nowrap">{{ market }}</span>
+                      <div
+                        v-if="shouldShowQuestionMark(market)"
+                        class="relative h-[13px] w-[13px] shrink-0"
                       >
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                      </svg>
-                      <svg
-                        v-else
-                        class="w-4 h-4 stroke-current fill-none"
-                        viewBox="0 0 24 24"
-                        stroke-width="2"
-                      >
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                      </svg>
-                    </button>
-                    <MarketIcon :symbol="market" :size="32" />
-                    <div class="flex flex-col text-left">
-                      <span class="text-base font-semibold leading-6 text-white">{{ market }}</span>
-                      <span class="text-sm leading-5 text-gray-400">{{ getMarketName(market) }}</span>
+                        <img
+                          src="@/assets/icons/question.svg"
+                          alt="Info"
+                          class="h-full w-full"
+                        />
+                      </div>
                     </div>
+                    <span class="text-sm leading-5 text-[#9b9b9b] whitespace-nowrap">{{ getMarketName(market) }}</span>
                   </div>
-                  <div class="flex flex-col items-end gap-1">
+                  <div class="flex flex-col items-end justify-center text-right whitespace-nowrap shrink-0">
                     <span
                       v-if="isMarketClosed(market)"
-                      class="text-base leading-6 font-semibold text-gray-400"
+                      class="text-base font-semibold leading-6 text-[#9b9b9b]"
                     >
-                      Closed
+                      Market Closed
                     </span>
                     <span
                       v-else-if="marketPrices[market]"
-                      class="text-base leading-6 font-semibold text-white"
+                      class="text-base font-semibold leading-6 text-white"
                     >
                       {{ formatSmallPrice(marketPrices[market].price) }}
                     </span>
-                    <span v-else class="text-base leading-6 font-semibold text-gray-400">--</span>
+                    <span v-else class="text-base font-semibold leading-6 text-[#9b9b9b]">--</span>
                     <span
                       v-if="isMarketClosed(market)"
-                      class="text-sm leading-5 font-medium text-gray-400"
+                      class="text-sm leading-5 font-normal text-[#9b9b9b]"
                     >
                       --
                     </span>
                     <span
                       v-else-if="marketPrices[market] && market24hRates[market] !== undefined"
                       :class="[
-                        'text-sm leading-5 font-medium',
-                        market24hRates[market] >= 0 ? 'text-green-500' : 'text-red-500'
+                        'text-sm leading-5 font-normal',
+                        market24hRates[market] >= 0 ? 'text-[#10c8a8]' : 'text-[#ff4e59]'
                       ]"
                     >
                       {{ market24hRates[market] >= 0 ? '+' : '' }}
                       {{ market24hRates[market].toFixed(2) }}%
                     </span>
-                    <span v-else class="text-sm leading-5 font-medium text-gray-400">--</span>
+                    <span v-else class="text-sm leading-5 font-normal text-[#9b9b9b]">--</span>
                   </div>
-                </div>
-              </button>
+                </button>
+              </div>
             </div>
           </div>
         </Transition>
@@ -185,6 +194,7 @@ import {
   FOUR_MEME_MARKETS,
 } from '@/constants/markets'
 import MarketIcon from '@/components/common/MarketIcon.vue'
+import CategoryTag from '@/components/common/CategoryTag.vue'
 import { isFavorite, toggleFavorite } from '@/utils/favorites'
 import { getMarketName } from '@/utils/marketNames'
 import { useMarketStatus } from '@/composables/useMarketStatus'
@@ -293,6 +303,10 @@ function clearSearch() {
   searchQuery.value = ''
 }
 
+function shouldShowQuestionMark(market: string): boolean {
+  return FOREX_MARKETS.includes(market as any) || STOCKS_MARKETS.includes(market as any)
+}
+
 watch(() => props.show, (newValue) => {
   if (!newValue) {
     searchQuery.value = ''
@@ -314,11 +328,13 @@ watch(() => props.show, (newValue) => {
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgb(31 41 55);
-  border-radius: 3px;
+  background: #373737;
+  border-radius: 4px;
+  opacity: 0.5;
 }
 
 .scrollbar-thin:hover::-webkit-scrollbar-thumb {
-  background: rgb(55 65 81);
+  background: #373737;
+  opacity: 1;
 }
 </style>
