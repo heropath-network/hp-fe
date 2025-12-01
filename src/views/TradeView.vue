@@ -1,22 +1,26 @@
 <template>
-  <div class="trade-view h-screen overflow-hidden bg-gray-950">
-    <TradeStatistics @open-market-select="showMarketSelect = true" />
+  <div class="trade-view flex h-screen flex-col overflow-hidden bg-[var(--hp-bg-dark)]">
+    <TradeHeader />
+   
+    <div class="flex flex-1 overflow-hidden">
+      <div class="flex flex-1 flex-col border-r border-gray-800">
 
-    <AccountInfo />
+        <TradeStatistics @open-market-select="showMarketSelect = true" />
 
-    <div class="grid h-[calc(100vh-108px)] grid-cols-[1fr_400px]">
+        <AccountInfo />
 
-      <div class="flex flex-col">
-        <div class="h-[60%] border-r border-gray-800">
+        <div class="flex-1 overflow-hidden">
           <PriceChart />
         </div>
 
-        <div class="h-[40%] border-r border-t border-gray-800">
+        <!-- Positions and Orders -->
+        <div class="h-[40%] border-t border-gray-800">
           <PositionsAndOrders />
         </div>
       </div>
 
-      <div class="overflow-hidden">
+      <!-- Right: Trading Form -->
+      <div class="w-[400px] overflow-hidden">
         <TradingForm />
       </div>
     </div>
@@ -27,6 +31,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import TradeHeader from '@/components/trade/TradeHeader.vue'
 import TradeStatistics from '@/components/trade/TradeStatistics.vue'
 import AccountInfo from '@/components/trade/AccountInfo.vue'
 import PriceChart from '@/components/trade/PriceChart.vue'

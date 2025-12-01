@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-full flex-col bg-gray-950 pb-8">
+  <div class="flex h-full flex-col bg-[var(--hp-bg-dark)] pb-8">
     <div class="flex items-center border-b border-gray-800">
       <button
         @click="tradeSide = 'long'"

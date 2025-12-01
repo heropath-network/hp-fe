@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-full flex-col bg-gray-950">
+  <div class="flex h-full flex-col bg-[var(--hp-bg-dark)]">
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead class="border-b border-gray-800">

@@ -1,6 +1,6 @@
 <template>
-  <div class="relative flex h-full w-full flex-col bg-gray-950">
-    <div v-if="!showChart" class="absolute inset-0 flex items-center justify-center bg-gray-950">
+  <div class="relative flex h-full w-full flex-col bg-[var(--hp-bg-dark)]">
+    <div v-if="!showChart" class="absolute inset-0 flex items-center justify-center bg-[var(--hp-bg-dark)]">
       <div class="text-center">
         <div class="mb-2 text-sm text-gray-400">Loading chart...</div>
         <div class="h-8 w-8 animate-spin rounded-full border-4 border-gray-700 border-t-blue-600 mx-auto"></div>

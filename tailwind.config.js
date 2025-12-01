@@ -1,5 +1,5 @@
 export default {
-  content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
+  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -10,11 +10,11 @@ export default {
           700: '#2d3548',
           600: '#4b5563',
           500: '#6b7280',
-          400: '#9ca3af',
+          400: '#9B9B9B',
           300: '#d1d5db',
-        }
-      }
-    }
+        },
+      },
+    },
   },
   plugins: [],
-};
+}
