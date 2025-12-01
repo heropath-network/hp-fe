@@ -430,14 +430,22 @@ function connectWebSocket() {
 
         // Handle price events for our token
         if (msg.event === '@TOKEN_PRICE_EVENT@0' && msg.data?.tokenId === market.tokenId) {
-          const wsPriceBnb = parseFloat(msg.data.price)
+          const wsPrice = parseFloat(msg.data.price)
+          const bnbUsd = parseFloat(bnbPrice.value || '0')
 
-          // WebSocket ALWAYS returns BNB prices
-          latestPriceBnb.value = wsPriceBnb.toFixed(18)
-
-          // Calculate USD price
-          if (bnbPrice.value) {
-            latestPriceUsd.value = (wsPriceBnb * parseFloat(bnbPrice.value)).toFixed(10)
+          // WS returns same unit as REST API: Phase 1 = BNB, Phase 2 = USD
+          if (tokenPhase.value === 1) {
+            // Phase 1: WS returns BNB
+            latestPriceBnb.value = wsPrice.toFixed(18)
+            if (bnbUsd > 0) {
+              latestPriceUsd.value = (wsPrice * bnbUsd).toFixed(10)
+            }
+          } else {
+            // Phase 2: WS returns USD
+            latestPriceUsd.value = wsPrice.toFixed(10)
+            if (bnbUsd > 0) {
+              latestPriceBnb.value = (wsPrice / bnbUsd).toFixed(18)
+            }
           }
 
           updateCount.value++

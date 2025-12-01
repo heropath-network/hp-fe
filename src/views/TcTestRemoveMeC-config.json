@@ -13,28 +13,28 @@
     {
       "id": "BIBI",
       "tokenId": 101342925,
-      "symbol": "Binance AI",
+      "symbol": "Bibi",
       "name": "Binance AI",
       "address": "0x444437716c563a0604b63319caa754016568e66e"
     },
     {
       "id": "BOL",
       "tokenId": 101323611,
-      "symbol": "BNBOFLEGENDS",
+      "symbol": "BOL",
       "name": "BNBOFLEGENDS",
       "address": "0x44444e15232ff6dfed49b550d672707a283b3910"
     },
     {
       "id": "RCHV",
       "tokenId": 101305256,
-      "symbol": "Archivas",
+      "symbol": "RCHV",
       "name": "Archivas",
       "address": "0x44442271e6ca7336a29032838d70675680adc7df"
     },
     {
       "id": "GG",
       "tokenId": 101287649,
-      "symbol": "RIP GIGGLE",
+      "symbol": "GG",
       "name": "RIP GIGGLE",
       "address": "0x444484eecf4a4364ba026ade9577f19a807c6260"
     },
