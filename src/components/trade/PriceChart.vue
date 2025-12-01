@@ -12,12 +12,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch, markRaw, effectScope, type EffectScope } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, markRaw, effectScope, type EffectScope, type WatchStopHandle } from 'vue'
 import { computedEager } from '@vueuse/core'
 import { useTradeStore } from '@/stores/tradeStore'
 import Widget from './chart/widget'
 import { convertResolutionStrToNum, alignTimeToResolution, fetchOracleCandles } from './chart/utils'
-import { useGainsWebSocketPrice, useGainsPrice24h, GAINS_PAIR_INDEX_MAP } from '@/packages/gains'
+import { useGainsWebSocketPrice, useGainsPrice24h, useBnbUsdPrice, GAINS_PAIR_INDEX_MAP } from '@/packages/gains'
 import { useMuxV3Price24h, useMuxRealtimePrice } from '@/packages/mux-v3'
 import { useFourMemeWebSocketPrice, useFourMemePrice24h, getFourMemeMarket } from '@/packages/four-meme'
 import { ProjectId } from '@/constants'
@@ -31,6 +31,7 @@ const selectedOracle = computed(() => tradeStore.selectedOracle)
 const gainsPrice24h = useGainsPrice24h()
 const muxV3Price24h = useMuxV3Price24h()
 const fourMemePrice24h = useFourMemePrice24h()
+const { price: bnbUsdPrice } = useBnbUsdPrice()
 
 const showChart = ref(false)
 const widget = ref<Widget | null>(null)
@@ -59,6 +60,7 @@ let realtimePricesScope: {
   symbol: '',
   scope: null
 }
+let waitForBnbPriceStop: WatchStopHandle | null = null
 
 function clearUpdateRealtimePriceTimer() {
   if (updateRealtimePriceTimer.value) {
@@ -184,6 +186,29 @@ function initChartWidget() {
   } catch (e) {
     console.error('Failed to initialize chart:', e)
   }
+}
+
+function initChartWidgetWhenReady() {
+  if (waitForBnbPriceStop) {
+    waitForBnbPriceStop()
+    waitForBnbPriceStop = null
+  }
+
+  if (selectedOracle.value === ProjectId.FOUR_MEME) {
+    const bnbPrice = bnbUsdPrice.value
+    if (!bnbPrice || bnbPrice <= 0) {
+      waitForBnbPriceStop = watch(bnbUsdPrice, (val) => {
+        if (val && val > 0) {
+          waitForBnbPriceStop?.()
+          waitForBnbPriceStop = null
+          initChartWidget()
+        }
+      })
+      return
+    }
+  }
+
+  initChartWidget()
 }
 
 function buildCandle(
@@ -435,12 +460,29 @@ watch(selectedMarket, (newMarket, oldMarket) => {
   }
 })
 
+watch(
+  bnbUsdPrice,
+  (newPrice, oldPrice) => {
+    if (
+      selectedOracle.value === ProjectId.FOUR_MEME &&
+      (!oldPrice || oldPrice <= 0) &&
+      newPrice &&
+      newPrice > 0
+    ) {
+      const market = getFourMemeMarket(selectedMarket.value)
+      if (market) {
+        fourMemePrice24h.fetchPrice24hAgo(market)
+      }
+    }
+  }
+)
+
 onMounted(() => {
   if (selectedOracle.value === ProjectId.FOUR_MEME) {
     muxV3Price24h.stopAutoRefresh()
     gainsPrice24h.stopAutoRefresh()
     const market = getFourMemeMarket(selectedMarket.value)
-    if (market) {
+    if (market && bnbUsdPrice.value && bnbUsdPrice.value > 0) {
       fourMemePrice24h.fetchPrice24hAgo(market)
     }
   } else if (selectedOracle.value === ProjectId.GAINS) {
@@ -455,7 +497,7 @@ onMounted(() => {
   }
   
   setTimeout(() => {
-    initChartWidget()
+    initChartWidgetWhenReady()
   }, 100)
 })
 
@@ -464,6 +506,10 @@ onUnmounted(() => {
   gainsPrice24h.stopAutoRefresh()
   muxV3Price24h.stopAutoRefresh()
   fourMemePrice24h.stopAutoRefresh()
+  if (waitForBnbPriceStop) {
+    waitForBnbPriceStop()
+    waitForBnbPriceStop = null
+  }
   
   if (widget.value) {
     widget.value.onDestroyed()
@@ -506,6 +552,13 @@ watch(selectedOracle, (newOracle, oldOracle) => {
     } else if (newOracle === ProjectId.MUX_V3) {
       const symbolName = selectedMarket.value.split('/')[0]
       muxV3Price24h.startAutoRefresh([symbolName])
+    } else if (newOracle === ProjectId.FOUR_MEME) {
+      gainsPrice24h.stopAutoRefresh()
+      muxV3Price24h.stopAutoRefresh()
+      const market = getFourMemeMarket(selectedMarket.value)
+      if (market && bnbUsdPrice.value && bnbUsdPrice.value > 0) {
+        fourMemePrice24h.fetchPrice24hAgo(market)
+      }
     }
     
     if (widget.value?.tvWidget) {
@@ -514,11 +567,11 @@ watch(selectedOracle, (newOracle, oldOracle) => {
       
       setTimeout(() => {
         if (selectedMarket.value) {
-          initChartWidget()
+          initChartWidgetWhenReady()
         }
       }, 300)
     } else if (selectedMarket.value) {
-      initChartWidget()
+      initChartWidgetWhenReady()
     }
   }
 })

@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { getFourMemeTokenData } from '../api/oracle'
 import type { FourMemeMarket } from '../constants'
+import { useBnbUsdPrice } from '@/packages/gains'
 
 const price24hAgoMap = ref<Map<number, number>>(new Map())
 const isLoading = ref(false)
@@ -10,10 +11,17 @@ const REFRESH_INTERVAL = 60_000
 
 export function useFourMemePrice24h() {
   let updateTimer: number | null = null
+  const { price: bnbUsdPrice } = useBnbUsdPrice()
 
   async function fetchPrice24hAgo(market: FourMemeMarket) {
     try {
       isLoading.value = true
+
+      const bnbPrice = bnbUsdPrice.value
+      if (!bnbPrice || bnbPrice <= 0) {
+        console.warn('Four.meme: Skipping 24h price fetch, missing BNB/USD price')
+        return
+      }
 
       const tokenData = await getFourMemeTokenData(market.address)
 
@@ -26,7 +34,8 @@ export function useFourMemePrice24h() {
           // dayIncrease is the percentage change, so: current = past * (1 + dayIncrease)
           // past = current / (1 + dayIncrease)
           const price24hAgo = currentPrice / (1 + dayIncrease)
-          price24hAgoMap.value.set(market.tokenId, price24hAgo)
+          const price24hAgoUsd = price24hAgo * bnbPrice
+          price24hAgoMap.value.set(market.tokenId, price24hAgoUsd)
           lastFetchTime.value = Date.now()
         }
       }
