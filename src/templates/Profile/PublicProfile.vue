@@ -58,7 +58,7 @@ const accounts = ref([
       <div class="space-y-6 bg-[var(--hp-bg-normal)] p-6">
         <div class="space-y-1">
           <h2 class="text-xl font-semibold leading-7">Key Metrics</h2>
-          <p class="text-sm leading-5 text-[var(--hp-text-color)]">Lifetime metrics across all accounts</p>
+          <p class="!mt-2 text-sm leading-5 text-[var(--hp-text-color)]">Lifetime metrics across all accounts</p>
         </div>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
