@@ -30,14 +30,9 @@ export function useAllFourMemePrices() {
 
   async function fetchAllPrices(): Promise<Map<string, FourMemePriceData>> {
     const result = new Map<string, FourMemePriceData>()
-    const bnbPrice = bnbUsdPrice.value
-
-    if (!bnbPrice || bnbPrice <= 0) {
-      return result
-    }
 
     try {
-      const apiPrices = await getAllFourMemeMarketPrices(FOUR_MEME_MARKETS, bnbPrice)
+      const apiPrices = await getAllFourMemeMarketPrices(FOUR_MEME_MARKETS)
 
       apiPrices.forEach((priceData, symbol) => {
         const priceBigInt = BigInt(Math.floor(priceData.price * 10 ** 18))
