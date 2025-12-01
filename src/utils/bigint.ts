@@ -160,15 +160,15 @@ export function formatSmallPrice(value: number | bigint | string): string {
     leadingZeros++
   }
 
-  if (leadingZeros >= 4) {
+  if (leadingZeros > 0) {
     const remainingFraction = fractionPartRaw.slice(leadingZeros) || '0'
     const truncated = remainingFraction.slice(0, 4) || '0'
-    return `${negative ? '-' : ''}${wholePart}.0{${leadingZeros}}${truncated}`
+    const zerosString = '0'.repeat(leadingZeros)
+    return `${negative ? '-' : ''}${wholePart}.${zerosString}${truncated}`
   }
 
-  const trimmedFraction = fractionPartRaw.replace(/0+$/, '')
-  const fraction = trimmedFraction || '0'
-  return `${negative ? '-' : ''}${wholePart}.${fraction}`
+  const truncated = fractionPartRaw.slice(0, 4) || '0'
+  return `${negative ? '-' : ''}${wholePart}.${truncated}`
 }
 
 function bigIntToDecimalString(value: bigint): string {
