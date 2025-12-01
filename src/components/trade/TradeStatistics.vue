@@ -1,118 +1,188 @@
 <template>
-  <div class="flex items-center justify-between border-b border-gray-800 bg-gray-950 px-4 py-3">
-    <div class="flex items-center gap-6">
-      <div class="flex items-center gap-2">
-        <button
-          @click="$emit('openMarketSelect')"
-          class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-white transition hover:bg-gray-800"
-        >
+  <div class="flex items-center h-16 bg-[var(--hp-bg-dark)] border-b border-gray-800 px-4">
+    <!-- Market Info Section -->
+    <div class="flex items-center min-w-[160px]">
+      <button
+        @click="$emit('openMarketSelect')"
+        class="flex items-center gap-3 text-white hover:text-blue-400 transition-colors cursor-pointer"
+      >
+        <div class="flex items-center gap-3">
           <MarketIcon :symbol="selectedMarket" :size="32" />
           <div class="flex flex-col text-left">
-            <span class="text-lg font-semibold">{{ selectedMarket }}</span>
-            <span class="text-sm text-gray-400 ">Up to 100X</span>
+            <div class="flex items-center gap-1">
+              <span class="text-base font-semibold leading-[24px] text-white">{{ selectedMarket }}</span>
+            </div>
+            <span class="text-xs mt-[2px] leading-[16px] text-gray-400">Up to {{ maxLeverage }}X</span>
           </div>
-          <svg class="h-4 w-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-      </div>
- 
-      <div class="h-8 w-px bg-gray-800"></div>
-
-      <div class="flex flex-col">
-        <div class="text-xs text-gray-400">Mark Price</div>
-        <div class="flex items-baseline gap-2">
-          <div
-            v-if="isLoadingMarkPrice && !isMarketClosed"
-            class="h-7 w-24 animate-pulse rounded bg-gray-700"
-          ></div>
-          <span
-            v-else-if="isMarketClosed"
-            class="text-xl font-semibold text-gray-400"
-          >
-            Closed
-          </span>
-          <span
-            v-else
-            class="text-xl font-semibold text-white"
-          >
-            ${{ formattedPrice }}
-          </span>
-          <span
-            v-if="!isMarketClosed && !isLoadingPriceChange && !isLoadingMarkPrice"
-            :class="[
-              'text-sm font-medium',
-              priceChange24h >= 0 ? 'text-green-500' : 'text-red-500'
-            ]"
-          >
-            {{ priceChange24h >= 0 ? '+' : '' }}{{ priceChange24h.toFixed(2) }}%
-          </span>
-          <div
-            v-else-if="!isMarketClosed && isLoadingPriceChange"
-            class="h-4 w-12 animate-pulse rounded bg-gray-700"
-          ></div>
         </div>
-      </div>
+        <svg class="ml-3 h-4 w-4 flex-shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      
+      <!-- Divider -->
+      <div class="h-16 mx-4 w-px border-l border-gray-800"></div>
+    </div>
 
-      <div class="h-8 w-px bg-gray-800"></div>
-
-      <!-- 24h High/Low -->
-      <div class="flex gap-4">
-        <div class="flex flex-col">
-          <div class="text-xs text-gray-400">24h High</div>
-          <div
-            v-if="!isLoadingHighLow"
-            class="text-sm font-medium text-white"
-          >
-            ${{ high24h }}
+    <!-- Statistics Row -->
+    <div class="flex items-center flex-1 overflow-x-auto">
+      <div class="flex items-center gap-4">
+        <!-- Price Box -->
+        <div class="flex items-center justify-center min-w-[170px]">
+          <div class="flex items-center">
+            <div v-if="isLoadingMarkPrice && !isMarketClosed" class="h-7 w-24 animate-pulse rounded bg-gray-700"></div>
+            <div v-else-if="isMarketClosed" class="text-xl font-semibold text-gray-400">Closed</div>
+            <div v-else class="text-xl font-semibold text-white">
+              ${{ formattedPrice }}
+            </div>
+            <div
+              v-if="!isMarketClosed && !isLoadingPriceChange && !isLoadingMarkPrice"
+              :class="[
+                'ml-2 text-base font-medium',
+                priceChange24h >= 0 ? 'text-green-500' : 'text-red-500'
+              ]"
+            >
+              ({{ priceChange24h >= 0 ? '+' : '' }}{{ priceChange24h.toFixed(2) }}%)
+            </div>
+            <div
+              v-else-if="!isMarketClosed && isLoadingPriceChange"
+              class="ml-2 h-4 w-16 animate-pulse rounded bg-gray-700"
+            ></div>
           </div>
-          <div
-            v-else
-            class="h-4 w-16 animate-pulse rounded bg-gray-700"
-          ></div>
         </div>
-        <div class="flex flex-col">
-          <div class="text-xs text-gray-400">24h Low</div>
-          <div
-            v-if="!isLoadingHighLow"
-            class="text-sm font-medium text-white"
-          >
-            ${{ low24h }}
+
+        <div class="h-5 w-px bg-gray-800"></div>
+
+        <!-- Est. 1H Funding (L/S) -->
+        <div class="flex flex-col min-w-[100px]">
+          <div class="text-xs text-gray-400 mb-1">Est. 1H Funding (L/S)</div>
+          <div class="text-xs text-white">
+            <span v-if="isLoadingFunding">
+              <div class="h-3 w-20 animate-pulse rounded bg-gray-700"></div>
+            </span>
+            <span v-else>
+              {{ formatPercentage(longFunding) }}% / {{ formatPercentage(shortFunding) }}%
+            </span>
           </div>
-          <div
-            v-else
-            class="h-4 w-16 animate-pulse rounded bg-gray-700"
-          ></div>
+        </div>
+
+        <div class="h-5 w-px bg-gray-800"></div>
+
+        <!-- Long / Short (Aggregator) -->
+        <div class="flex flex-col min-w-[118px]">
+          <Tooltip :content="openInterestTooltip">
+            <div class="text-xs text-gray-400 mb-1 cursor-help">
+              Long / Short (Aggregator)
+            </div>
+          </Tooltip>
+          <div class="text-xs text-white">
+            <span v-if="isLoadingOpenInterest">
+              <div class="h-3 w-20 animate-pulse rounded bg-gray-700"></div>
+            </span>
+            <span v-else>
+              ${{ formatNumber(longOpenInterest) }} / ${{ formatNumber(shortOpenInterest) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="h-5 w-px bg-gray-800"></div>
+
+        <!-- 24H High / Low -->
+        <div class="flex flex-col min-w-[100px]">
+          <div class="text-xs text-gray-400 mb-1">24H High / Low</div>
+          <div class="text-xs text-white">
+            <span v-if="isLoadingHighLow">
+              <div class="h-3 w-20 animate-pulse rounded bg-gray-700"></div>
+            </span>
+            <span v-else>
+              ${{ high24h }} / ${{ low24h }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
 
-    <OracleSelect
-      :options="allOracleOptions"
-      :selected-value="selectedOracleName"
-      label="Chart Source"
-      @select="handleOracleSelect"
-    />
+    <!-- Chart Source Selector -->
+    <div class="flex items-center ml-4 pl-4 border-l border-gray-800">
+      <div class="flex flex-col min-w-[120px]">
+        <div class="text-xs text-gray-400 mb-1">Chart Source</div>
+        <Menu as="div" class="relative inline-block text-left">
+          <div>
+            <MenuButton
+              class="flex items-center gap-2 rounded-lg border border-gray-800 bg-gray-900 px-2 py-1 text-xs text-gray-300 transition hover:border-gray-700 focus:border-blue-500 focus:outline-none"
+            >
+              <div class="flex items-center justify-center w-4 h-4 rounded-full bg-orange-500 flex-shrink-0">
+                <svg class="h-2.5 w-2.5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v20M2 12h20" />
+                </svg>
+              </div>
+              <span class="text-xs">{{ selectedOracleName || 'Auto Match' }}</span>
+              <svg class="h-3 w-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+              </svg>
+            </MenuButton>
+          </div>
+
+          <transition
+            enter-active-class="transition duration-100 ease-out"
+            enter-from-class="transform scale-95 opacity-0"
+            enter-to-class="transform scale-100 opacity-100"
+            leave-active-class="transition duration-75 ease-in"
+            leave-from-class="transform scale-100 opacity-100"
+            leave-to-class="transform scale-95 opacity-0"
+          >
+            <MenuItems
+              class="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-lg border border-gray-800 bg-gray-900 shadow-lg focus:outline-none"
+            >
+              <div class="py-1">
+                <MenuItem
+                  v-for="oracle in allOracleOptions"
+                  :key="oracle.value"
+                  v-slot="{ active }"
+                >
+                  <button
+                    @click="handleOracleSelect(oracle.value)"
+                    :class="[
+                      active ? 'bg-gray-800 text-gray-200' : '',
+                      oracle.value === selectedOracleName ? 'text-gray-300' : 'text-white',
+                      'group flex w-full items-center px-4 py-2 text-sm transition'
+                    ]"
+                  >
+                    {{ oracle.label }}
+                  </button>
+                </MenuItem>
+              </div>
+            </MenuItems>
+          </transition>
+        </Menu>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useTradeStore } from '@/stores/tradeStore'
 import { formatSmallPrice } from '@/utils/bigint'
 import { useMarket24hRates } from '@/composables/useMarket24hRates'
 import { usePrice24hHighLow } from '@/composables/usePrice24hHighLow'
 import { useMarketStatus } from '@/composables/useMarketStatus'
-import OracleSelect from './OracleSelect.vue'
 import MarketIcon from '@/components/common/MarketIcon.vue'
+import ChainLabel from '@/components/common/ChainLabel.vue'
+import Tooltip from '@/components/common/Tooltip.vue'
+import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 
 const tradeStore = useTradeStore()
 const marketStatus = useMarketStatus()
 
 const selectedMarket = computed(() => tradeStore.selectedMarket)
 const isMarketClosed = computed(() => marketStatus.checkMarketClosed(selectedMarket.value))
-const oracleSources = computed(() => tradeStore.oracleSources)
+const maxLeverage = computed(() => '100') // Default leverage, can be made dynamic
 
+// Chain name - can be made dynamic based on selected network/chain
+const currentChainName = computed(() => 'Arbitrum') // Default chain, can be connected to wallet/network state
+
+const oracleSources = computed(() => tradeStore.oracleSources)
 const selectedOracleName = computed(() => tradeStore.currentOracleName)
 
 const allOracleOptions = computed(() => {
@@ -129,8 +199,6 @@ function handleOracleSelect(value: string) {
   tradeStore.setOracleByName(value)
 }
 
-const selectedOracleId = computed(() => tradeStore.selectedOracle)
-
 const isLoadingMarkPrice = computed(() => {
   const marketPrice = tradeStore.marketPrices[selectedMarket.value]
   return !marketPrice
@@ -142,11 +210,13 @@ const formattedPrice = computed(() => {
   return formatSmallPrice(price)
 })
 
-
-const { rates: market24hRates, isLoading: isLoadingPriceChange } = useMarket24hRates(computed(() => [selectedMarket.value]), {
-  autoRefresh: true,
-  onMounted: true,
-})
+const { rates: market24hRates, isLoading: isLoadingPriceChange } = useMarket24hRates(
+  computed(() => [selectedMarket.value]),
+  {
+    autoRefresh: true,
+    onMounted: true,
+  }
+)
 
 const priceChange24h = computed(() => {
   const market = selectedMarket.value
@@ -154,6 +224,7 @@ const priceChange24h = computed(() => {
   return market24hRates.value[market] || 0
 })
 
+const selectedOracleId = computed(() => tradeStore.selectedOracle)
 const price24hHighLowState = usePrice24hHighLow(selectedMarket, selectedOracleId)
 
 const isLoadingHighLow = computed(() => price24hHighLowState.isLoading.value)
@@ -170,6 +241,32 @@ const low24h = computed(() => {
   return formatSmallPrice(data.low)
 })
 
+// Funding rates (mock data for now - can be replaced with actual API calls)
+const isLoadingFunding = ref(false)
+const longFunding = ref(0.00004) // 0.004% per hour
+const shortFunding = ref(0.00003) // 0.003% per hour
+
+// Open Interest (mock data for now - can be replaced with actual API calls)
+const isLoadingOpenInterest = ref(false)
+const longOpenInterest = ref(10000000) // $10.00M
+const shortOpenInterest = ref(10000000) // $10.00M
+
+const openInterestTooltip = computed(() => {
+  return `Long Open Interest: $${formatNumber(longOpenInterest.value)}\nShort Open Interest: $${formatNumber(shortOpenInterest.value)}`
+})
+
+function formatPercentage(value: number): string {
+  return (value * 100).toFixed(3)
+}
+
+function formatNumber(value: number): string {
+  if (value >= 1000000) {
+    return (value / 1000000).toFixed(2) + 'M'
+  } else if (value >= 1000) {
+    return (value / 1000).toFixed(2) + 'K'
+  }
+  return value.toFixed(0)
+}
 
 defineEmits(['openMarketSelect'])
 </script>

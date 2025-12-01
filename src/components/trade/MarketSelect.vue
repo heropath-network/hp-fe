@@ -21,7 +21,7 @@
           leave-from-class="opacity-100 scale-100"
           leave-to-class="opacity-0 scale-95"
         >
-          <div class="w-full max-w-[400px] max-h-[624px] rounded-2xl border border-gray-800 bg-gray-950 shadow-2xl flex flex-col overflow-hidden">
+          <div class="w-full max-w-[400px] max-h-[624px] rounded-2xl border border-gray-800 bg-[var(--hp-bg-dark)] shadow-2xl flex flex-col overflow-hidden">
             <div class="flex items-center justify-between p-4 border-b border-gray-800">
               <h3 class="text-base font-semibold leading-6 text-white m-0">Select Market</h3>
               <button
@@ -100,8 +100,8 @@
                   :class="[
                     'w-full min-h-[60px] rounded-xl flex items-center justify-between transition-all px-4 py-2',
                     selectedMarket === market
-                      ? 'bg-gray-950 border-none'
-                      : 'bg-gray-900 border border-gray-800'
+                      ? 'bg-[var(--hp-bg-dark)] border-none'
+                      : 'bg-[var(--hp-bg-dark)] border border-gray-800'
                   ]"
                 >
                   <div class="flex items-center flex-1 gap-3">

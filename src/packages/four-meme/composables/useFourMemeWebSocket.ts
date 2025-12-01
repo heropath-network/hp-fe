@@ -129,7 +129,6 @@ function initWebSocket(): WebSocket | null {
         if (message.event === '@TOKEN_PRICE_EVENT@0' && message.data) {
           const update: FourMemePriceUpdate = message.data
           priceCache.set(update.tokenId, update)
-          console.log('Four.meme: price update', update.tokenId, update.price)
         } else if (message.event?.includes('@BAR_EVENT') && message.data) {
           const update: FourMemeBarUpdate = {
             tokenId: message.data.tokenId,
