@@ -54,6 +54,13 @@ export const MARKET_NAMES: Record<string, string> = {
   SBET: 'Sharplink Gaming Inc',
   PLTR: 'Palantir Technologies',
   MARA: 'MARA Holdings',
+  ALIF: 'ALIF',
+  BIBI: 'Binance AI',
+  BOL: 'BNBOFLEGENDS',
+  RCHV: 'Archivas',
+  GG: 'RIP GIGGLE',
+  AJC: 'AI Judge Companion',
+  AIF: 'AIfluence House',
 }
 
 export function getMarketName(symbol: string): string {
