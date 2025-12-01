@@ -20,7 +20,7 @@
       </div>
 
       <!-- Right: Trading Form -->
-      <div class="w-[400px] overflow-hidden">
+      <div class="w-[343px] overflow-hidden border-l border-gray-800">
         <TradingForm />
       </div>
     </div>
