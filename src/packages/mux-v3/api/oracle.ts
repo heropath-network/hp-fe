@@ -52,19 +52,17 @@ export async function queryMuxOracleCandle(
   resolution: number,
   from: number,
   to: number,
-  symbol: string
+  symbol: string,
 ): Promise<OracleCandle[]> {
-  const dataTypeValue = 'mux3'
-  const url = '/mux3/priceChart/indexPrices'
-  
+  const url = '/priceChart/indexPrices'
+
   const params = {
     symbol: symbol.toUpperCase(),
     timeMode: convertResolution(resolution),
     beginTime: from,
     endTime: to,
-    dataType: dataTypeValue,
   }
-  
+
   try {
     const responseData = await defaultOracleServerApiClient().request({
       url: url,
@@ -81,7 +79,6 @@ export async function queryMuxOracleCandle(
       low: String(candle.low),
       high: String(candle.high),
     }))
-
   } catch (error: any) {
     console.error('MUX V3: Failed to fetch oracle candles:', error)
     return []
@@ -97,28 +94,24 @@ export type PriceAgoResponseType = {
   prices: PriceAgoType[];
 };
 
-export async function getMux24hAgoPrices(
-  symbols: string[]
-): Promise<PriceAgoType[]> {
-  const dataTypeValue = "mux3";
-  const url = "/mux3/priceChart/price24hAgo";
+export async function getMux24hAgoPrices(symbols: string[]): Promise<PriceAgoType[]> {
+  const url = '/priceChart/price24hAgo'
 
   const params = {
-    symbols: symbols.join(","),
-    dataType: dataTypeValue,
-  };
+    symbols: symbols.join(','),
+  }
 
   try {
     const responseData = await defaultOracleServerApiClient().request({
       url: url,
-      method: "GET",
+      method: 'GET',
       params,
-    });
+    })
 
-    return (responseData as unknown as PriceAgoResponseType).prices || [];
+    return (responseData as unknown as PriceAgoResponseType).prices || []
   } catch (error: any) {
-    console.error("MUX V3: Failed to fetch 24h ago price:", error);
-    return [];
+    console.error('MUX V3: Failed to fetch 24h ago price:', error)
+    return []
   }
 }
 

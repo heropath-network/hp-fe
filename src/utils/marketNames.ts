@@ -1,7 +1,6 @@
 export const MARKET_NAMES: Record<string, string> = {
   BTC: 'Bitcoin',
   ETH: 'Ethereum',
-  WLFI: 'World Liberty Financial',
   LINK: 'Chainlink',
   BNB: 'Binance Coin',
   ADA: 'Cardano',
