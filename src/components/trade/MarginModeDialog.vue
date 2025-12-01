@@ -170,3 +170,5 @@ input[type='range']::-moz-range-thumb {
   @apply h-4 w-4 cursor-pointer appearance-none rounded-full border-0 bg-teal-500;
 }
 </style>
+
+

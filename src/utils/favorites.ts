@@ -22,3 +22,5 @@ export function getFavorites(): string[] {
   return favoritesStorage.value
 }
 
+
+
