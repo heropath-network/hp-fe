@@ -303,8 +303,11 @@ async function handlePurchase() {
                   selectedAccount?.accountSize ? `$${selectedAccount.accountSize.toLocaleString()}` : '--'
                 }}</span>
                 <span
-                  class="icon-mask !bg-[var(--hp-text-color)] !h-3 !w-3 group-hover:!bg-[var(--hp-primary-green)]"
-                  :style="{ '--icon-url': `url(${DownArrowIcon})` }"
+                  class="icon-mask !bg-[var(--hp-text-color)] !h-3 !w-3 group-hover:!bg-[var(--hp-primary-green)] transition-transform duration-200"
+                  :style="{
+                    '--icon-url': `url(${DownArrowIcon})`,
+                    transform: showAccountDropdown ? 'rotate(180deg)' : 'rotate(0deg)',
+                  }"
                 >
                 </span>
               </button>
@@ -320,7 +323,7 @@ async function handlePurchase() {
                   v-for="(item, idx) in accountOptions"
                   :key="item.level"
                   type="button"
-                  class="flex w-full items-center justify-between px-4 py-3 text-left transition hover:bg-[var(--hp-bg-normal)]"
+                  class="flex w-full items-center justify-between px-4 py-3 text-left transition hover:bg-[var(--hp-line-light-color)]"
                   :class="idx === selectedAccountIndex ? 'text-[var(--hp-text-color)]' : 'text-[var(--hp-white-color)]'"
                   @click="selectAccount(idx)"
                 >
@@ -355,8 +358,11 @@ async function handlePurchase() {
                   <span>{{ selectedToken.symbol }}</span>
                 </div>
                 <span
-                  class="icon-mask !bg-[var(--hp-text-color)] !h-3 !w-3 group-hover:!bg-[var(--hp-primary-green)]"
-                  :style="{ '--icon-url': `url(${DownArrowIcon})` }"
+                  class="icon-mask !bg-[var(--hp-text-color)] !h-3 !w-3 group-hover:!bg-[var(--hp-primary-green)] transition-transform duration-200"
+                  :style="{
+                    '--icon-url': `url(${DownArrowIcon})`,
+                    transform: showTokenDropdown ? 'rotate(180deg)' : 'rotate(0deg)',
+                  }"
                 >
                 </span>
               </button>
@@ -372,7 +378,7 @@ async function handlePurchase() {
                   v-for="token in paymentTokens"
                   :key="token.symbol"
                   type="button"
-                  class="flex w-full items-center justify-between px-4 py-3 text-left transition hover:bg-[var(--hp-bg-normal)]"
+                  class="flex w-full items-center justify-between px-4 py-3 text-left transition hover:bg-[var(--hp-line-light-color)]"
                   @click="selectToken(token)"
                 >
                   <div

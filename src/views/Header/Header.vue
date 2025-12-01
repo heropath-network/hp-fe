@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import ConnectWalletButton from './ConnectWalletButton.vue'
 import { ROUTE_NAMES } from '@/router'
 
@@ -20,7 +20,7 @@ function goNewEvaluation() {
     <div class="flex items-center gap-4 text-sm text-[var(--hp-text-color)]">
       <button
         type="button"
-        class="rounded bg-[var(--hp-primary-green)] h-[32px] px-2 py-1.5 text-[var(--hp-black-color)] text-[14px] font-[500] leading-none transition hover:bg-[var(--hp-primary-green-hover)] active:bg-[var(--hp-primary-green-hover)]"
+        class="bg-[var(--hp-primary-green)] h-[32px] px-2 py-1.5 text-[var(--hp-black-color)] text-[14px] font-[500] leading-none transition hover:bg-[var(--hp-primary-green-hover)] active:bg-[var(--hp-primary-green-hover)]"
         @click="goNewEvaluation"
       >
         New Evaluation
