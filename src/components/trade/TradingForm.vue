@@ -74,16 +74,52 @@
       <div class="mb-4">
         <label class="mb-2 block text-xs font-medium text-gray-400">Size</label>
         <div class="relative">
+          <div class="mb-1 text-xs text-gray-500">Up To: {{ maxSize }}</div>
           <input
             v-model="size"
             type="number"
             step="0.001"
             class="w-full rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 pr-16 text-sm text-white transition focus:border-blue-500 focus:outline-none"
-            placeholder="0.000"
+            placeholder="0.0"
+            @input="handleSizeInput"
           />
-          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">
-            {{ selectedMarket.split('/')[0] }}
-          </span>
+          <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            <select
+              class="appearance-none bg-transparent text-xs text-gray-500 focus:outline-none"
+              disabled
+            >
+              <option>{{ selectedMarket.split('/')[0] }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center gap-3">
+          <div class="flex h-8 min-w-[4rem] items-center justify-center rounded-lg bg-gray-900 px-2 text-sm font-medium text-white">
+            {{ sizePercentage }}%
+          </div>
+          <div class="relative flex-1">
+            <div class="relative h-2 w-full rounded-lg bg-gray-800 overflow-hidden">
+              <div
+                class="absolute left-0 top-0 h-full bg-cyan-500 transition-all duration-150"
+                :style="{ width: `${sizePercentage}%` }"
+              ></div>
+              <div class="absolute left-0 top-0 flex h-2 w-full justify-between pointer-events-none">
+                <span class="h-2 w-0.5 bg-gray-700"></span>
+                <span class="h-2 w-0.5 bg-gray-700"></span>
+                <span class="h-2 w-0.5 bg-gray-700"></span>
+                <span class="h-2 w-0.5 bg-gray-700"></span>
+                <span class="h-2 w-0.5 bg-gray-700"></span>
+              </div>
+            </div>
+            <input
+              v-model.number="sizePercentage"
+              type="range"
+              min="0"
+              max="100"
+              step="25"
+              class="size-percentage-slider absolute inset-0 h-2 w-full cursor-pointer appearance-none bg-transparent"
+              @input="handlePercentageChange"
+            />
+          </div>
         </div>
       </div>
 
@@ -108,22 +144,6 @@
         </div>
       </div>
 
-      <div class="mb-4">
-        <label class="mb-2 block text-xs font-medium text-gray-400">Collateral</label>
-        <div class="relative">
-          <input
-            v-model="collateral"
-            type="number"
-            step="1"
-            class="w-full rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 pr-12 text-sm text-white transition focus:border-blue-500 focus:outline-none"
-            placeholder="0.00"
-          />
-          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">USD</span>
-        </div>
-        <div class="mt-2 text-xs text-gray-500">
-          Available: {{ formatCurrency(accountBalance) }}
-        </div>
-      </div>
 
       <div class="mb-4 space-y-2 rounded-lg border border-gray-800 bg-gray-900 p-3 text-xs">
         <div class="flex justify-between">
@@ -188,7 +208,7 @@
 import { ref, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useTradeStore } from '@/stores/tradeStore'
-import { toBigInt, fromBigInt, formatCurrency } from '@/utils/bigint'
+import { toBigInt, fromBigInt } from '@/utils/bigint'
 import MarginModeDialog from '@/components/trade/MarginModeDialog.vue'
 import LiquiditySourcesDialog from '@/components/trade/LiquiditySourcesDialog.vue'
 import AccountDataCard from '@/components/trade/AccountDataCard.vue'
@@ -207,8 +227,8 @@ const tradeSide = ref<'long' | 'short'>('long')
 const orderType = ref<'market' | 'limit' | 'stop'>('market')
 const price = ref('')
 const size = ref('')
+const sizePercentage = ref(0)
 const leverage = ref(10)
-const collateral = ref('')
 const showMarginModeDialog = ref(false)
 const showLiquiditySourcesDialog = ref(false)
 
@@ -278,20 +298,68 @@ const tradingFee = computed(() => {
   return (posSize * 0.001).toFixed(2)
 })
 
+const calculatedCollateral = computed(() => {
+  const sizeNum = parseFloat(size.value) || 0
+  const priceNum = parseFloat(displayPrice.value) || 0
+  if (sizeNum === 0 || priceNum === 0) return BigInt(0)
+  
+  // Collateral = (Size * Price) / Leverage
+  const positionValue = sizeNum * priceNum
+  const collateralAmount = positionValue / leverage.value
+  return BigInt(Math.floor(collateralAmount * 10 ** 18))
+})
+
+const maxSize = computed(() => {
+  const priceNum = parseFloat(displayPrice.value) || 0
+  if (priceNum === 0) return '0.0'
+  
+  // Max size = (Available Balance * Leverage) / Price
+  const availableBalance = parseFloat(fromBigInt(accountBalance.value, 18))
+  const maxSizeValue = (availableBalance * leverage.value) / priceNum
+  return maxSizeValue.toFixed(4)
+})
+
 const isFormValid = computed(() => {
   const hasSize = parseFloat(size.value) > 0
-  const hasCollateral = parseFloat(collateral.value) > 0
   const hasPrice = orderType.value === 'market' || parseFloat(price.value) > 0
-  const sufficientBalance = toBigInt(collateral.value || '0') <= accountBalance.value
+  const sufficientBalance = calculatedCollateral.value <= accountBalance.value
   
-  return hasSize && hasCollateral && hasPrice && sufficientBalance
+  return hasSize && hasPrice && sufficientBalance
+})
+
+function handlePercentageChange() {
+  const maxSizeNum = parseFloat(maxSize.value) || 0
+  if (maxSizeNum === 0) return
+  
+  const newSize = (maxSizeNum * sizePercentage.value) / 100
+  size.value = newSize.toFixed(4)
+}
+
+function handleSizeInput() {
+  const maxSizeNum = parseFloat(maxSize.value) || 0
+  const currentSize = parseFloat(size.value) || 0
+  
+  if (maxSizeNum === 0) {
+    sizePercentage.value = 0
+    return
+  }
+  
+  const percentage = (currentSize / maxSizeNum) * 100
+  sizePercentage.value = Math.min(100, Math.max(0, Math.round(percentage)))
+}
+
+watch([maxSize, leverage, displayPrice], () => {
+  // Recalculate percentage when max size changes
+  if (size.value) {
+    handleSizeInput()
+  }
 })
 
 function handleTrade() {
   if (!isFormValid.value) return
 
   const sizeValue = toBigInt(size.value)
-  const collateralValue = toBigInt(collateral.value)
+  const collateralValue = calculatedCollateral.value
   
   if (orderType.value === 'market') {
     // Open position immediately
@@ -305,7 +373,7 @@ function handleTrade() {
     )
 
     size.value = ''
-    collateral.value = ''
+    sizePercentage.value = 0
   } else {
     const triggerPrice = toBigInt(price.value)
     tradeStore.placeOrder(
@@ -318,6 +386,7 @@ function handleTrade() {
 
     price.value = ''
     size.value = ''
+    sizePercentage.value = 0
   }
 }
 </script>
@@ -340,6 +409,28 @@ input[type='range']::-moz-range-thumb {
   border: none;
   border-radius: 9999px;
   background-color: #2563eb;
+}
+
+.size-percentage-slider::-webkit-slider-thumb {
+  height: 1rem;
+  width: 1rem;
+  cursor: pointer;
+  appearance: none;
+  border-radius: 9999px;
+  background-color: #1f2937;
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.size-percentage-slider::-moz-range-thumb {
+  height: 1rem;
+  width: 1rem;
+  cursor: pointer;
+  appearance: none;
+  border: 2px solid white;
+  border-radius: 9999px;
+  background-color: #1f2937;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 </style>
 
