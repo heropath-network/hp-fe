@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, Ref } from 'vue'
+import { ref, Ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ROUTE_NAMES } from '@/router'
-import { tryOnBeforeMount } from '@vueuse/core'
 import BaseIcon from '@/components/BaseIcon.vue'
 
 enum MenuItem {

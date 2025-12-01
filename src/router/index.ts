@@ -12,7 +12,7 @@ export enum ROUTE_NAMES {
   TradingEducation = 'trading-education',
   Leaderboard = 'leaderboard',
   Ecosystem = 'ecosystem',
-  Trade = "trade",
+  Trade = 'trade',
 }
 
 const ROUTER_LIST: RouteRecordRaw[] = [
@@ -74,15 +74,15 @@ const ROUTER_LIST: RouteRecordRaw[] = [
     component: TradeView,
   },
   {
-    path: "/tc-c",
-    name: "tc-c",
+    path: '/tc-c',
+    name: 'tc-c',
     component: TcTestRemoveMeCFourMeme,
   },
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes: ROUTER_LIST,
-});
+  history: createWebHistory(),
+  routes: ROUTER_LIST,
+})
 
 export default router
