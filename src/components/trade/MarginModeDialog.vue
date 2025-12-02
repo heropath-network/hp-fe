@@ -8,7 +8,7 @@
         <button
           @click="localMarginMode = 'isolated'"
           :class="[
-            'flex-1 rounded-lg py-3 text-sm font-semibold transition',
+            'flex-1 py-3 text-sm font-semibold transition',
             localMarginMode === 'isolated'
               ? 'bg-teal-500 text-white'
               : 'bg-gray-800 text-white'
@@ -19,7 +19,7 @@
         <button
           @click="localMarginMode = 'cross'"
           :class="[
-            'flex-1 rounded-lg py-3 text-sm font-semibold transition',
+            'flex-1 py-3 text-sm font-semibold transition',
             localMarginMode === 'cross'
               ? 'bg-teal-500 text-white'
               : 'bg-gray-800 text-white'
@@ -40,7 +40,7 @@
           <button
             @click="decreaseLeverage"
             :disabled="localLeverage <= 1"
-            class="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-white transition hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex h-10 w-10 items-center justify-center  border border-gray-700 bg-gray-800 text-white transition hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             -
           </button>
@@ -50,7 +50,7 @@
           <button
             @click="increaseLeverage"
             :disabled="localLeverage >= 100"
-            class="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-white transition hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex h-10 w-10 items-center justify-center border border-gray-700 bg-gray-800 text-white transition hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             +
           </button>
@@ -64,7 +64,7 @@
             min="1"
             max="100"
             step="1"
-            class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-800"
+            class="h-2 w-full cursor-pointer appearance-none bg-gray-800"
           />
           <div class="mt-2 flex justify-between text-xs text-gray-500">
             <span>1x</span>
@@ -77,7 +77,7 @@
       </div>
 
       <!-- Description Text -->
-      <div class="rounded-lg bg-gray-900 p-4 text-xs leading-relaxed text-gray-400">
+      <div class=" bg-gray-900 p-4 text-xs leading-relaxed text-gray-400">
         <p v-if="localMarginMode === 'isolated'">
           Isolated Margin Mode: Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of a position reached 100%, the position will be liquidated. Margin can be added or removed to positions using this mode.
         </p>
@@ -91,7 +91,7 @@
       <!-- Confirm Button -->
       <button
         @click="handleConfirm"
-        class="w-full rounded-lg bg-teal-500 py-3 text-sm font-semibold text-white transition hover:bg-teal-600"
+        class="w-full bg-teal-500 py-3 text-sm font-semibold text-white transition hover:bg-teal-600"
       >
         Confirm
       </button>

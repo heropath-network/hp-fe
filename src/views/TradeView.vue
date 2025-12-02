@@ -18,7 +18,7 @@
       </div>
 
       <!-- Right: Trading Form -->
-      <div class="w-[343px] overflow-hidden border-l border-gray-800">
+      <div class="w-[343px]  border-l border-gray-800">
         <TradingForm />
       </div>
     </div>
