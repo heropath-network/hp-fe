@@ -73,7 +73,7 @@ const menuItems = [
   },
   {
     id: MenuItem.Ecosystem,
-    label: 'Ecosystem & Dashboard',
+    label: 'Ecosystem Dashboard',
     icon: ecosystemIcon,
     routeName: ROUTE_NAMES.Ecosystem,
   },
