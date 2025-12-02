@@ -9,6 +9,7 @@ import { UserWithdrawalHistory } from '@/types/heroPath'
 const MIN_WITHDRAWAL_AMOUNT = 50
 const USDC_TOKEN_ADDRESS = '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d'
 const TOKEN_SYMBOL = 'USDC'
+const PAYOUT_NETWORK = 'BEP20'
 
 const { isConnected, address } = useConnection()
 const { signTypedDataAsync } = useSignTypedData()
@@ -121,43 +122,50 @@ async function handleWithdraw() {
     </div>
 
     <div class="flex flex-col gap-6 bg-[var(--hp-bg-normal)] p-6">
-      <p class="text-xl font-semibold leading-7">Withdrawals</p>
+      <p class="text-xl font-semibold leading-7">Payout Details</p>
 
       <div class="flex flex-col gap-4 bg-[var(--hp-bg-light)] p-4">
-        <label class="text-sm leading-5 text-[var(--hp-text-color)]">
-          Withdrawal Amount (Min. Withdrawal: ${{ MIN_WITHDRAWAL_AMOUNT }})
-          <span class="text-[var(--hp-primary-green)]"> *</span>
-        </label>
-
-        <div class="flex flex-col gap-2 border border-[var(--hp-line-light-color)] p-4">
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div class="flex w-full items-center gap-2">
-              <span class="text-xl font-semibold text-[#var(--hp-text-color)]">$</span>
-              <input
-                v-model="amount"
-                type="text"
-                inputmode="decimal"
-                @input="handleAmountInput"
-                placeholder="0.00"
-                class="w-full bg-transparent text-xl font-semibold text-[var(--hp-white-color)] placeholder:text-[var(--hp-text-color)] focus:outline-none"
-              />
+        <div class="grid gap-3 md:grid-cols-2">
+          <div
+            class="flex flex-col gap-2 border border-[var(--hp-line-light-color)] bg-[var(--hp-bg-normal)] px-4 py-3"
+          >
+            <div class="flex items-center gap-1 text-sm leading-5 text-[var(--hp-text-color)]">
+              <span>Amount</span>
+              <span class="text-[var(--hp-primary-green)]">*</span>
             </div>
+            <input
+              v-model="amount"
+              type="text"
+              inputmode="decimal"
+              @input="handleAmountInput"
+              placeholder="$0.00"
+              class="h-7 w-full bg-transparent text-xl font-semibold text-[var(--hp-white-color)] placeholder:text-[var(--hp-text-color)] focus:outline-none"
+            />
+          </div>
 
-            <button
-              type="button"
-              class="flex items-center justify-center h-10 w-full bg-[var(--hp-primary-green)] px-3 text-sm font-medium text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-[120px]"
-              :disabled="confirmIsDisabled"
-              @click="handleWithdraw"
-            >
-              Withdraw <LoadingIcon v-if="withdrawing" :is-black="true" class="ml-1" />
-            </button>
+          <div
+            class="flex flex-col gap-2 border border-[var(--hp-line-light-color)] bg-[var(--hp-bg-normal)] px-4 py-3"
+          >
+            <p class="text-sm leading-5 text-[var(--hp-text-color)]">Network</p>
+            <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">{{ PAYOUT_NETWORK }}</p>
           </div>
         </div>
 
-        <div class="flex items-center justify-between text-sm leading-5 text-[var(--hp-text-color)]">
-          <span>Account Withdrawal</span>
-          <span class="text-[var(--hp-white-color)]">{{ amount ? formatNumber(amount, 2) : 'N/A' }}</span>
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-[var(--hp-text-color)]">Wallet Address</span>
+          <span class="break-all text-right text-[var(--hp-white-color)]">
+            {{ isConnected ? address : 'N/A' }}
+          </span>
         </div>
+
+        <button
+          type="button"
+          class="flex h-12 w-full items-center justify-center bg-[var(--hp-primary-green)] px-6 text-base font-semibold text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+          :disabled="confirmIsDisabled"
+          @click="handleWithdraw"
+        >
+          USDC Payout <LoadingIcon v-if="withdrawing" :is-black="true" class="ml-2" />
+        </button>
       </div>
     </div>
 
