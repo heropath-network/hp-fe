@@ -69,12 +69,10 @@
                 <span class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold font-['IBM_Plex_Sans',sans-serif]">{{ formatPrice(displayPrice) }}</span>
               </div>
             </div>
-            <!-- Chain Label Icon -->
-            <div class="absolute right-0 top-0 bottom-0 flex items-center justify-center w-6 h-6 bg-[#373737]">
-              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 0L4.61803 2.76393L7.23607 1.23607L5.70811 3.8541L8.47214 4.47214L5.70811 5.09018L7.23607 7.70821L4.61803 6.18025L4 8.94428L3.38197 6.18025L0.763932 7.70821L2.29189 5.09018L-0.472136 4.47214L2.29189 3.8541L0.763932 1.23607L3.38197 2.76393L4 0Z" fill="#FFD700"/>
-              </svg>
-            </div>
+            <!-- Source Liquidity Label -->
+            <SourceLiquidityLabel
+              class="top-0 right-0"
+            />
           </div>
 
           <!-- Order Type Dropdown -->
@@ -394,6 +392,7 @@ import { toBigInt, fromBigInt } from '@/utils/bigint'
 import { formatCurrency } from '@/utils/bigint'
 import MarginModeDialog from '@/components/trade/MarginModeDialog.vue'
 import LiquiditySourcesDialog from '@/components/trade/LiquiditySourcesDialog.vue'
+import SourceLiquidityLabel from '@/components/common/SourceLiquidityLabel.vue'
 import type { LiquiditySourceId } from '@/constants/liquiditySources'
 
 const tradeStore = useTradeStore()

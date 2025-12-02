@@ -1,7 +1,7 @@
 <template>
   <div class="flex items-center h-16 bg-[var(--hp-bg-dark)] border-b border-gray-800 px-4">
     <!-- Market Info Section -->
-    <div class="flex items-center min-w-[160px]">
+    <div class="flex items-center min-w-[160px] relative">
       <button
         @click="$emit('openMarketSelect')"
         class="flex items-center gap-3 text-white hover:text-blue-400 transition-colors cursor-pointer"
@@ -22,13 +22,21 @@
       
       <!-- Divider -->
       <div class="h-16 mx-4 w-px border-l border-gray-800"></div>
+
+
+          <!-- Source Liquidity Label -->
+          <SourceLiquidityLabel
+            v-if="!isMarketClosed && !isLoadingMarkPrice"
+            :oracle-name="selectedOracleName"
+            class="top-0 -right-2"
+          />
     </div>
 
     <!-- Statistics Row -->
     <div class="flex items-center flex-1 overflow-x-auto">
       <div class="flex items-center gap-4">
         <!-- Price Box -->
-        <div class="flex items-center justify-center min-w-[170px]">
+        <div class="flex items-center justify-center min-w-[170px] relative">
           <div class="flex items-center">
             <div v-if="isLoadingMarkPrice && !isMarketClosed" class="h-7 w-24 animate-pulse rounded bg-gray-700"></div>
             <div v-else-if="isMarketClosed" class="text-xl font-semibold text-gray-400">Closed</div>
@@ -175,8 +183,8 @@ import { useMarket24hRates } from '@/composables/useMarket24hRates'
 import { usePrice24hHighLow } from '@/composables/usePrice24hHighLow'
 import { useMarketStatus } from '@/composables/useMarketStatus'
 import MarketIcon from '@/components/common/MarketIcon.vue'
-import ChainLabel from '@/components/common/ChainLabel.vue'
 import Tooltip from '@/components/common/Tooltip.vue'
+import SourceLiquidityLabel from '@/components/common/SourceLiquidityLabel.vue'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 
 const tradeStore = useTradeStore()
@@ -185,9 +193,6 @@ const marketStatus = useMarketStatus()
 const selectedMarket = computed(() => tradeStore.selectedMarket)
 const isMarketClosed = computed(() => marketStatus.checkMarketClosed(selectedMarket.value))
 const maxLeverage = computed(() => '100') // Default leverage, can be made dynamic
-
-// Chain name - can be made dynamic based on selected network/chain
-const currentChainName = computed(() => 'Arbitrum') // Default chain, can be connected to wallet/network state
 
 const oracleSources = computed(() => tradeStore.oracleSources)
 const selectedOracleName = computed(() => tradeStore.currentOracleName)
