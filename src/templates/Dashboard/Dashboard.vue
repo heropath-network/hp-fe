@@ -38,7 +38,15 @@ const selectedEvaluationLabel = computed(() => {
   }: $${formatNumber(size, 0)}`
 })
 
+const accountSize = computed(() => {
+  if (!selectedEvaluation.value) {
+    return 0
+  }
+  return selectedEvaluation.value.evaluationConfig.accountSize
+})
+
 const pnl = computed(() => {
+  // TODO
   return 0
 })
 
@@ -57,6 +65,7 @@ const priorDayBalance = computed(() => {
 })
 
 const totalVolume = computed(() => {
+  // TODO
   return 0
 })
 
@@ -197,7 +206,7 @@ watch(
     <div class="flex flex-col gap-4">
       <div class="space-y-6 bg-[var(--hp-bg-normal)] p-6">
         <p class="text-xl font-semibold leading-7">
-          <span class="text-[var(--hp-primary-green)]">${{ formatNumber(accountBalance, 2) }}</span>
+          <span class="text-[var(--hp-primary-green)]">${{ formatNumber(accountSize, 2) }}</span>
           <span class="pl-1">Evaluation</span>
         </p>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -256,7 +265,7 @@ watch(
             class="absolute left-0 top-0 rounded-sm bg-[var(--hp-line-light-color)] px-2 py-1 text-[12px] leading-4 text-[var(--hp-text-color)]"
           >
             Prior Day Balance: (<span class="text-[var(--hp-white-color)]">
-              >${{ formatNumber(priorDayBalance, 2) }}</span
+              ${{ formatNumber(priorDayBalance, 2) }}</span
             >
             / <span class="text-[var(--hp-white-color)]">{{ dayCountDown }}</span
             >)

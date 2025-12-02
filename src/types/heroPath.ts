@@ -11,3 +11,13 @@ export interface UserEvaluation {
   }
   timestamp: number
 }
+
+export interface UserWithdrawalHistory {
+  timestamp: number
+  amount: number
+  address: string
+  status: 'success' | 'pending' | 'failed'
+}
+export interface UserPayouts {
+  withdrawnAmount: number
+}
