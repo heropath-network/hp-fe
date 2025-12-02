@@ -223,75 +223,49 @@ watch(
       </div>
     </div>
 
-    <div class="space-y-4">
-      <div class="flex items-center justify-between">
-        <p class="text-2xl font-semibold leading-[30px]">Goals Overview</p>
-      </div>
+    <div class="space-y-4 bg-[var(--hp-bg-normal)] p-6">
+      <p class="text-xl font-semibold leading-7">${{ formatNumber(accountBalance, 2) }} Current Equity</p>
+
       <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <article class="flex h-full flex-col gap-6 bg-[var(--hp-bg-normal)] p-6">
-          <div class="space-y-1">
-            <p class="text-xl font-semibold leading-7">Profit Target</p>
-            <p class="text-sm leading-5 text-[var(--hp-text-color)] mt-1">&nbsp;</p>
-          </div>
-          <div class="flex flex-col gap-4 bg-[var(--hp-bg-light)] p-4">
-            <div class="space-y-1">
-              <p class="text-xl font-semibold leading-7">${{ formatNumber(accountBalance, 2) }}</p>
-              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Current Equity</p>
-              <div class="!mt-4 h-px w-full bg-[var(--hp-line-light-color)]" />
-            </div>
-            <div class="space-y-1">
-              <p class="text-xl font-semibold leading-7 text-[var(--hp-text-green)]">
-                ${{ formatNumber(targetEquity, 2) }}
-              </p>
-              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Target Equity</p>
-            </div>
+        <article class="flex h-[100px] flex-col justify-center gap-2 bg-[var(--hp-bg-light)] px-6 py-5">
+          <div>
+            <p class="text-xl font-semibold leading-7 text-[var(--hp-text-green)]">
+              ${{ formatNumber(targetEquity, 2) }}
+            </p>
+            <p class="text-sm leading-5 text-[var(--hp-text-color)]">Profit Target Equity</p>
           </div>
         </article>
 
-        <article class="flex h-full flex-col gap-6 bg-[var(--hp-bg-normal)] p-6">
-          <div class="space-y-1">
-            <p class="text-xl font-semibold leading-7">Maximum Drawdown</p>
-            <p class="text-sm leading-5 text-[var(--hp-text-color)] mt-1">
-              High Water Mark: (<span class="text-[var(--hp-white-color)]">${{ formatNumber(highWaterMark, 2) }}</span
-              >)
-            </p>
+        <article class="relative flex h-[100px] flex-col justify-center gap-2 bg-[var(--hp-bg-light)] px-6 py-5">
+          <div
+            class="absolute left-0 top-0 rounded-sm bg-[var(--hp-line-light-color)] px-2 py-1 text-[12px] leading-4 text-[var(--hp-text-color)]"
+          >
+            High Water Mark: (<span class="text-[var(--hp-white-color)]">${{ formatNumber(highWaterMark, 2) }}</span
+            >)
           </div>
-          <div class="flex flex-col gap-4 bg-[var(--hp-bg-light)] p-4">
-            <div class="space-y-1">
-              <p class="text-xl font-semibold leading-7">${{ formatNumber(accountBalance, 2) }}</p>
-              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Current Equity</p>
-              <div class="!mt-4 h-px w-full bg-[var(--hp-line-light-color)]" />
-            </div>
-            <div class="space-y-1">
-              <p class="text-xl font-semibold leading-7 text-[var(--hp-text-red)]">
-                ${{ formatNumber(maxDrawdownEquityLimit, 2) }}
-              </p>
-              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Equity Limit</p>
-            </div>
+          <div>
+            <p class="text-xl font-semibold leading-7 text-[var(--hp-text-red)]">
+              ${{ formatNumber(maxDrawdownEquityLimit, 2) }}
+            </p>
+            <p class="text-sm leading-5 text-[var(--hp-text-color)]">Max. drawdown Equity Limit</p>
           </div>
         </article>
 
-        <article class="flex h-full flex-col gap-6 bg-[var(--hp-bg-normal)] p-6">
-          <div class="space-y-1">
-            <p class="text-xl font-semibold leading-7">Maximum Daily Loss</p>
-            <p class="text-sm leading-5 text-[var(--hp-text-color)] mt-1">
-              Prior Day Balance (<span class="text-[var(--hp-white-color)]"
-                >${{ formatNumber(priorDayBalance, 2) }}</span
-              >)/<span class="text-[var(--hp-primary-green)]">{{ dayCountDown }}</span>
-            </p>
+        <article class="relative flex h-[100px] flex-col justify-center gap-2 bg-[var(--hp-bg-light)] px-6 py-5">
+          <div
+            class="absolute left-0 top-0 rounded-sm bg-[var(--hp-line-light-color)] px-2 py-1 text-[12px] leading-4 text-[var(--hp-text-color)]"
+          >
+            Prior Day Balance: (<span class="text-[var(--hp-white-color)]">
+              >${{ formatNumber(priorDayBalance, 2) }}</span
+            >
+            / <span class="text-[var(--hp-white-color)]">{{ dayCountDown }}</span
+            >)
           </div>
-          <div class="flex flex-col gap-4 bg-[var(--hp-bg-light)] p-4">
-            <div class="space-y-1">
-              <p class="text-xl font-semibold leading-7">${{ formatNumber(accountBalance, 2) }}</p>
-              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Current Equity</p>
-              <div class="!mt-4 h-px w-full bg-[var(--hp-line-light-color)]" />
-            </div>
-            <div class="space-y-1">
-              <p class="text-xl font-semibold leading-7 text-[var(--hp-text-red)]">
-                ${{ formatNumber(maxDailyLossEquityLimit, 2) }}
-              </p>
-              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Equity Limit</p>
-            </div>
+          <div>
+            <p class="text-xl font-semibold leading-7 text-[var(--hp-text-red)]">
+              ${{ formatNumber(maxDailyLossEquityLimit, 2) }}
+            </p>
+            <p class="text-sm leading-5 text-[var(--hp-text-color)]">Max.daily loss Equity Limit</p>
           </div>
         </article>
       </div>
