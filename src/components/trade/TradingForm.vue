@@ -231,10 +231,14 @@
             </div>
           </div>
           <!-- Liquidity Source with icon -->
-          <div v-if="(item as TradeDetailItem).key === 'liquiditySource'" class="flex items-center gap-1">
-            <svg width="16" height="16" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 0L4.61803 2.76393L7.23607 1.23607L5.70811 3.8541L8.47214 4.47214L5.70811 5.09018L7.23607 7.70821L4.61803 6.18025L4 8.94428L3.38197 6.18025L0.763932 7.70821L2.29189 5.09018L-0.472136 4.47214L2.29189 3.8541L0.763932 1.23607L3.38197 2.76393L4 0Z" fill="#FFD700"/>
-            </svg>
+          <div v-if="(item as TradeDetailItem).key === 'liquiditySource'" class="flex items-center gap-[4px]">
+            <div class="relative shrink-0 size-[16px]">
+              <img
+                :src="getLiquiditySourceIcon(activeLiquiditySources[0]?.id)"
+                :alt="item.value"
+                class="block w-full h-full object-contain"
+              />
+            </div>
             <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif]">{{ item.value }}</span>
           </div>
           <!-- Max. Position Slippage with edit icon -->
@@ -397,6 +401,13 @@ const marginModeLabel = computed(() => {
 
 function handleLiquiditySourceToggle(id: LiquiditySourceId) {
   tradeStore.toggleLiquiditySource(id)
+}
+
+function getLiquiditySourceIcon(sourceId: LiquiditySourceId | undefined): string {
+  if (!sourceId) {
+    return '/img/liquidity/aster.svg' // Default to Aster
+  }
+  return `/img/liquidity/${sourceId}.svg`
 }
 
 function handleMarginModeConfirm(data: { marginMode: 'isolated' | 'cross'; leverage: number }) {
