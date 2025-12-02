@@ -4,8 +4,7 @@ import { tryOnMounted, useClipboard } from "@vueuse/core";
 import { HpDialog } from "@/components";
 import { useConnection, useDisconnect, useConfig } from "@wagmi/vue";
 import Avatar from "@/components/Wallet/Avatar.vue";
-import CopyIcon from "@/assets/icons/copy.svg";
-import BlockLinkIcon from "@/assets/icons/blockLink.svg";
+import BaseIcon from "@/components/BaseIcon.vue";
 import emitter from "@/event";
 import { WALLET_EVENTS } from "@/event/walletEvent";
 
@@ -99,10 +98,11 @@ tryOnMounted(() => {
               class="text-[14px] leading-5 group-hover:text-[var(--hp-primary-green)]"
               >Copy Address</span
             >
-            <span
-              class="icon-mask ml-1 w-4 h-4 group-hover:!bg-[var(--hp-primary-green)]"
-              :style="{ '--icon-url': `url(${CopyIcon})` }"
-            ></span>
+            <BaseIcon
+              name="copy"
+              size="16"
+              class="ml-1 h-4 w-4 text-[var(--hp-text-color)] transition-colors group-hover:text-[var(--hp-primary-green)]"
+            />
           </div>
           <div
             class="flex item-center cursor-pointer group ml-6"
@@ -112,10 +112,11 @@ tryOnMounted(() => {
               class="text-[14px] leading-5 group-hover:text-[var(--hp-primary-green)]"
               >View on Explorer</span
             >
-            <span
-              class="icon-mask ml-1 w-4 h-4 group-hover:!bg-[var(--hp-primary-green)]"
-              :style="{ '--icon-url': `url(${BlockLinkIcon})` }"
-            ></span>
+            <BaseIcon
+              name="blockLink"
+              size="16"
+              class="ml-1 h-4 w-4 text-[var(--hp-text-color)] transition-colors group-hover:text-[var(--hp-primary-green)]"
+            />
           </div>
         </div>
       </div>

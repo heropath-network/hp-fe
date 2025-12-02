@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import ArrowIcon from '@/assets/icons/arrow.svg'
+import BaseIcon from '@/components/BaseIcon.vue'
 
 type EducationCard = {
   title: string
@@ -84,7 +84,7 @@ const cardRows = computed(() => {
           class="flex items-center gap-2 bg-[var(--hp-primary-green)] px-6 py-[14px] text-base font-medium text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)]"
         >
           Go to Training
-          <span class="icon-mask h-[18px] w-[18px] rotate-[270deg]" :style="{ '--icon-url': `url(${ArrowIcon})` }" />
+          <BaseIcon name="arrow" size="18" class="rotate-[270deg] text-[var(--hp-black-color)]" />
         </button>
       </div>
     </div>

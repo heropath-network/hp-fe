@@ -3,14 +3,7 @@ import { ref, Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ROUTE_NAMES } from '@/router'
 import { tryOnBeforeMount } from '@vueuse/core'
-import dashboardIcon from '@/assets/icons/menu/dashboard.svg'
-import leaderboardIcon from '@/assets/icons/menu/leaderboard.svg'
-import profitIcon from '@/assets/icons/menu/profit.svg'
-import evaluationIcon from '@/assets/icons/menu/evaluation.svg'
-import payoutsIcon from '@/assets/icons/menu/payouts.svg'
-import questIcon from '@/assets/icons/menu/quest.svg'
-import tradingEduIcon from '@/assets/icons/menu/tradingEdu.svg'
-import ecosystemIcon from '@/assets/icons/menu/ecosystem.svg'
+import BaseIcon from '@/components/BaseIcon.vue'
 
 enum MenuItem {
   Dashboard = 'Dashboard',
@@ -32,49 +25,49 @@ const menuItems = [
   {
     id: MenuItem.Dashboard,
     label: 'Dashboard',
-    icon: dashboardIcon,
+    icon: 'menu-dashboard',
     routeName: ROUTE_NAMES.Dashboard,
   },
   {
     id: MenuItem.Profile,
     label: 'Profile',
-    icon: profitIcon,
+    icon: 'menu-profit',
     routeName: ROUTE_NAMES.Profile,
   },
   {
     id: MenuItem.Evaluation,
     label: 'Evaluation',
-    icon: evaluationIcon,
+    icon: 'menu-evaluation',
     routeName: ROUTE_NAMES.Evaluation,
   },
   {
     id: MenuItem.Quest,
     label: 'Quest',
-    icon: questIcon,
+    icon: 'menu-quest',
     routeName: ROUTE_NAMES.Quest,
   },
   {
     id: MenuItem.Payouts,
     label: 'Payouts',
-    icon: payoutsIcon,
+    icon: 'menu-payouts',
     routeName: ROUTE_NAMES.Payouts,
   },
   {
     id: MenuItem.TradingEducation,
     label: 'Trading & Education',
-    icon: tradingEduIcon,
+    icon: 'menu-tradingEdu',
     routeName: ROUTE_NAMES.TradingEducation,
   },
   {
     id: MenuItem.Leaderboard,
     label: 'Leaderboard',
-    icon: leaderboardIcon,
+    icon: 'menu-leaderboard',
     routeName: ROUTE_NAMES.Leaderboard,
   },
   {
     id: MenuItem.Ecosystem,
     label: 'Ecosystem Dashboard',
-    icon: ecosystemIcon,
+    icon: 'menu-ecosystem',
     routeName: ROUTE_NAMES.Ecosystem,
   },
 ]
@@ -116,19 +109,22 @@ tryOnBeforeMount(() => {
         :key="item.id"
         @click="switchActiveItem(item.id)"
         type="button"
-        class="flex w-full items-center gap-3 px-3 py-3 text-left transition"
+        class="group flex w-full items-center gap-3 px-3 py-3 text-left transition"
         :class="
           item.id === activeItemId
             ? 'text-[var(--hp-primary-green)]'
             : 'hover:bg-[var(--hp-line-color)] hover:text-[var(--hp-white-color)]'
         "
       >
-        <span
-          class="icon-mask"
-          :style="{
-            '--icon-url': `url(${item.icon})`,
-            color: item.id === activeItemId ? 'var(--hp-primary-green)' : 'var(--hp-text-color)',
-          }"
+        <BaseIcon
+          :name="item.icon"
+          size="20"
+          class="shrink-0 transition-colors"
+          :class="
+            item.id === activeItemId
+              ? 'text-[var(--hp-primary-green)]'
+              : 'text-[var(--hp-text-color)] group-hover:text-[var(--hp-white-color)]'
+          "
         />
         <span
           class="text-[14px] font-semibold"

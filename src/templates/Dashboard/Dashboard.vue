@@ -3,9 +3,8 @@ import { useConnection } from '@wagmi/vue'
 import { ellipsisMiddle, formatNumber, getAccountTypeLabel } from '@/utils/common'
 import { useUserEvaluationsStorage } from '@/storages/heroPath'
 import { computed, ref, watch } from 'vue'
-import DownArrowIcon from '@/assets/icons/downArrow.svg'
 import { useDayCountDown } from '@/use/useDayCountDown'
-import ArrowIcon from '@/assets/icons/arrow.svg'
+import BaseIcon from '@/components/BaseIcon.vue'
 
 const { remainingText: dayCountDown } = useDayCountDown()
 
@@ -144,12 +143,11 @@ watch(
             <div class="flex flex-col">
               <span class="text-[var(--hp-white-color)]">{{ selectedEvaluationLabel }}</span>
             </div>
-            <span
-              class="icon-mask !h-3 !w-3 !bg-[var(--hp-white-color)] transition-transform duration-150"
-              :style="{
-                '--icon-url': `url(${DownArrowIcon})`,
-                transform: showEvaluationDropdown ? 'rotate(180deg)' : 'rotate(0deg)',
-              }"
+            <BaseIcon
+              name="downArrow"
+              size="12"
+              class="transition-transform duration-150 text-[var(--hp-white-color)]"
+              :class="showEvaluationDropdown ? 'rotate-180' : ''"
             />
           </button>
 

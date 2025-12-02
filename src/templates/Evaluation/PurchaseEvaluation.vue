@@ -9,12 +9,11 @@ import {
   type EvaluationStep1Config,
   type EvaluationStep2Config,
 } from '@/types/evaluation'
-import DownArrowIcon from '@/assets/icons/downArrow.svg'
 import { useConnection, useSignTypedData } from '@wagmi/vue'
 import { MOCK_TOKEN_PRICES, PaymentTokens } from '@/config/paymentTokens'
 import { useUserEvaluationsStorage } from '@/storages/heroPath'
 import { generateTimeBasedSixDigitId } from '@/utils/common'
-import { LoadingIcon } from '@/components'
+import { BaseIcon, LoadingIcon } from '@/components'
 
 type AccountOption = EvaluationStep1Config | EvaluationStep2Config
 
@@ -302,14 +301,12 @@ async function handlePurchase() {
                 <span>{{
                   selectedAccount?.accountSize ? `$${selectedAccount.accountSize.toLocaleString()}` : '--'
                 }}</span>
-                <span
-                  class="icon-mask !bg-[var(--hp-text-color)] !h-3 !w-3 group-hover:!bg-[var(--hp-primary-green)] transition-transform duration-200"
-                  :style="{
-                    '--icon-url': `url(${DownArrowIcon})`,
-                    transform: showAccountDropdown ? 'rotate(180deg)' : 'rotate(0deg)',
-                  }"
-                >
-                </span>
+                <BaseIcon
+                  name="downArrow"
+                  size="12"
+                  class="text-[var(--hp-text-color)] transition-transform duration-200 group-hover:text-[var(--hp-primary-green)]"
+                  :class="showAccountDropdown ? 'rotate-180' : ''"
+                />
               </button>
 
               <!-- backdrop to capture outside clicks and close the dropdown -->
@@ -357,14 +354,12 @@ async function handlePurchase() {
                   <img class="h-[22px] w-[22px]" :src="requireSymbolIcon(selectedToken.symbol)" />
                   <span>{{ selectedToken.symbol }}</span>
                 </div>
-                <span
-                  class="icon-mask !bg-[var(--hp-text-color)] !h-3 !w-3 group-hover:!bg-[var(--hp-primary-green)] transition-transform duration-200"
-                  :style="{
-                    '--icon-url': `url(${DownArrowIcon})`,
-                    transform: showTokenDropdown ? 'rotate(180deg)' : 'rotate(0deg)',
-                  }"
-                >
-                </span>
+                <BaseIcon
+                  name="downArrow"
+                  size="12"
+                  class="text-[var(--hp-text-color)] transition-transform duration-200 group-hover:text-[var(--hp-primary-green)]"
+                  :class="showTokenDropdown ? 'rotate-180' : ''"
+                />
               </button>
 
               <!-- backdrop to capture outside clicks and close the dropdown -->
