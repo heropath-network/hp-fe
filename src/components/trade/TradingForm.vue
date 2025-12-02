@@ -552,12 +552,17 @@ function handleTrade() {
     sizePercentage.value = 0
   } else {
     const triggerPrice = toBigInt(price.value)
+    // Get current liquiditySource
+    const currentLiquiditySource = tradeStore.getLiquiditySourceFromOracle(tradeStore.selectedOracle)
+    
     tradeStore.placeOrder(
       selectedMarket.value,
       tradeSide.value,
       sizeValue,
       triggerPrice,
-      orderType.value as 'limit' | 'stop'
+      orderType.value as 'limit' | 'stop',
+      chainId.value,
+      currentLiquiditySource
     )
 
     price.value = ''
