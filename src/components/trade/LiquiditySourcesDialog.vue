@@ -1,25 +1,16 @@
 <template>
   <Dialog :show="show" @close="$emit('close')">
     <template #title>
-      <div class="flex h-14 items-center justify-between px-0 py-4 w-full">
+      <div class="flex items-center justify-between px-0 w-full">
         <div class="flex items-center gap-4">
-          <button
-            type="button"
-            class="flex h-4 w-4 shrink-0 items-center justify-center text-white transition-opacity hover:opacity-75"
-            @click="$emit('close')"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
           <h3 class="text-base font-semibold leading-6 text-white">Liquidity Sources</h3>
         </div>
       </div>
     </template>
 
-    <div class="flex flex-col gap-4 pb-4">
-      <p class="text-sm leading-5 text-[#9b9b9b] whitespace-pre-wrap">
-        MUX aggregator will automatically route your positions to suitable liquidity sources based on your preferences.
+    <div class="flex flex-col gap-4 ">
+      <p class="text-sm leading-5 text-gray-400">
+        Aggregator will automatically route your positions to suitable liquidity sources based on your preferences.
       </p>
 
       <div class="flex flex-col gap-2">
