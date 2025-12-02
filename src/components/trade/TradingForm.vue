@@ -1,5 +1,5 @@
 <template>
-  <div class="trade-form relative flex h-full flex-col bg-gray-800 w-[343px]">
+  <div class="trade-form overflow-y-auto relative flex h-full flex-col bg-gray-800 w-[343px]">
     <!-- Header Section -->
     <div class="flex items-center gap-4 px-4 pt-3 pb-2">
       <div class="flex items-center gap-4">
@@ -10,8 +10,8 @@
             :class="[
               'flex-1 px-0 py-2 text-sm font-medium transition w-[83px]',
               tradeSide === 'long'
-                ? 'bg-[#10c8a8] text-neutral-950'
-                : 'text-[#9b9b9b]'
+                ? 'bg-green-success text-gray-1000'
+                : 'text-gray-400'
             ]"
           >
             Buy/Long
@@ -21,8 +21,8 @@
             :class="[
               'flex-1 px-0 py-2 text-sm font-medium transition w-[83px]',
               tradeSide === 'short'
-                ? 'bg-[#10c8a8] text-neutral-950'
-                : 'text-[#9b9b9b]'
+                ? 'bg-red-error text-gray-1000'
+                : 'text-gray-400'
             ]"
           >
             Sell/Short
@@ -202,8 +202,9 @@
         :class="[
           'w-full py-[14px] text-[14px] font-medium text-center transition',
           isFormValid
-            ? 'bg-[#10c8a8] text-neutral-950 opacity-100'
-            : 'bg-[#10c8a8] text-neutral-950 opacity-50 cursor-not-allowed'
+            ? ' text-neutral-950 opacity-100'
+            : ' text-neutral-950 opacity-50 cursor-not-allowed',
+          tradeSide === 'long' ? 'bg-green-success text-gray-1000' : 'bg-red-error text-gray-1000'
         ]"
       >
         {{ isFormValid ? `${tradeSide === 'long' ? 'Buy' : 'Sell'} ${selectedMarket.split('/')[0]}` : 'Enter an amount' }}
