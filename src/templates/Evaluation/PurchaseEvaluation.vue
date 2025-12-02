@@ -10,16 +10,19 @@ import {
   type EvaluationStep2Config,
 } from '@/types/evaluation'
 import { useConnection, useSignTypedData } from '@wagmi/vue'
-import { MOCK_TOKEN_PRICES, PaymentTokens } from '@/config/paymentTokens'
+import { TOKEN_PRICES, PaymentTokens } from '@/config/paymentTokens'
 import { useUserEvaluationsStorage } from '@/storages/heroPath'
 import { generateTimeBasedSixDigitId } from '@/utils/common'
 import { BaseIcon, LoadingIcon } from '@/components'
+import { usePaymentTokenPrices } from '@/use/usePaymentTokenPrices'
 
 type AccountOption = EvaluationStep1Config | EvaluationStep2Config
 
 const requireSymbolIcon = (symbol: string) => {
   return new URL(`/src/assets/icons/tokens/${symbol}.svg`, import.meta.url).href
 }
+
+const { prices: apiPrices } = usePaymentTokenPrices()
 
 const stepTabs = [
   { label: '1 Step', value: EvaluationSteps.Step1 },
@@ -75,7 +78,7 @@ watch(
 
 const selectedTokenUsdBalance = computed(() => {
   const balance = Number(selectedToken.value.balance ?? 0)
-  const price = MOCK_TOKEN_PRICES[selectedToken.value.symbol] ?? 0
+  const price = apiPrices.value[selectedToken.value.symbol] ?? TOKEN_PRICES[selectedToken.value.symbol] ?? 0
   return balance * price
 })
 
@@ -247,7 +250,6 @@ async function handlePurchase() {
       </button>
       <h1 class="text-2xl font-semibold leading-[30px]">Purchase Evaluation Order Info</h1>
     </div>
-
     <div class="mx-auto mt-6 w-full max-w-[720px]">
       <div class="space-y-6 bg-[var(--hp-bg-normal)] p-6">
         <div class="space-y-4">
