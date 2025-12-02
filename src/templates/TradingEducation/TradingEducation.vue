@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import ArrowIcon from '@/assets/icons/arrow.svg'
 
 type EducationCard = {
   title: string
@@ -26,7 +27,9 @@ const cardRows = computed(() => {
 </script>
 
 <template>
-  <section class="mx-auto mt-4 flex w-full max-w-[1160px] flex-col gap-12 px-4 text-[var(--hp-white-color)] sm:px-6">
+  <section
+    class="mx-auto mt-4 flex w-full max-w-[1160px] flex-col gap-12 px-4 pb-28 text-[var(--hp-white-color)] sm:px-6"
+  >
     <div v-for="(row, rowIndex) in cardRows" :key="rowIndex" class="flex flex-col gap-6">
       <h2 class="text-2xl font-semibold leading-8">Crypto Trading</h2>
 
@@ -73,4 +76,23 @@ const cardRows = computed(() => {
       </div>
     </div>
   </section>
+
+  <div
+    class="fixed bottom-4 left-1/2 z-20 w-full max-w-[1160px] -translate-x-1/2 px-4 sm:px-6"
+    role="presentation"
+  >
+    <div class="flex items-center justify-between bg-[var(--hp-bg-normal)] px-6 py-5 shadow-lg shadow-black/40">
+      <p class="text-xl font-semibold leading-7">Ready for Training?</p>
+      <button
+        type="button"
+        class="flex items-center gap-2 bg-[var(--hp-primary-green)] px-6 py-[14px] text-base font-medium text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)]"
+      >
+        Go to Training
+        <span
+          class="icon-mask h-[18px] w-[18px] rotate-[270deg]"
+          :style="{ '--icon-url': `url(${ArrowIcon})` }"
+        />
+      </button>
+    </div>
+  </div>
 </template>
