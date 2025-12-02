@@ -14,7 +14,7 @@
                 : 'text-gray-400'
             ]"
           >
-            Buy/Long
+            Buy / Long
           </button>
           <button
             @click="tradeSide = 'short'"
@@ -25,7 +25,7 @@
                 : 'text-gray-400'
             ]"
           >
-            Sell/Short
+            Sell / Short
           </button>
         </div>
         
