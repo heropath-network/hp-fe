@@ -185,7 +185,7 @@ async function handlePurchase() {
   }
 
   const evaluationId = generateTimeBasedSixDigitId()
-  const signMsg = `Purchase Evaluation Order\n\nEvaluation ID: ${evaluationId}\nProduct: ${productLabel.value}\nTotal: $${purchaseTotal.value}\n\nBy signing this message, you agree to the Evaluation Agreement and Refund Policy.`
+  const signMsg = `Purchase Evaluation Order\n\nEvaluation ID: ${evaluationId}\nProduct: ${productLabel.value}\nTotal: $${purchaseTotal.value}\n\n.`
 
   try {
     const evaluationConfig = payload.account
@@ -223,7 +223,7 @@ async function handlePurchase() {
         showDrawdown: true,
         showPublic: true,
       },
-      timestamp: Date.now(),
+      timestamp: Math.floor(Date.now() / 1000),
     })
 
     router.push({ name: ROUTE_NAMES.Dashboard })
