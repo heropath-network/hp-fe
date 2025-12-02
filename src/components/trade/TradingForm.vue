@@ -62,11 +62,11 @@
           <div class="flex-1 relative">
             <div class="bg-[#272727] p-3 flex flex-col gap-2">
               <div class="flex items-center gap-2">
-                <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Market Price</span>
+                <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Market Price</span>
               </div>
               <div class="flex items-center gap-1">
-                <span class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold font-['IBM_Plex_Sans',sans-serif]">$</span>
-                <span class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold font-['IBM_Plex_Sans',sans-serif]">{{ formatPrice(displayPrice) }}</span>
+                <span class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold">$</span>
+                <span class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold">{{ formatPrice(displayPrice) }}</span>
               </div>
             </div>
             <!-- Source Liquidity Label -->
@@ -83,10 +83,10 @@
                 class="w-full bg-[#272727] p-3 flex flex-col gap-2 text-left"
               >
                 <div class="flex items-center justify-end">
-                  <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif] text-right">Order Type</span>
+                  <span class="text-[13px] leading-[18px] text-[#9b9b9b] text-right">Order Type</span>
                 </div>
                 <div class="flex items-center justify-end gap-1">
-                  <span class="text-[16px] leading-[24px] text-white font-medium font-['IBM_Plex_Sans',sans-serif] text-right">{{ orderType.charAt(0).toUpperCase() + orderType.slice(1) }}</span>
+                  <span class="text-[16px] leading-[24px] text-white font-medium text-right">{{ orderType.charAt(0).toUpperCase() + orderType.slice(1) }}</span>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M4 6L8 10L12 6" stroke="#9b9b9b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
@@ -97,7 +97,7 @@
                   v-for="type in ['market', 'limit', 'stop']"
                   :key="type"
                   @click.stop="orderType = type as any; showOrderTypeMenu = false"
-                  class="w-full px-3 py-2 text-left text-[16px] leading-[24px] text-white font-medium font-['IBM_Plex_Sans',sans-serif] hover:bg-[#373737] transition"
+                  class="w-full px-3 py-2 text-left text-[16px] leading-[24px] text-white font-medium hover:bg-[#373737] transition"
                 >
                   {{ type.charAt(0).toUpperCase() + type.slice(1) }}
                 </button>
@@ -113,9 +113,9 @@
             <div class="bg-[#272727] p-3 flex flex-col gap-2 w-[311px]">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-1">
-                <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Size</span>
+                <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Size</span>
               </div>
-              <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif] text-right">Up to: {{ maxSize }}</span>
+              <span class="text-[13px] leading-[18px] text-[#9b9b9b] text-right">Up to: {{ maxSize }}</span>
             </div>
             <div class="flex items-center justify-between gap-2">
               <div class="flex-1 flex items-center">
@@ -124,12 +124,12 @@
                   type="number"
                   step="0.001"
                   @input="handleSizeInput"
-                  class="w-full bg-transparent text-[18px] leading-[24px] text-white font-semibold font-['IBM_Plex_Sans',sans-serif] outline-none placeholder:text-[#545454]"
+                  class="w-full bg-transparent text-[18px] leading-[24px] text-white font-semibold outline-none placeholder:text-[#545454]"
                   placeholder="0.0"
                 />
               </div>
               <div class="flex items-center gap-1 justify-end">
-                <span class="text-[16px] leading-[24px] text-white font-medium font-['IBM_Plex_Sans',sans-serif] text-right">{{ selectedMarket.split('/')[0] }}</span>
+                <span class="text-[16px] leading-[24px] text-white font-medium text-right">{{ selectedMarket.split('/')[0] }}</span>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M4 6L8 10L12 6" stroke="#9b9b9b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -140,8 +140,8 @@
             <div class="absolute bottom-3 left-3 flex items-center gap-3" style="width: calc(100% - 24px);">
               <!-- Percentage Display -->
               <div class="bg-[#272727] h-9 px-2 flex items-center gap-1 w-[58px]">
-                <span class="text-[14px] leading-[20px] text-white font-semibold font-['IBM_Plex_Sans',sans-serif] flex-1">{{ sizePercentage }}</span>
-                <span class="text-[12px] leading-[16px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif] text-right">%</span>
+                <span class="text-[14px] leading-[20px] text-white font-semibold flex-1">{{ sizePercentage }}</span>
+                <span class="text-[12px] leading-[16px] text-[#9b9b9b] text-right">%</span>
               </div>
               <!-- Slider -->
               <div class="relative h-4 w-[217px]">
@@ -192,7 +192,7 @@
           v-model="takeProfitStopLoss"
           class="w-4 h-4 border border-[#9b9b9b] bg-transparent"
         />
-        <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Take Profit / Stop Loss</span>
+        <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Take Profit / Stop Loss</span>
       </div>
 
       <!-- Action Button -->
@@ -219,11 +219,11 @@
         >
           <div class="flex flex-col">
             <Tooltip :width="300" v-if="item.tooltip" :content="item.tooltip">
-              <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif] underline decoration-dotted decoration-[#9b9b9b] underline-offset-[2px]">
+              <span class="text-[13px] leading-[18px] text-[#9b9b9b] underline decoration-dotted decoration-[#9b9b9b] underline-offset-[2px]">
                 {{ item.label }}
               </span>
             </Tooltip>
-            <span v-else class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">
+            <span v-else class="text-[13px] leading-[18px] text-[#9b9b9b]">
               {{ item.label }}
             </span>
             <div v-if="item.tooltip" class="h-0 relative w-full mt-0.5">
@@ -239,14 +239,14 @@
                 class="block w-full h-full object-contain"
               />
             </div>
-            <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif]">{{ item.value }}</span>
+            <span class="text-[13px] leading-[18px] text-white">{{ item.value }}</span>
           </div>
           <!-- Max. Position Slippage with edit icon -->
           <div v-else-if="(item as TradeDetailItem).key === 'maxSlippage'" class="flex items-center gap-1">
-            <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif] text-right">{{ item.value }}</span>
+            <span class="text-[13px] leading-[18px] text-white text-right">{{ item.value }}</span>
           </div>
           <!-- Regular value -->
-          <span v-else class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif] text-right">{{ item.value }}</span>
+          <span v-else class="text-[13px] leading-[18px] text-white text-right">{{ item.value }}</span>
         </div>
       </div>
 
@@ -257,7 +257,7 @@
       <div class="flex flex-col gap-3 pb-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-1">
-            <span class="text-[14px] leading-[20px] text-white font-semibold font-['IBM_Plex_Sans',sans-serif]">Account</span>
+            <span class="text-[14px] leading-[20px] text-white font-semibold">Account</span>
           </div>
         </div>
 
@@ -266,7 +266,7 @@
           <div class="flex items-start justify-between">
             <div class="flex items-center gap-1">
               <div class="flex flex-col">
-                <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Margin Usage</span>
+                <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Margin Usage</span>
                 <div class="h-px w-full bg-[#272727] mt-0.5"></div>
               </div>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -274,7 +274,7 @@
               </svg>
             </div>
             <div class="flex flex-col items-end">
-              <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif]">{{ formatCurrency(marginUsageAmount) }}</span>
+              <span class="text-[13px] leading-[18px] text-white">{{ formatCurrency(marginUsageAmount) }}</span>
               <div class="h-px w-[51px] bg-[#272727] mt-0.5"></div>
             </div>
           </div>
@@ -282,26 +282,26 @@
           <!-- Margin Usage Percentage -->
           <div class="flex items-start justify-between">
             <div class="flex flex-col">
-              <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Margin Usage</span>
+              <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Margin Usage</span>
               <div class="h-px w-full bg-[#272727] mt-0.5"></div>
             </div>
-            <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif]">{{ formattedMarginUsage }}</span>
+            <span class="text-[13px] leading-[18px] text-white">{{ formattedMarginUsage }}</span>
           </div>
 
           <!-- Effective Leverage -->
           <div class="flex items-start justify-between">
             <div class="flex flex-col">
-              <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Effective Leverage</span>
+              <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Effective Leverage</span>
               <div class="h-px w-full bg-[#272727] mt-0.5"></div>
             </div>
-            <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif]">{{ effectiveLeverageDisplay }}</span>
+            <span class="text-[13px] leading-[18px] text-white">{{ effectiveLeverageDisplay }}</span>
           </div>
 
           <!-- Cross Margin Ratio -->
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1">
               <div class="flex flex-col">
-                <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Cross Margin Ratio</span>
+                <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Cross Margin Ratio</span>
                 <div class="h-px w-full bg-[#272727] mt-0.5"></div>
               </div>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -309,7 +309,7 @@
               </svg>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-[13px] leading-[18px] text-[#10c8a8] font-['IBM_Plex_Sans',sans-serif]">{{ formattedMarginRatio }}</span>
+              <span class="text-[13px] leading-[18px] text-[#10c8a8]">{{ formattedMarginRatio }}</span>
               <!-- Bar Chart -->
               <div class="flex items-center gap-1">
                 <div class="w-0.5 h-3 bg-[#10c8a8]"></div>
