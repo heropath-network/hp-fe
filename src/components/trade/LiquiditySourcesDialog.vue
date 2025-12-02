@@ -14,15 +14,6 @@
           </button>
           <h3 class="text-base font-semibold leading-6 text-white">Liquidity Sources</h3>
         </div>
-        <button
-          type="button"
-          class="flex h-4 w-4 shrink-0 items-center justify-center text-white transition-opacity hover:opacity-75"
-          @click="$emit('close')"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
       </div>
     </template>
 
