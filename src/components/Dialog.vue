@@ -35,22 +35,22 @@ const currentVisible = computed({
   },
   set(value: boolean) {
     visible.value = value;
+    if (!value) {
+      emit("close");
+    }
   },
 });
 
 function closeModal() {
   currentVisible.value = false;
-  emit("close");
 }
 
 watch(
   () => props.show,
   (newVal) => {
     visible.value = newVal;
-    if (!visible.value) {
-      closeModal();
-    }
-  }
+  },
+  { immediate: true }
 );
 </script>
 
