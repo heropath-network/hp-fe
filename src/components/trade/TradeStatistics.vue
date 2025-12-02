@@ -103,23 +103,23 @@
     </div>
 
     <!-- Chart Source Selector -->
-    <div class="flex items-center ml-4 pl-4 border-l border-gray-800">
-      <div class="flex flex-col min-w-[120px]">
-        <div class="text-xs text-gray-400 mb-1">Chart Source</div>
+    <div class="flex items-center">
+      <div class="flex flex-col">
+        <div class="text-xs text-gray-400 mb-1 text-right">Chart Source</div>
         <Menu as="div" class="relative inline-block text-left">
           <div>
             <MenuButton
-              class="flex items-center gap-2 rounded-lg border border-gray-800 bg-gray-900 px-2 py-1 text-xs text-gray-300 transition hover:border-gray-700 focus:border-blue-500 focus:outline-none"
+              class="flex items-center justify-end gap-1 px-2 text-xs text-gray-300  focus:outline-none"
             >
-              <div class="flex items-center justify-center w-4 h-4 rounded-full bg-orange-500 flex-shrink-0">
-                <svg class="h-2.5 w-2.5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v20M2 12h20" />
-                </svg>
+              <div class="relative h-4 w-4 shrink-0">
+                <img
+                  :src="getChartSourceIcon(selectedOracleName || 'Auto Match')"
+                  :alt="selectedOracleName || 'Auto Match'"
+                  class="h-full w-full object-contain"
+                />
               </div>
-              <span class="text-xs">{{ selectedOracleName || 'Auto Match' }}</span>
-              <svg class="h-3 w-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-              </svg>
+              <span class="text-xs text-white">{{ selectedOracleName || 'Auto Match' }}</span>
+              <i class="iconfont icon-down text-white"></i>
             </MenuButton>
           </div>
 
@@ -132,7 +132,7 @@
             leave-to-class="transform scale-95 opacity-0"
           >
             <MenuItems
-              class="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-lg border border-gray-800 bg-gray-900 shadow-lg focus:outline-none"
+              class="absolute right-0 z-10 mt-2 w-40 origin-top-right bg-gray-800 shadow-lg focus:outline-none"
             >
               <div class="py-1">
                 <MenuItem
@@ -145,9 +145,16 @@
                     :class="[
                       active ? 'bg-gray-800 text-gray-200' : '',
                       oracle.value === selectedOracleName ? 'text-gray-300' : 'text-white',
-                      'group flex w-full items-center px-4 py-2 text-sm transition'
+                      'group flex w-full items-center gap-2 px-4 py-2 text-sm transition hover:bg-gray-700'
                     ]"
                   >
+                    <div class="relative h-4 w-4 shrink-0">
+                      <img
+                        :src="getChartSourceIcon(oracle.label)"
+                        :alt="oracle.label"
+                        class="h-full w-full object-contain"
+                      />
+                    </div>
                     {{ oracle.label }}
                   </button>
                 </MenuItem>
@@ -266,6 +273,17 @@ function formatNumber(value: number): string {
     return (value / 1000).toFixed(2) + 'K'
   }
   return value.toFixed(0)
+}
+
+function getChartSourceIcon(oracleName: string): string {
+  // Map oracle names to their corresponding liquidity source icons
+  const iconMap: Record<string, string> = {
+    'Aster': '/img/liquidity/aster.svg',
+    'gTrade': '/img/liquidity/gtrade.svg',
+    'Four.meme': '/img/liquidity/four.svg',
+    'Auto Match': '/img/liquidity/aster.svg', // Default to Aster icon for Auto Match
+  }
+  return iconMap[oracleName] || '/img/liquidity/aster.svg'
 }
 
 defineEmits(['openMarketSelect'])
