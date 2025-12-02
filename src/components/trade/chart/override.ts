@@ -16,7 +16,7 @@ export default function override(isMobile: boolean) {
     'paneProperties.vertGridProperties.style': LINESTYLE_SOLID,
     'paneProperties.horzGridProperties.color': '#1D1D1D',
     'paneProperties.horzGridProperties.style': LINESTYLE_SOLID,
-    'paneProperties.crossHairProperties.color': '#1D1D1D',
+    'paneProperties.crossHairProperties.color': '#9B9B9B',
     'paneProperties.crossHairProperties.width': 1,
     'paneProperties.crossHairProperties.style': LINESTYLE_DASHED,
 
@@ -33,8 +33,8 @@ export default function override(isMobile: boolean) {
 
     'scalesProperties.backgroundColor': '#0A0A0A',
     'scalesProperties.fontSize': 12,
-    'scalesProperties.lineColor': '#0F1529',
-    'scalesProperties.textColor': '#6678A9',
+    'scalesProperties.lineColor': '#1D1D1D',
+    'scalesProperties.textColor': '#9B9B9B',
 
     'mainSeriesProperties.style': 1,
     'mainSeriesProperties.showCountdown': false,
