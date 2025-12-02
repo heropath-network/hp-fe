@@ -7,7 +7,7 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/vue";
-import CloseIcon from "@/assets/icons/close.svg";
+import BaseIcon from "./BaseIcon.vue";
 
 interface Props {
   show?: boolean;
@@ -96,12 +96,15 @@ watch(
                     <slot name="title">Dialog Title</slot>
                   </span>
                   <span
-                    class="icon-mask !bg-[var(--hp-white-color)] cursor-pointer hover:!bg-[var(--hp-text-color)] h-[14px] w-[14px]"
+                    class="cursor-pointer"
                     @click="currentVisible = false"
-                    :style="{
-                      '--icon-url': `url(${CloseIcon})`,
-                    }"
-                  />
+                  >
+                    <BaseIcon
+                      name="close"
+                      size="14"
+                      class="text-[var(--hp-white-color)] hover:text-[var(--hp-text-color)] transition-colors"
+                    />
+                  </span>
                 </div>
               </DialogTitle>
               <div class="mt-1">

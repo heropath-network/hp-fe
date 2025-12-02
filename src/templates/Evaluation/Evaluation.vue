@@ -8,8 +8,8 @@ import {
   type EvaluationStep1Config,
   type EvaluationStep2Config,
 } from '@/types/evaluation'
-import questionIcon from '@/assets/icons/menu/question.svg'
 import { ROUTE_NAMES } from '@/router'
+import BaseIcon from '@/components/BaseIcon.vue'
 
 type StepRow =
   | {
@@ -149,7 +149,7 @@ function handleFeeClick(index: number) {
         >
           <div class="flex w-[160px] items-center gap-1 px-6 text-sm text-[var(--hp-text-color)]">
             <span class="whitespace-nowrap">{{ row.label }}</span>
-            <img :src="questionIcon" alt="" class="h-4 w-4 flex-shrink-0 opacity-60" />
+            <BaseIcon name="menu-question" size="16" class="flex-shrink-0 opacity-60 text-[var(--hp-text-color)]" />
           </div>
 
           <div

@@ -2,12 +2,12 @@
     <g clip-path="url(#clip0_384_1961)">
         <path
             d="M8.00065 14.6667C11.6825 14.6667 14.6673 11.6819 14.6673 8.00004C14.6673 4.31814 11.6825 1.33337 8.00065 1.33337C4.31875 1.33337 1.33398 4.31814 1.33398 8.00004C1.33398 11.6819 4.31875 14.6667 8.00065 14.6667Z"
-            stroke="#9B9B9B" />
-        <path d="M8 4V8L10 10" stroke="#9B9B9B" />
+            stroke="currentColor" />
+        <path d="M8 4V8L10 10" stroke="currentColor" />
     </g>
     <defs>
         <clipPath id="clip0_384_1961">
-            <rect width="16" height="16" fill="white" />
+            <rect width="16" height="16" fill="currentColor" />
         </clipPath>
     </defs>
 </svg>

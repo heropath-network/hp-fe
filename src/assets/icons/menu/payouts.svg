@@ -5,6 +5,6 @@
     <path
         d="M12 10C12 11.1046 11.1046 12 10 12C8.8954 12 8 11.1046 8 10C8 8.8954 8.8954 8 10 8C11.1046 8 12 8.8954 12 10Z"
         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-    <rect x="14" y="9" width="2" height="2" fill="#9B9B9B" />
-    <rect x="4" y="9" width="2" height="2" fill="#9B9B9B" />
+    <rect x="14" y="9" width="2" height="2" fill="currentColor" />
+    <rect x="4" y="9" width="2" height="2" fill="currentColor" />
 </svg>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import BaseIcon from '@/components/BaseIcon.vue'
 import EcosystemTestIcon from '@/assets/icons/ecosystem-test.svg'
-import LinkIcon from '@/assets/icons/link.svg'
 
 type EcosystemLink = {
   title: string
@@ -83,11 +83,10 @@ const communityProjects: EcosystemLink[] = [
               class="group inline-flex items-center gap-2 text-base font-semibold leading-6"
             >
               <span class="group-hover:text-[var(--hp-primary-green)]">{{ link.title }}</span>
-              <span
-                class="icon-mask !w-[16px] !h-[16px] !text-[var(--hp-text-color)] group-hover:!text-[var(--hp-primary-green)]"
-                :style="{
-                  '--icon-url': `url(${LinkIcon})`,
-                }"
+              <BaseIcon
+                name="link"
+                size="16"
+                class="text-[var(--hp-text-color)] group-hover:text-[var(--hp-primary-green)]"
               />
             </a>
           </div>
@@ -117,11 +116,10 @@ const communityProjects: EcosystemLink[] = [
               class="group inline-flex items-center gap-2 text-base font-semibold leading-6"
             >
               <span class="group-hover:text-[var(--hp-primary-green)]">{{ link.title }}</span>
-              <span
-                class="icon-mask !w-[16px] !h-[16px] !text-[var(--hp-text-color)] group-hover:!text-[var(--hp-primary-green)]"
-                :style="{
-                  '--icon-url': `url(${LinkIcon})`,
-                }"
+              <BaseIcon
+                name="link"
+                size="16"
+                class="text-[var(--hp-text-color)] group-hover:text-[var(--hp-primary-green)]"
               />
             </a>
           </div>

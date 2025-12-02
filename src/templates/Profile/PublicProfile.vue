@@ -8,7 +8,7 @@ import { useRouter } from 'vue-router'
 import { ROUTE_NAMES } from '@/router'
 import { useUserEvaluationsStorage } from '@/storages/heroPath'
 import { formatDate, formatNumber, getAccountTypeLabel, getAccountStatusLabel } from '@/utils/common'
-import ArrowIcon from '@/assets/icons/arrow.svg'
+import BaseIcon from '@/components/BaseIcon.vue'
 
 const router = useRouter()
 
@@ -192,12 +192,7 @@ const lifetimeProfitWithdrawn = computed(() => {
         @click="router.push({ name: ROUTE_NAMES.Evaluation })"
       >
         New Evaluation
-        <span
-          class="icon-mask ml-1 rotate-[270deg] w-[18px] h-[18px]"
-          :style="{
-            '--icon-url': `url(${ArrowIcon})`,
-          }"
-        />
+        <BaseIcon name="arrow" size="18" class="ml-1 rotate-[270deg] text-[var(--hp-black-color)]" />
       </button>
     </div>
   </section>

@@ -1,24 +1,21 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useConnection } from '@wagmi/vue'
-import TimeIcon from '@/assets/icons/time.svg'
+import BaseIcon from '@/components/BaseIcon.vue'
+import { generateUUID } from '@/utils/common'
+import { QuestTaskId } from '@/types/heroPath'
 import XIcon from '@/assets/icons/quest/x.svg'
 import TradePerpIcon from '@/assets/icons/quest/tradePerp.svg'
 import TradeMemeIcon from '@/assets/icons/quest/tradeMeme.svg'
 import SwapIcon from '@/assets/icons/quest/swap.svg'
-import ArrowIcon from '@/assets/icons/arrow.svg'
-import RetryIcon from '@/assets/icons/retry.svg'
-import CompletedIcon from '@/assets/icons/completed.svg'
 import TradingLogoIcon from '@/assets/icons/quest/tradingLogo.svg'
-import { generateUUID } from '@/utils/common'
-import { QuestTaskId } from '@/types/heroPath'
 import { useUserQuestTaskStatusStorage, useUserQuestDiscountStatusStorage } from '@/storages/heroPath'
 
 type QuestTask = {
   id: QuestTaskId
   title: string
   description?: string
-  icon: any
+  icon: string
   status: 'pending' | 'completed'
 }
 
@@ -162,7 +159,7 @@ watch(
     </header>
 
     <div class="flex items-center gap-2 text-sm leading-5 text-[var(--hp-text-color)]">
-      <span class="icon-mask h-4 w-4" :style="{ '--icon-url': `url(${TimeIcon})` }" />
+      <BaseIcon name="time" size="16" class="text-[var(--hp-text-color)]" />
       <span>2025/11/24 16:00- 2025/12/31 16:00 GMT+08:00</span>
     </div>
 
@@ -179,9 +176,10 @@ watch(
           @click="toggleTask(task.id)"
         >
           <div class="flex items-center gap-6">
-            <span
-              class="icon-mask !h-4 !w-4 group-hover:!text-[var(--hp-primary-green)]"
-              :style="{ '--icon-url': `url(${ArrowIcon})` }"
+            <BaseIcon
+              name="arrow"
+              size="16"
+              class="shrink-0 transition-transform text-[var(--hp-text-color)] group-hover:text-[var(--hp-primary-green)]"
               :class="[isOpen(task.id) ? 'rotate-180' : '']"
             />
 
@@ -192,15 +190,13 @@ watch(
           </div>
 
           <template v-if="task.status === 'completed'">
-            <span
-              class="icon-mask !w-[18px] !h-[18px] !text-[var(--hp-primary-green)]"
-              :style="{ '--icon-url': `url(${CompletedIcon})` }"
-            />
+            <BaseIcon name="completed" size="18" class="text-[var(--hp-primary-green)]" />
           </template>
           <template v-else>
-            <span
-              class="icon-mask !w-[18px] !h-[18px] hover:!text-[var(--hp-primary-green)]"
-              :style="{ '--icon-url': `url(${RetryIcon})` }"
+            <BaseIcon
+              name="retry"
+              size="18"
+              class="text-[var(--hp-text-color)] transition-colors hover:text-[var(--hp-primary-green)]"
               @click.stop="() => {}"
             />
           </template>
@@ -228,7 +224,7 @@ watch(
         class="flex items-center gap-2 bg-[var(--hp-primary-green)] px-6 py-[14px] text-base font-medium text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)]"
       >
         Go to Training
-        <span class="icon-mask h-[18px] w-[18px] rotate-[270deg]" :style="{ '--icon-url': `url(${ArrowIcon})` }" />
+        <BaseIcon name="arrow" size="18" class="rotate-[270deg] text-[var(--hp-black-color)]" />
       </button>
     </div>
   </div>
