@@ -38,10 +38,7 @@ export const PaymentTokens: {
   },
 ]
 
-export const MOCK_TOKEN_PRICES: { [key: string]: number } = {
-  ETH: 2800,
-  BTC: 85500,
+export const TOKEN_PRICES: { [key: string]: number } = {
   USDC: 1,
-  BNB: 826,
   USDT: 1,
 }
