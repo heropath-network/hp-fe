@@ -4,18 +4,11 @@
   "listedPancake": true,
   "markets": [
     {
-      "id": "ALIF",
-      "tokenId": 101343471,
-      "symbol": "ALIF",
-      "name": "ALIF",
-      "address": "0x4444095396f637f6ea43b19267cb8a572cf1c847"
-    },
-    {
-      "id": "BIBI",
-      "tokenId": 101342925,
-      "symbol": "Bibi",
-      "name": "Binance AI",
-      "address": "0x444437716c563a0604b63319caa754016568e66e"
+      "id": "WEIRD",
+      "tokenId": 101353338,
+      "symbol": "WEIRD",
+      "name": "Weird Coin",
+      "address": "0x444489335e11d29b41135d3d744c44ba72272772"
     },
     {
       "id": "BOL",
@@ -32,18 +25,18 @@
       "address": "0x44442271e6ca7336a29032838d70675680adc7df"
     },
     {
-      "id": "GG",
-      "tokenId": 101287649,
-      "symbol": "GG",
-      "name": "RIP GIGGLE",
-      "address": "0x444484eecf4a4364ba026ade9577f19a807c6260"
+      "id": "gm",
+      "tokenId": 101221973,
+      "symbol": "gm",
+      "name": "gm",
+      "address": "0x4444b33f8d84f37c08b9487ff2efb8c908496b34"
     },
     {
-      "id": "AJC",
-      "tokenId": 101282081,
-      "symbol": "AJC",
-      "name": "Ai Judge Companion",
-      "address": "0x4444eb8f7d173ba29e3a5bf3a9e57d5f234545d4"
+      "id": "Bibi",
+      "tokenId": 101342925,
+      "symbol": "Bibi",
+      "name": "Binance AI",
+      "address": "0x444437716c563a0604b63319caa754016568e66e"
     },
     {
       "id": "AIF",
