@@ -1,6 +1,6 @@
-const UserEvaluationsKey = 'user_evaluation_history_{addr}'
-const UserPositionsKey = 'user_positions_{addr}'
-const UserOrdersKey = 'user_orders_{addr}'
-const UserTradeHistory = 'user_trade_history_{addr}'
+const UserEvaluationsKey = 'user:evaluation:history:{addr}'
+const UserPositionsKey = 'user:positions:{addr}'
+const UserOrdersKey = 'user:orders:{addr}'
+const UserTradeHistory = 'user:trade:history:{addr}'
 
 export { UserTradeHistory, UserEvaluationsKey, UserPositionsKey, UserOrdersKey }

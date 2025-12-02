@@ -50,3 +50,23 @@ export function getAccountTypeLabel(type: string) {
       return 'Unknown'
   }
 }
+
+export function getAccountStatusLabel(type: string) {
+  switch (type) {
+    case 'active':
+      return 'Active'
+    case 'inactive':
+      return 'Inactive'
+    default:
+      return 'Unknown'
+  }
+}
+
+export function formatDate(timestamp: number): string {
+  const date = new Date(timestamp)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}

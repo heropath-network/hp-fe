@@ -5,6 +5,7 @@ import { useUserEvaluationsStorage } from '@/storages/heroPath'
 import { computed, ref, watch } from 'vue'
 import DownArrowIcon from '@/assets/icons/downArrow.svg'
 import { useDayCountDown } from '@/use/useDayCountDown'
+import ArrowIcon from '@/assets/icons/arrow.svg'
 
 const { remainingText: dayCountDown } = useDayCountDown()
 
@@ -147,9 +148,9 @@ watch(
 
           <div
             v-if="showEvaluationDropdown"
-            class="absolute right-0 top-[calc(100%+8px)] z-20 w-full min-w-[280px] overflow-hidden border border-[var(--hp-line-light-color)] bg-[var(--hp-bg-normal)]"
+            class="absolute right-0 top-[calc(100%+8px)] z-20 w-full min-w-[280px] overflow-hidden border border-[var(--hp-line-light-color)] bg-[var(--hp-bg-light)]"
           >
-            <div v-if="!evaluationList.length" class="px-4 py-3 text-sm text-[var(--hp-text-color)]">
+            <div v-if="!evaluationList.length" class="px-4 py-3 text-sm text-[var(--hp-white-color)]">
               No evaluation accounts
             </div>
             <button
@@ -180,9 +181,15 @@ watch(
         </div>
         <button
           type="button"
-          class="ml-3 bg-[var(--hp-primary-green)] h-[40px] px-3 py-2.5 text-[var(--hp-black-color)] text-[14px] font-[500] leading-none transition hover:bg-[var(--hp-primary-green-hover)] active:bg-[var(--hp-primary-green-hover)]"
+          class="flex items-center ml-3 bg-[var(--hp-primary-green)] h-[40px] px-3 py-2.5 text-[var(--hp-black-color)] text-[14px] font-[500] leading-none transition hover:bg-[var(--hp-primary-green-hover)] active:bg-[var(--hp-primary-green-hover)]"
         >
           Open Trading Terminal
+          <span
+            class="icon-mask ml-1 rotate-[270deg] w-4 h-4"
+            :style="{
+              '--icon-url': `url(${ArrowIcon})`,
+            }"
+          />
         </button>
       </div>
     </header>
