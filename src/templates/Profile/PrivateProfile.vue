@@ -1,25 +1,17 @@
 <script setup lang="ts">
-import { Ref, ref } from 'vue'
+import { computed, Ref, ref } from 'vue'
 import { HpSwitch } from '@/components'
+import { useAccountShowInLeaderboard, useUserEvaluationsStorage } from '@/storages/heroPath'
+import { useConnection } from '@wagmi/vue'
+import { formatNumber, formatDate, getAccountTypeLabel, getAccountStatusLabel } from '@/utils/common'
 
-const accounts = ref([
-  {
-    date: '2025-11-28',
-    number: '#535094',
-    dropdownVisible: true,
-    publicProfileVisible: false,
-    type: 'Evaluation',
-    status: 'Active',
-  },
-  {
-    date: '2025-11-28',
-    number: '#535095',
-    dropdownVisible: true,
-    publicProfileVisible: false,
-    type: 'Evaluation',
-    status: 'Inactive',
-  },
-])
+const { address } = useConnection()
+
+const {
+  data: userEvaluations,
+  updateDisplayDrawdownStatus,
+  updateDisplayPublicStatus,
+} = useUserEvaluationsStorage(address)
 
 const accountFilters = [
   { id: 'all', label: 'All' },
@@ -28,7 +20,46 @@ const accountFilters = [
 ]
 const selectedAccountFilter: Ref<string> = ref('all')
 
-const leaderboardVisible = ref(true)
+const filteredUserEvaluations = computed(() => {
+  if (selectedAccountFilter.value === 'all') {
+    return userEvaluations.value
+  }
+  return userEvaluations.value.filter((evaluation) => {
+    const statusLabel = getAccountStatusLabel(evaluation.accountStatus).toLowerCase()
+    return statusLabel === selectedAccountFilter.value
+  })
+})
+
+const leaderboardVisible = useAccountShowInLeaderboard(address)
+
+const lifetimeTradingVolume = computed(() => {
+  return 0
+})
+
+const fundedTradingVolume = computed(() => {
+  return 0
+})
+const currentWithdrawableProfit = computed(() => {
+  return 0
+})
+const highestWinRateAsset = computed(() => {
+  return '--'
+})
+
+const tradingWinRate = computed(() => {
+  return '0'
+})
+const lifetimeProfitWithdrawn = computed(() => {
+  return 0
+})
+
+function onUpdateDropdownStatus(accountId: string, value: boolean) {
+  updateDisplayDrawdownStatus(accountId, value)
+}
+
+function onUpdatePublicProfileStatus(accountId: string, value: boolean) {
+  updateDisplayPublicStatus(accountId, value)
+}
 </script>
 
 <template>
@@ -37,27 +68,37 @@ const leaderboardVisible = ref(true)
       <h2 class="text-xl font-semibold leading-7">Public Profile Settings</h2>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
-          <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">$0.00</p>
+          <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
+            ${{ formatNumber(lifetimeTradingVolume, 2) }}
+          </p>
           <p class="text-sm leading-5 text-[var(--hp-text-color)]">Lifetime Trading Volume</p>
         </div>
         <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
-          <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">$0.00</p>
+          <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
+            ${{ formatNumber(fundedTradingVolume, 2) }}
+          </p>
           <p class="text-sm leading-5 text-[var(--hp-text-color)]">Funded Trading Volume</p>
         </div>
         <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
-          <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">$0.00</p>
+          <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
+            ${{ formatNumber(currentWithdrawableProfit, 2) }}
+          </p>
           <p class="text-sm leading-5 text-[var(--hp-text-color)]">Current Withdrawable Profit</p>
         </div>
         <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
-          <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">BTCUSD</p>
+          <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">{{ highestWinRateAsset }}</p>
           <p class="text-sm leading-5 text-[var(--hp-text-color)]">Highest Win Rate Asset</p>
         </div>
         <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
-          <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">0.00%</p>
+          <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
+            {{ formatNumber(tradingWinRate, 2) }}%
+          </p>
           <p class="text-sm leading-5 text-[var(--hp-text-color)]">Trading Win Rate</p>
         </div>
         <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
-          <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">$0.00</p>
+          <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
+            ${{ formatNumber(lifetimeProfitWithdrawn, 2) }}
+          </p>
           <p class="text-sm leading-5 text-[var(--hp-text-color)]">Lifetime Profit Withdrawn</p>
         </div>
       </div>
@@ -127,7 +168,7 @@ const leaderboardVisible = ref(true)
           <span>Status</span>
         </div>
 
-        <template v-if="!accounts.length">
+        <template v-if="!filteredUserEvaluations.length">
           <div class="h-[72px] flex items-center justify-center bg-[var(--hp-bg-light)] text-[var(--hp-white-color)]">
             No accounts available.
           </div>
@@ -135,22 +176,28 @@ const leaderboardVisible = ref(true)
 
         <template v-else>
           <div
-            v-for="(account, index) in accounts"
-            :key="account.number"
+            v-for="(account, index) in filteredUserEvaluations"
+            :key="account.accountId"
             class="grid grid-cols-[140px,160px,200px,1fr,220px,140px] items-center px-6 py-4 text-[16px] font-medium leading-6"
             :class="index % 2 === 0 ? 'bg-[var(--hp-bg-light)]' : 'bg-[var(--hp-bg-normal)]'"
           >
-            <span class="text-[var(--hp-white-color)]">{{ account.date }}</span>
-            <span class="text-[var(--hp-white-color)]">{{ account.number }}</span>
+            <span class="text-[var(--hp-white-color)]">{{ formatDate(account.timestamp) }}</span>
+            <span class="text-[var(--hp-white-color)]">#{{ account.accountId }}</span>
             <div>
-              <HpSwitch v-model:enabled="account.dropdownVisible" />
+              <HpSwitch
+                :enabled="account.displayStatus.showDrawdown"
+                @change="onUpdateDropdownStatus(account.accountId, $event)"
+              />
             </div>
-            <span class="text-[var(--hp-white-color)]">{{ account.type }}</span>
+            <span class="text-[var(--hp-white-color)]">{{ getAccountTypeLabel(account.accountType) }}</span>
             <div>
-              <HpSwitch v-model:enabled="account.dropdownVisible" />
+              <HpSwitch
+                :enabled="account.displayStatus.showPublic"
+                @change="onUpdatePublicProfileStatus(account.accountId, $event)"
+              />
             </div>
             <span class="text-[16px] font-medium leading-6 text-[var(--hp-white-color)]">
-              {{ account.status }}
+              {{ getAccountStatusLabel(account.accountStatus) }}
             </span>
           </div>
         </template>

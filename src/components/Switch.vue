@@ -10,11 +10,13 @@ const props = withDefaults(defineProps<Props>(), {})
 
 const emits = defineEmits<{
   (e: 'update:enabled', value: boolean): void
+  (e: 'change', value: boolean): void
 }>()
 
 const isEnabled = computed({
   get: () => props.enabled,
   set: (value: boolean) => {
+    emits('change', value)
     emits('update:enabled', value)
   },
 })
@@ -23,7 +25,7 @@ const isEnabled = computed({
 <template>
   <Switch
     v-model="isEnabled"
-    :class="isEnabled ? 'bg-[var(--hp-primary-green)]' : 'bg-[var(--hp-bg-light)]'"
+    :class="isEnabled ? 'bg-[var(--hp-primary-green)]' : 'bg-[var(--hp-bg-dark)]'"
     class="relative flex items-center h-[16px] w-[28px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75"
   >
     <span

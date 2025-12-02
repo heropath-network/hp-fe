@@ -3,13 +3,22 @@ import { useConnection } from '@wagmi/vue'
 import Avatar from '@/components/Wallet/Avatar.vue'
 import { EMPTY_ADDRESS } from '@/constants'
 import { ellipsisMiddle } from '@/utils/common'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ROUTE_NAMES } from '@/router'
+import { useUserEvaluationsStorage } from '@/storages/heroPath'
+import { formatDate, formatNumber, getAccountTypeLabel, getAccountStatusLabel } from '@/utils/common'
+import ArrowIcon from '@/assets/icons/arrow.svg'
 
 const router = useRouter()
 
 const { address, isConnected } = useConnection()
+
+const { data: _userEvaluations } = useUserEvaluationsStorage(address)
+
+const userEvaluations = computed(() => {
+  return _userEvaluations.value.filter((evaluation) => evaluation.displayStatus.showPublic)
+})
 
 const accountFilters = [
   { id: 'all', label: 'All', active: true },
@@ -19,6 +28,16 @@ const accountFilters = [
 
 const selectedAccountFilter = ref('all')
 
+const filteredUserEvaluations = computed(() => {
+  if (selectedAccountFilter.value === 'all') {
+    return userEvaluations.value
+  }
+  return userEvaluations.value.filter((evaluation) => {
+    const statusLabel = getAccountStatusLabel(evaluation.accountStatus).toLowerCase()
+    return statusLabel === selectedAccountFilter.value
+  })
+})
+
 const patternStyle = {
   backgroundColor: 'var(--hp-primary-green)',
   backgroundImage:
@@ -27,20 +46,26 @@ const patternStyle = {
   backgroundPosition: '-20px -20px',
 }
 
-const accounts = ref([
-  {
-    date: '2025-11-28',
-    number: '#535094',
-    type: 'Evaluation',
-    status: 'Active',
-  },
-  {
-    date: '2025-11-28',
-    number: '#535095',
-    type: 'Evaluation',
-    status: 'Inactive',
-  },
-])
+const lifetimeTradingVolume = computed(() => {
+  return 0
+})
+
+const fundedTradingVolume = computed(() => {
+  return 0
+})
+const currentWithdrawableProfit = computed(() => {
+  return 0
+})
+const highestWinRateAsset = computed(() => {
+  return '--'
+})
+
+const tradingWinRate = computed(() => {
+  return '0'
+})
+const lifetimeProfitWithdrawn = computed(() => {
+  return 0
+})
 </script>
 
 <template>
@@ -62,27 +87,37 @@ const accounts = ref([
         </div>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
-            <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">$0.00</p>
+            <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
+              ${{ formatNumber(lifetimeTradingVolume, 2) }}
+            </p>
             <p class="text-sm leading-5 text-[var(--hp-text-color)]">Lifetime Trading Volume</p>
           </div>
           <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
-            <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">$0.00</p>
+            <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
+              ${{ formatNumber(fundedTradingVolume, 2) }}
+            </p>
             <p class="text-sm leading-5 text-[var(--hp-text-color)]">Funded Trading Volume</p>
           </div>
           <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
-            <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">$0.00</p>
+            <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
+              ${{ formatNumber(currentWithdrawableProfit, 2) }}
+            </p>
             <p class="text-sm leading-5 text-[var(--hp-text-color)]">Current Withdrawable Profit</p>
           </div>
           <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
-            <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">BTCUSD</p>
+            <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">{{ highestWinRateAsset }}</p>
             <p class="text-sm leading-5 text-[var(--hp-text-color)]">Highest Win Rate Asset</p>
           </div>
           <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
-            <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">0.00%</p>
+            <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
+              {{ formatNumber(tradingWinRate, 2) }}%
+            </p>
             <p class="text-sm leading-5 text-[var(--hp-text-color)]">Trading Win Rate</p>
           </div>
           <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
-            <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">$0.00</p>
+            <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
+              ${{ formatNumber(lifetimeProfitWithdrawn, 2) }}
+            </p>
             <p class="text-sm leading-5 text-[var(--hp-text-color)]">Lifetime Profit Withdrawn</p>
           </div>
           <div class="md:col-span-3 flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
@@ -125,7 +160,7 @@ const accounts = ref([
           <span>Account Type</span>
           <span>Status</span>
         </div>
-        <template v-if="!accounts.length">
+        <template v-if="!filteredUserEvaluations.length">
           <div class="h-[72px] flex items-center justify-center bg-[var(--hp-bg-light)] text-[var(--hp-white-color)]">
             No accounts available.
           </div>
@@ -133,16 +168,16 @@ const accounts = ref([
 
         <template v-else>
           <div
-            v-for="(account, index) in accounts"
-            :key="account.number"
+            v-for="(account, index) in filteredUserEvaluations"
+            :key="account.accountId"
             class="grid grid-cols-[160px,1.3fr,1.3fr,1.1fr] items-center px-6 py-4 text-[16px] font-medium leading-6"
             :class="index % 2 === 0 ? 'bg-[var(--hp-bg-light)]' : 'bg-[var(--hp-bg-normal)]'"
           >
-            <span class="text-[var(--hp-white-color)]">{{ account.date }}</span>
-            <span class="text-[var(--hp-white-color)]">{{ account.number }}</span>
-            <span class="text-[var(--hp-white-color)]">{{ account.type }}</span>
+            <span class="text-[var(--hp-white-color)]">{{ formatDate(account.timestamp) }}</span>
+            <span class="text-[var(--hp-white-color)]">#{{ account.accountId }}</span>
+            <span class="text-[var(--hp-white-color)]">{{ getAccountTypeLabel(account.accountType) }}</span>
             <span class="text-[16px] font-medium leading-6 text-[var(--hp-white-color)]">
-              {{ account.status }}
+              {{ getAccountStatusLabel(account.accountStatus) }}
             </span>
           </div>
         </template>
@@ -153,10 +188,16 @@ const accounts = ref([
       <p class="text-[20px] font-semibold leading-7">Ready for a new Evaluation?</p>
       <button
         type="button"
-        class="bg-[var(--hp-primary-green)] px-6 py-[14px] text-[16px] font-medium leading-6 text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)]"
+        class="flex items-center bg-[var(--hp-primary-green)] px-6 py-[14px] text-[16px] font-medium leading-6 text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)]"
         @click="router.push({ name: ROUTE_NAMES.Evaluation })"
       >
         New Evaluation
+        <span
+          class="icon-mask ml-1 rotate-[270deg] w-[18px] h-[18px]"
+          :style="{
+            '--icon-url': `url(${ArrowIcon})`,
+          }"
+        />
       </button>
     </div>
   </section>
