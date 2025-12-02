@@ -24,69 +24,17 @@
               </div>
             </td>
           </tr>
-          <tr
+          <HistoryRow
             v-for="trade in history"
             :key="trade.id"
-            class="transition hover:bg-gray-900/50"
-          >
-            <td class="px-4 py-3">
-              <div class="font-medium text-white">{{ trade.market }}</div>
-            </td>
-            <td class="px-4 py-3">
-              <span
-                :class="[
-                  'inline-block rounded px-2 py-0.5 text-xs font-semibold',
-                  trade.side === 'long'
-                    ? 'bg-green-500/20 text-green-500'
-                    : 'bg-red-500/20 text-red-500'
-                ]"
-              >
-                {{ trade.side.toUpperCase() }}
-              </span>
-            </td>
-            <td class="px-4 py-3 text-right text-white">
-              {{ formatNumber(trade.size, 4) }}
-            </td>
-            <td class="px-4 py-3 text-right text-white">
-              ${{ formatNumber(trade.entryPrice, 2) }}
-            </td>
-            <td class="px-4 py-3 text-right text-white">
-              ${{ formatNumber(trade.exitPrice, 2) }}
-            </td>
-            <td class="px-4 py-3 text-right">
-              <div
-                :class="[
-                  'font-semibold',
-                  trade.pnl >= 0 ? 'text-green-500' : 'text-red-500'
-                ]"
-              >
-                {{ formatCurrency(trade.pnl) }}
-              </div>
-              <div
-                :class="[
-                  'text-xs',
-                  trade.pnl >= 0 ? 'text-green-500' : 'text-red-500'
-                ]"
-              >
-                {{ formatPercentage(getPnLPercent(trade)) }}
-              </div>
-            </td>
-            <td class="px-4 py-3 text-gray-400">
-              {{ formatDate(trade.timestamp) }}
-            </td>
-            <td class="px-4 py-3 text-gray-400">
-              {{ formatDate(trade.closeTimestamp) }}
-            </td>
-            <td class="px-4 py-3 text-right text-gray-400">
-              {{ formatDuration(trade.timestamp, trade.closeTimestamp) }}
-            </td>
-          </tr>
+            :trade="trade"
+          />
         </tbody>
       </table>
     </div>
 
     <!-- Summary -->
-    <div
+    <!-- <div
       v-if="history.length > 0"
       class="mt-auto border-t border-gray-800 bg-gray-900 px-4 py-3"
     >
@@ -122,15 +70,15 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useTradeStore } from '@/stores/tradeStore'
-import { formatNumber, formatCurrency, formatPercentage } from '@/utils/bigint'
-import type { TradeHistory } from '@/stores/tradeStore'
+import { formatCurrency } from '@/utils/bigint'
+import HistoryRow from './HistoryRow.vue'
 import noDataIcon from '@/assets/img/no-data.svg'
 
 const tradeStore = useTradeStore()
@@ -151,33 +99,5 @@ const winRate = computed(() => {
   const wins = history.value.filter(trade => trade.pnl > 0).length
   return ((wins / history.value.length) * 100).toFixed(1)
 })
-
-function getPnLPercent(trade: TradeHistory): number {
-  if (trade.entryPrice === BigInt(0)) return 0
-  const priceDiff = trade.exitPrice - trade.entryPrice
-  const multiplier = trade.side === 'long' ? 1 : -1
-  return (Number(priceDiff) / Number(trade.entryPrice)) * 100 * multiplier
-}
-
-function formatDate(timestamp: number): string {
-  const date = new Date(timestamp)
-  return date.toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-function formatDuration(start: number, end: number): string {
-  const diff = end - start
-  const minutes = Math.floor(diff / 60000)
-  const hours = Math.floor(diff / 3600000)
-  const days = Math.floor(diff / 86400000)
-  
-  if (minutes < 60) return `${minutes}m`
-  if (hours < 24) return `${hours}h ${minutes % 60}m`
-  return `${days}d ${hours % 24}h`
-}
 </script>
 

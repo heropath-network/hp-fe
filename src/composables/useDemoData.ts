@@ -82,7 +82,9 @@ export function useDemoData() {
       exitPrice: toBigInt('48200'),
       pnl: toBigInt('210'),
       timestamp: now - oneDay * 2,
-      closeTimestamp: now - oneDay * 2 + oneHour * 3
+      closeTimestamp: now - oneDay * 2 + oneHour * 3,
+      chainId: 56, // BNB Chain
+      liquiditySource: 'aster', // Aster liquidity source
     })
 
     // Losing trade
@@ -95,7 +97,9 @@ export function useDemoData() {
       exitPrice: toBigInt('3200'),
       pnl: toBigInt('-75'),
       timestamp: now - oneDay,
-      closeTimestamp: now - oneDay + oneHour * 5
+      closeTimestamp: now - oneDay + oneHour * 5,
+      chainId: 42161, // Arbitrum
+      liquiditySource: 'four', // Four liquidity source
     })
 
     // Another winning trade
@@ -108,7 +112,9 @@ export function useDemoData() {
       exitPrice: toBigInt('102'),
       pnl: toBigInt('350'),
       timestamp: now - oneHour * 8,
-      closeTimestamp: now - oneHour * 2
+      closeTimestamp: now - oneHour * 2,
+      chainId: 10, // Optimism
+      liquiditySource: 'gtrade', // gTrade liquidity source
     })
   }
 
