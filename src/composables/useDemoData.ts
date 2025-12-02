@@ -16,7 +16,9 @@ export function useDemoData() {
       toBigInt('0.5'),
       toBigInt('48500'),
       10,
-      toBigInt('2425')
+      toBigInt('2425'),
+      56, // BNB Chain
+      'aster' // Aster liquidity source
     )
 
     tradeStore.openPosition(
@@ -25,7 +27,9 @@ export function useDemoData() {
       toBigInt('2'),
       toBigInt('3100'),
       15,
-      toBigInt('413')
+      toBigInt('413'),
+      42161, // Arbitrum
+      'four' // Four liquidity source
     )
   }
 
