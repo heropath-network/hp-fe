@@ -5,17 +5,18 @@
 const LINESTYLE_SOLID = 0
 const LINESTYLE_DASHED = 2
 
+// after updates need to cache/storage reload
 export default function override(isMobile: boolean) {
   return {
-    volumePaneSize: 'tiny',
-
     'paneProperties.backgroundType': 'solid',
-    'paneProperties.background': '#040818',
-    'paneProperties.vertGridProperties.color': '#0F1529',
+    'paneProperties.background': '#0A0A0A',
+
+    volumePaneSize: 'tiny',
+    'paneProperties.vertGridProperties.color': '#1D1D1D',
     'paneProperties.vertGridProperties.style': LINESTYLE_SOLID,
-    'paneProperties.horzGridProperties.color': '#0F1529',
+    'paneProperties.horzGridProperties.color': '#1D1D1D',
     'paneProperties.horzGridProperties.style': LINESTYLE_SOLID,
-    'paneProperties.crossHairProperties.color': '#4D5E90',
+    'paneProperties.crossHairProperties.color': '#1D1D1D',
     'paneProperties.crossHairProperties.width': 1,
     'paneProperties.crossHairProperties.style': LINESTYLE_DASHED,
 
@@ -30,7 +31,7 @@ export default function override(isMobile: boolean) {
     'paneProperties.legendProperties.showLegend': true,
     'paneProperties.legendProperties.showBarChange': true,
 
-    'scalesProperties.backgroundColor': '#040818',
+    'scalesProperties.backgroundColor': '#0A0A0A',
     'scalesProperties.fontSize': 12,
     'scalesProperties.lineColor': '#0F1529',
     'scalesProperties.textColor': '#6678A9',

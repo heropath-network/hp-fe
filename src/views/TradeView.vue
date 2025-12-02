@@ -7,8 +7,6 @@
 
         <TradeStatistics @open-market-select="showMarketSelect = true" />
 
-        <AccountInfo />
-
         <div class="flex-1 overflow-hidden">
           <PriceChart />
         </div>

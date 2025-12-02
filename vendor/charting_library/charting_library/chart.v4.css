@@ -1,11 +1,13 @@
+/* It works */
+
 .theme-dark:root {
-  --tv-color-platform-background: #040818;
-  --tv-color-pane-background: #040818;
-  --tv-color-pane-background-secondary: #040818;
+  --tv-color-platform-background: #0A0A0A;
+  --tv-color-pane-background: #0A0A0A;
+  --tv-color-pane-background-secondary: #0A0A0A;
   --tv-color-toolbar-button-background-hover: #2D3552;
   --tv-color-toolbar-button-background-secondary-hover: #2D3552;
-  --tv-color-toolbar-button-background-expanded: #040818;
-  --tv-color-toolbar-button-text: #6678A9;
+  --tv-color-toolbar-button-background-expanded: #0A0A0A;
+  --tv-color-toolbar-button-text: #9B9B9B;
   --tv-color-toolbar-button-text-hover: #B0B9DC;
   --tv-color-toolbar-button-text-active: #B0B9DC;
   --tv-color-toolbar-button-text-active-hover: #B0B9DC;
@@ -15,16 +17,16 @@
 }
 
 html.theme-dark body {
-  color: #6678A9;
+  color: #0A0A0A;
   font-weight: 500;
 }
 
 html.theme-dark .tv-dialog {
-  background-color: #12182C;
+  background-color: #0A0A0A;
 }
 
 .chart-widget--themed-dark .gear-eYu3weXF svg {
-  fill: #6678A9 !important;
+  fill: #0A0A0A !important;
 }
 
 html.theme-dark .layout__area--left {
@@ -40,7 +42,7 @@ html.theme-dark .separator-XAfcqqAz,
 html.theme-dark .separator-tdPP3m5x,
 html.theme-dark .group-gmpTgcxI+.group-gmpTgcxI:before,
 html.theme-dark .layout__area--center {
-  background: #0F1529 !important;
+  background: #0A0A0A !important;
 }
 
 html.theme-dark .separator-XAfcqqAz {
@@ -49,7 +51,7 @@ html.theme-dark .separator-XAfcqqAz {
 
 /* border color */
 html.theme-dark .chart-toolbar {
-  border-color: #0F1529 !important;
+  border-color: #0A0A0A !important;
 }
 
 html.theme-dark .tv-insert-indicator-dialog__search-control input {
@@ -62,10 +64,14 @@ html.theme-dark .drawingToolbar-gmpTgcxI:not(.isHidden-gmpTgcxI) .toggleButton-Y
 }
 
 html.theme-dark .group-3uonVBsm {
-  border-color: #0F1529 !important;
+  border-color: #0A0A0A !important;
   border-right: 1px solid;
 }
 html.theme-dark .group-2_so5thS {
-  border-color: #0F1529 !important;
+  border-color: #0A0A0A !important;
   border-bottom: 1px solid;
+}
+
+html.theme-dark .chart-page .chart-container-border {
+  background-color: #0A0A0A !important;
 }

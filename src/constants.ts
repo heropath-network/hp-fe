@@ -1,8 +1,6 @@
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000'
 
-export const CHART_LIBRARY_PATH = import.meta.env.PROD
-  ? '/charting_library/'
-  : '/vendor/charting_library/charting_library/'
+export const CHART_LIBRARY_PATH = '/charting_library/'
 
 export enum ProjectId {
   NULL_PROJECT = 0,

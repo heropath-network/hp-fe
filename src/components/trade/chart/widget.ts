@@ -93,7 +93,7 @@ export default class Widget {
       theme: 'Dark',
       timeframe: '1D',
       loading_screen: {
-        backgroundColor: '#040818',
+        backgroundColor: '#0A0A0A',
       },
       load_last_chart: false,
       auto_save_delay: 5,
@@ -143,9 +143,10 @@ export default class Widget {
       studies_overrides: {
         'volume.volume.color.0': '#10C8A8',
         'volume.volume.color.1': '#FF4E59',
-        'volume.volume.transparency': 75,
+        'volume.volume.transparency': 100,
       },
       overrides: override(false),
+      settings_overrides: override(false),
       custom_css_url: 'chart.v4.css',
     }
   }
