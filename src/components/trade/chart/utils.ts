@@ -53,16 +53,22 @@ export function convertResolutionToFourMemeBarType(resolution: string): string {
 
 export function alignTimeToResolution(dataResolution: number, timestamp?: number): number {
   const r = dataResolution
-  let t: 'minutes' | 'hours' | 'days' | 'weeks' = 'minutes'
-
-  if (r === 1 || r === 3 || r === 5 || r === 15 || r === 30) {
+  let t: 'minutes' | 'hours' | 'days' | 'weeks' | 'months' = 'minutes'
+  
+  if (r === 1 || r === 3 || r === 5 || r === 15 || r === 30 || r === 45) {
     t = 'minutes'
-  } else if (r === 60 || r === 240) {
+  }
+  if (r === 60 || r === 120 || r === 180 || r === 240) {
     t = 'hours'
-  } else if (r === 60 * 24) {
+  }
+  if (r === 60 * 24) {
     t = 'days'
-  } else if (r === 60 * 24 * 7) {
+  }
+  if (r === 60 * 24 * 7) {
     t = 'weeks'
+  }
+  if (r === 60 * 24 * 30) {
+    t = 'months'
   }
 
   let v = moment().utc().startOf(t)
@@ -71,19 +77,12 @@ export function alignTimeToResolution(dataResolution: number, timestamp?: number
       .utc()
       .startOf(t)
   }
-
-  if (t === 'minutes') {
-    const minute = v.minute()
-    const aligned = Math.floor(minute / r) * r
-    v.minute(aligned)
-  } else if (t === 'hours') {
-    const hour = v.hour()
-    const hourResolution = r / 60
-    const aligned = Math.floor(hour / hourResolution) * hourResolution
-    v.hour(aligned)
+  
+  if (t === 'weeks') {
+    v.add(1, 'days')
   }
-
-  return v.valueOf()
+  
+  return v.unix() * 1000
 }
 
 export async function fetchOracleCandles(
