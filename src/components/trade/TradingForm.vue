@@ -1,5 +1,5 @@
 <template>
-  <div class="trade-form overflow-y-auto relative flex h-full flex-col bg-gray-800 w-[343px]">
+  <div class="trade-form  relative flex h-full flex-col bg-gray-800 w-[343px]">
     <!-- Header Section -->
     <div class="flex items-center gap-4 px-4 pt-3 pb-2">
       <div class="flex items-center gap-4">

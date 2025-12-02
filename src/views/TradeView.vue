@@ -1,8 +1,8 @@
 <template>
-  <div class="trade-view flex h-screen flex-col overflow-hidden bg-[var(--hp-bg-dark)]">
+  <div class="trade-view flex h-screen flex-col bg-[var(--hp-bg-dark)]">
     <TradeHeader />
    
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-1 ">
       <div class="flex flex-1 flex-col border-r border-gray-800">
 
         <TradeStatistics @open-market-select="showMarketSelect = true" />
