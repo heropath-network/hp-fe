@@ -1,43 +1,101 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useConnection } from '@wagmi/vue'
+import TimeIcon from '@/assets/icons/time.svg'
+import XIcon from '@/assets/icons/quest/x.svg'
+import TradePerpIcon from '@/assets/icons/quest/tradePerp.svg'
+import TradeMemeIcon from '@/assets/icons/quest/tradeMeme.svg'
+import SwapIcon from '@/assets/icons/quest/swap.svg'
+import ArrowIcon from '@/assets/icons/arrow.svg'
+import RetryIcon from '@/assets/icons/retry.svg'
+import CompletedIcon from '@/assets/icons/completed.svg'
+import TradingLogoIcon from '@/assets/icons/quest/tradingLogo.svg'
+import { generateUUID } from '@/utils/common'
+import { QuestTaskId } from '@/types/heroPath'
+import { useUserQuestTaskStatusStorage, useUserQuestDiscountStatusStorage } from '@/storages/heroPath'
 
 type QuestTask = {
-  id: string
+  id: QuestTaskId
   title: string
   description?: string
+  icon: any
   status: 'pending' | 'completed'
 }
 
+// Responsive container width handling
+const containerDom = ref<HTMLElement | null>(null)
+const containerWidth = ref(0)
+
+function updateContainerWidth() {
+  if (containerDom.value) {
+    containerWidth.value = containerDom.value.clientWidth
+  }
+}
+
+watch(
+  containerDom,
+  (newVal, _, onCleanup) => {
+    if (newVal) {
+      updateContainerWidth()
+      const handler = () => updateContainerWidth()
+      window.addEventListener('resize', handler)
+      onCleanup(() => {
+        window.removeEventListener('resize', handler)
+      })
+    }
+  },
+  { immediate: true },
+)
+watch(containerDom, (newVal) => {
+  if (newVal) {
+    containerWidth.value = newVal.clientWidth
+  }
+})
+// End of responsive container width handling
+
+const { isConnected, address } = useConnection()
+
+const { data: taskStatus, updateTaskStatus } = useUserQuestTaskStatusStorage(address)
+const { addDiscountStatus } = useUserQuestDiscountStatusStorage(address)
+
 const tasks = ref<QuestTask[]>([
   {
-    id: 'follow-x',
+    id: QuestTaskId.FollowX,
     title: 'Follow @Aster_DEX on X',
     description: 'Follow @Aster_DEX on X to stay updated with quests and announcements.',
     status: 'pending',
+    icon: XIcon,
   },
   {
-    id: 'trade-perps',
+    id: QuestTaskId.TradePerp,
     title: 'Trade Perps on Aster',
     description: 'Open at least one perpetual position on Aster (any pair).',
     status: 'pending',
+    icon: TradePerpIcon,
   },
   {
-    id: 'swap-pancake',
+    id: QuestTaskId.SwapPancake,
     title: 'Swap on Pancake',
     description: 'Complete one swap on Pancake with your connected wallet.',
     status: 'pending',
+    icon: SwapIcon,
   },
   {
-    id: 'trade-meme',
+    id: QuestTaskId.TradeMeme,
     title: 'Trade Meme Coin on Form',
     description: 'Trade $20 Meme Coin on Form',
-    status: 'completed',
+    status: 'pending',
+    icon: TradeMemeIcon,
   },
 ])
 
-const openTasks = ref<Set<string>>(new Set(['trade-meme']))
+const allTasksIsCompleted = computed(() => {
+  return tasks.value.every((task) => task.status === 'completed')
+})
 
-function toggleTask(id: string) {
+const openTasks = ref<Set<QuestTaskId>>(new Set([QuestTaskId.FollowX]))
+
+function toggleTask(id: QuestTaskId) {
   const next = new Set(openTasks.value)
   if (next.has(id)) {
     next.delete(id)
@@ -47,34 +105,64 @@ function toggleTask(id: string) {
   openTasks.value = next
 }
 
-function isOpen(id: string) {
+function isOpen(id: QuestTaskId) {
   return openTasks.value.has(id)
 }
+
+function setAllTasksCompleted() {
+  if (!isConnected.value || allTasksIsCompleted.value) {
+    return
+  }
+  tasks.value = tasks.value.map((task) => ({ ...task, status: 'completed' }))
+  tasks.value.forEach((task) => {
+    updateTaskStatus(task.id, true)
+  })
+  addDiscountStatus({
+    id: generateUUID(),
+    isUsed: false,
+  })
+}
+
+function initialTaskStatus() {
+  const v = tasks.value.map((task) => {
+    const completed = taskStatus.value ? taskStatus.value[task.id] : false
+    return {
+      ...task,
+      status: completed ? 'completed' : 'pending',
+    }
+  })
+  const isAllCompleted = v.every((task) => task.status === 'completed')
+  if (isAllCompleted) {
+    openTasks.value.add(QuestTaskId.TradeMeme)
+  }
+  tasks.value = v as QuestTask[]
+}
+
+watch(
+  address,
+  () => {
+    initialTaskStatus()
+  },
+  {
+    immediate: true,
+  },
+)
 </script>
 
 <template>
-  <section class="mx-auto mt-4 flex w-full max-w-[1160px] flex-col gap-6 px-4 text-[var(--hp-white-color)] sm:px-6">
+  <section
+    ref="containerDom"
+    class="mx-auto mt-4 flex w-full max-w-[1160px] flex-col gap-6 px-4 pb-28 text-[var(--hp-white-color)] sm:px-6"
+  >
     <header class="flex flex-col gap-2">
       <h1 class="text-2xl font-semibold leading-8">Hero&apos;s Rebirth - Get Evaluation Opportunities</h1>
       <p class="text-sm leading-5 text-[var(--hp-text-color)]">
-        Complete the following tasks to get a free evaluation opportunity.
+        Complete the following tasks to get a free evaluation <span @click="setAllTasksCompleted">opportunity</span>.
       </p>
     </header>
 
     <div class="flex items-center gap-2 text-sm leading-5 text-[var(--hp-text-color)]">
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        class="h-4 w-4 text-[var(--hp-text-color)]"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <circle cx="12" cy="12" r="9" />
-        <path d="M12 7.5V12l2.5 2.5" />
-      </svg>
+      <span class="icon-mask h-4 w-4" :style="{ '--icon-url': `url(${TimeIcon})` }" />
       <span>2025/11/24 16:00- 2025/12/31 16:00 GMT+08:00</span>
     </div>
 
@@ -87,57 +175,35 @@ function isOpen(id: string) {
       >
         <button
           type="button"
-          class="flex w-full items-center justify-between px-6 py-5 text-left"
+          class="flex w-full items-center justify-between px-6 py-5 text-left group"
           @click="toggleTask(task.id)"
         >
           <div class="flex items-center gap-6">
             <span
-              class="flex h-4 w-4 items-center justify-center rounded-full border border-[var(--hp-text-color)] transition"
-              :class="isOpen(task.id) ? 'rotate-180 border-[var(--hp-white-color)]' : ''"
-            >
-              <svg aria-hidden="true" viewBox="0 0 16 16" class="h-3 w-3" fill="none" stroke="currentColor">
-                <path d="m4 6 4 4 4-4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </span>
+              class="icon-mask !h-4 !w-4 group-hover:!text-[var(--hp-primary-green)]"
+              :style="{ '--icon-url': `url(${ArrowIcon})` }"
+              :class="[isOpen(task.id) ? 'rotate-180' : '']"
+            />
 
             <div class="flex items-center gap-3">
-              <span
-                class="flex h-[18px] w-[18px] items-center justify-center rounded-sm"
-                :class="task.status === 'completed' ? 'bg-[var(--hp-primary-green)]' : 'bg-[var(--hp-bg-light)]'"
-              >
-                <svg
-                  v-if="task.status === 'completed'"
-                  aria-hidden="true"
-                  viewBox="0 0 16 16"
-                  class="h-3.5 w-3.5 text-[var(--hp-black-color)]"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="m4 8 2.5 2.5L12 5" />
-                </svg>
-              </span>
+              <img :src="task.icon" alt="" class="w-[18px] h-[18px]" />
               <p class="text-base font-medium leading-6">{{ task.title }}</p>
             </div>
           </div>
 
-          <span class="text-[var(--hp-primary-green)]">
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              class="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M21 12a9 9 0 1 1-3-6.7" />
-              <path d="M21 3v6h-6" />
-            </svg>
-          </span>
+          <template v-if="task.status === 'completed'">
+            <span
+              class="icon-mask !w-[18px] !h-[18px] !text-[var(--hp-primary-green)]"
+              :style="{ '--icon-url': `url(${CompletedIcon})` }"
+            />
+          </template>
+          <template v-else>
+            <span
+              class="icon-mask !w-[18px] !h-[18px] hover:!text-[var(--hp-primary-green)]"
+              :style="{ '--icon-url': `url(${RetryIcon})` }"
+              @click.stop="() => {}"
+            />
+          </template>
         </button>
 
         <div v-if="isOpen(task.id)" class="px-14 pb-5 text-sm leading-5 text-[var(--hp-text-color)]">
@@ -146,4 +212,24 @@ function isOpen(id: string) {
       </article>
     </div>
   </section>
+
+  <div
+    class="fixed bottom-4 ml-[24px] absolute-translate-x-1/2"
+    :style="{ width: `${containerWidth - 48}px` }"
+    role="presentation"
+  >
+    <div
+      class="flex items-center justify-between relative bg-[var(--hp-bg-normal)] px-6 py-5 shadow-lg shadow-black/40"
+    >
+      <img :src="TradingLogoIcon" alt="" class="w-[96px] h-[96px] absolute left-6 top-[-20px] z-[1]" />
+      <p class="text-xl font-semibold leading-7 pl-[12%]">A Free Evaluation Opportunity</p>
+      <button
+        type="button"
+        class="flex items-center gap-2 bg-[var(--hp-primary-green)] px-6 py-[14px] text-base font-medium text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)]"
+      >
+        Go to Training
+        <span class="icon-mask h-[18px] w-[18px] rotate-[270deg]" :style="{ '--icon-url': `url(${ArrowIcon})` }" />
+      </button>
+    </div>
+  </div>
 </template>

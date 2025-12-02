@@ -21,3 +21,15 @@ export interface UserWithdrawalHistory {
 export interface UserPayouts {
   withdrawnAmount: number
 }
+
+export enum QuestTaskId {
+  FollowX = 'follow-x',
+  TradePerp = 'trade-perp',
+  SwapPancake = 'swap-pancake',
+  TradeMeme = 'trade-meme',
+}
+
+export interface QuestDiscount {
+  id: string
+  isUsed: boolean
+}
