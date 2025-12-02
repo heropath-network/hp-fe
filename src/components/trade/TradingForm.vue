@@ -344,6 +344,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useChainId } from '@wagmi/vue'
 import { useTradeStore } from '@/stores/tradeStore'
 import { toBigInt, fromBigInt } from '@/utils/bigint'
 import { formatCurrency } from '@/utils/bigint'
@@ -361,6 +362,7 @@ interface TradeDetailItem {
 }
 
 const tradeStore = useTradeStore()
+const chainId = useChainId()
 const {
   selectedMarket,
   accountBalance,
@@ -532,13 +534,18 @@ function handleTrade() {
   
   if (orderType.value === 'market') {
     // Open position immediately
+    // Get current liquiditySource
+    const currentLiquiditySource = tradeStore.getLiquiditySourceFromOracle(tradeStore.selectedOracle)
+    
     tradeStore.openPosition(
       selectedMarket.value,
       tradeSide.value,
       sizeValue,
       currentMarketPrice.value,
       leverage.value,
-      collateralValue
+      collateralValue,
+      chainId.value,
+      currentLiquiditySource
     )
 
     size.value = ''
