@@ -109,12 +109,16 @@ function initChartWidget() {
             selectedOracle.value
           )
           
-
-          if (candles.length > 0) {
-            const latestBar = candles[candles.length - 1]
+          // Only update latestBarData if this is current/latest data (to is close to now)
+          // Don't update it for historical data requests to avoid wrong bar updates
+          const now = Math.ceil(Date.now() / 1000)
+          const isCurrentData = to >= now - resolution * 60 * 2 // Within 2 resolution periods of now
+          
+          if (candles.length > 0 && isCurrentData) {
+            // Find the bar with maximum time (latest bar) - matching mux-fe logic
+            const latestBar = candles.reduce((max, current) => (current.time > max.time ? current : max), candles[0])
 
             if (!latestBar.close || isNaN(latestBar.close) || latestBar.close <= 0) {
-              console.error('Invalid latestBar.close:', latestBar.close)
               onResult(candles, { noData: candles.length === 0 })
               return
             }
@@ -223,7 +227,6 @@ function buildCandle(
     latestBarData.value.fetchCount < maxGetLatestBarCount
   ) {
     getLatestCandleBarData(resolution, chartSymbol).then(() => {})
-    return undefined
   }
 
   if (latestBarData.value.isFetching) {
@@ -235,18 +238,7 @@ function buildCandle(
   const lastBarData = latestBarData.value
 
   if (lastBarData.chartSymbol && lastBarData.chartSymbol === chartSymbol && lastBarData.bar) {
-    const resolutionMs = resolution * 60 * 1000
-    const lastBarTime = lastBarData.bar.time
-    
-    if (newTime < lastBarTime) {
-      return undefined
-    }
-    
-    const currentAlignedTime = alignTimeToResolution(resolution)
-    
-    const allowedMaxTime = Math.max(currentAlignedTime, lastBarTime + resolutionMs)
-    
-    if (newTime > allowedMaxTime) {
+    if (newTime < lastBarData.bar.time) {
       return undefined
     }
     
@@ -255,17 +247,11 @@ function buildCandle(
       time: newTime,
     }
     
-    if (newTime === lastBarTime) {
+    if (newTime === lastBarData.bar.time) {
       barData.close = newPrice
       barData.low = Math.min(lastBarData.bar.low, newPrice)
       barData.high = Math.max(lastBarData.bar.high, newPrice)
     } else {
-      const expectedNextTime = lastBarTime + resolutionMs
-      
-      if (newTime !== expectedNextTime && newTime !== currentAlignedTime) {
-        return undefined
-      }
-      
       barData.open = lastBarData.bar.close
       barData.low = Math.min(barData.open, newPrice)
       barData.high = Math.max(barData.open, newPrice)
@@ -292,16 +278,17 @@ async function getLatestCandleBarData(resolution: number, chartSymbol: string) {
   let bar: Bar | undefined = undefined
   
   try {
-    const now = Math.floor(Date.now() / 1000)
-    const from = now - resolution * 60 * 4
+    const to = Math.ceil(Date.now() / 1000)
+    const from = to - resolution * 60 * 4
     
-    const candles = await fetchOracleCandles(resolution, from, now, chartSymbol, selectedOracle.value)
+    const candles = await fetchOracleCandles(resolution, from, to, chartSymbol, selectedOracle.value)
     
     if (candles.length > 0) {
-      bar = candles[candles.length - 1]
+      // Find the bar with maximum time (latest bar) - matching mux-fe logic
+      bar = candles.reduce((max, current) => (current.time > max.time ? current : max), candles[0])
     }
   } catch (error) {
-    console.error('Failed to fetch latest candle bar:', error)
+    console.error('[PriceChart] getLatestCandleBarData: Failed to fetch latest candle bar:', error)
   }
   
   latestBarData.value = {
@@ -327,17 +314,17 @@ function useMuxV3RealtimePrices(chartSymbol: string) {
   })
 
   updateRealtimePriceTimer.value = window.setInterval(() => {
-    if (price.value) {
+    if (!!price.value) {
       const [newPrice, newPriceTime] = price.value.split('-')
-      const priceNum = parseFloat(newPrice)
       const timestamp = Number(newPriceTime)
       
-      updateRealtimePrice(priceNum, dataResolution.value, chartSymbol, timestamp)
+      updateRealtimePrice(newPrice, dataResolution.value, chartSymbol, ProjectId.MUX_V3, timestamp)
       
+      const priceNum = parseFloat(newPrice)
       const change24hRate = muxV3Price24h.calculate24hChangeRate(priceNum, marketSymbol)
       tradeStore.setCurrentPrice(priceNum, change24hRate)
     }
-  }, 1000)
+  }, 300)
 }
 
 function useGainsRealtimePrices(chartSymbol: string) {
@@ -354,16 +341,17 @@ function useGainsRealtimePrices(chartSymbol: string) {
   const { price } = useGainsWebSocketPrice(pairIndexRef, 200)
 
   updateRealtimePriceTimer.value = window.setInterval(() => {
-    if (price.value) {
-      const priceNum = price.value
-    
+    if (!!price.value) {
+      const priceStr = price.value.toFixed ? price.value.toFixed() : price.value.toString()
+  
       
-      updateRealtimePrice(priceNum, dataResolution.value, chartSymbol)
+      updateRealtimePrice(priceStr, dataResolution.value, chartSymbol, ProjectId.GAINS)
       
+      const priceNum = typeof price.value === 'number' ? price.value : parseFloat(priceStr)
       const change24hRate = gainsPrice24h.calculate24hChangeRate(priceNum, chartSymbol)
       tradeStore.setCurrentPrice(priceNum, change24hRate)
     }
-  }, 1000)
+  }, 300)
 }
 
 function useFourMemeRealtimePrices(chartSymbol: string) {
@@ -379,33 +367,36 @@ function useFourMemeRealtimePrices(chartSymbol: string) {
   const { price } = useFourMemeWebSocketPrice(marketRef, 200)
 
   updateRealtimePriceTimer.value = window.setInterval(() => {
-    if (price.value) {
-      const priceNum = price.value
+    if (!!price.value) {
+      const priceStr = typeof price.value === 'number' ? price.value.toString() : price.value
       
-      updateRealtimePrice(priceNum, dataResolution.value, chartSymbol)
+      updateRealtimePrice(priceStr, dataResolution.value, chartSymbol, ProjectId.FOUR_MEME)
       
+      const priceNum = typeof price.value === 'number' ? price.value : parseFloat(priceStr)
       const change24hRate = fourMemePrice24h.calculate24hChangeRate(priceNum, market.tokenId)
       tradeStore.setCurrentPrice(priceNum, change24hRate)
     }
-  }, 1000)
+  }, 300)
 }
 
 function updateRealtimePrice(
-  price: number,
+  price: string | number,
   resolution: number,
   chartSymbol: string,
+  projectId: ProjectId,
   timestamp?: number
 ) {
-  if (!widget.value || !widget.value.tvWidget || latestBarData.value.isFetching) {
+  if (!widget.value || !widget.value.tvWidget || !!latestBarData.value?.isFetching) {
     return
   }
   
-  const bar = buildCandle(price, resolution, chartSymbol, timestamp)
+  const bar = buildCandle(Number(price), resolution, chartSymbol, timestamp)
   
   if (bar && widget.value) {
     try {
       widget.value.updateRealtimePrice(bar, chartSymbol)
-    } catch (e) { 
+    } catch (e) {
+      console.warn('[PriceChart] updateRealtimePrice: Error updating chart', e, { bar, chartSymbol })
     }
   }
 }
@@ -424,11 +415,11 @@ function startRealtimePriceUpdates(projectId: ProjectId, chartSymbol: string) {
   if (realtimePricesScope.scope) {
     realtimePricesScope.scope.run(() => {
       if (projectId === ProjectId.FOUR_MEME) {
-        useFourMemeRealtimePrices(chartSymbol)
+        // useFourMemeRealtimePrices(chartSymbol)
       } else if (projectId === ProjectId.MUX_V3) {
         useMuxV3RealtimePrices(chartSymbol)
       } else if (projectId === ProjectId.GAINS) {
-        useGainsRealtimePrices(chartSymbol)
+        // useGainsRealtimePrices(chartSymbol)
       }
     })
   } else {
