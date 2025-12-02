@@ -21,8 +21,8 @@ function setOpen(value: boolean) {
 <template>
   <Popover class="relative inline-flex">
     <PopoverButton
-      as="div"
-      class="tooltip-trigger"
+      as="span"
+      class="tooltip-trigger inline-flex"
       @click.prevent
       @mouseenter="setOpen(true)"
       @mouseleave="setOpen(false)"
@@ -54,7 +54,6 @@ function setOpen(value: boolean) {
 .tooltip-trigger {
   display: inline-flex;
   align-items: center;
-  cursor: help;
 }
 
 .tooltip-panel {
