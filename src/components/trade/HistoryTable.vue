@@ -17,8 +17,11 @@
         </thead>
         <tbody class="divide-y divide-gray-800">
           <tr v-if="history.length === 0">
-            <td colspan="9" class="px-4 py-8 text-center text-gray-500">
-              No trade history
+            <td colspan="9" class="px-4 py-0">
+              <div class="flex flex-col items-center justify-center gap-2 py-16">
+                <img :src="noDataIcon" alt="No data" class="w-20 h-20" />
+                <p class="text-sm text-[#9b9b9b] text-center">No Trade History</p>
+              </div>
             </td>
           </tr>
           <tr
@@ -128,6 +131,7 @@ import { computed } from 'vue'
 import { useTradeStore } from '@/stores/tradeStore'
 import { formatNumber, formatCurrency, formatPercentage } from '@/utils/bigint'
 import type { TradeHistory } from '@/stores/tradeStore'
+import noDataIcon from '@/assets/img/no-data.svg'
 
 const tradeStore = useTradeStore()
 
