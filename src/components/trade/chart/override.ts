@@ -16,7 +16,7 @@ export default function override(isMobile: boolean) {
     'paneProperties.vertGridProperties.style': LINESTYLE_SOLID,
     'paneProperties.horzGridProperties.color': '#1D1D1D',
     'paneProperties.horzGridProperties.style': LINESTYLE_SOLID,
-    'paneProperties.crossHairProperties.color': '#9B9B9B',
+    'paneProperties.crossHairProperties.color': '#1D1D1D',
     'paneProperties.crossHairProperties.width': 1,
     'paneProperties.crossHairProperties.style': LINESTYLE_DASHED,
 
