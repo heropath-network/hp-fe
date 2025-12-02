@@ -8,12 +8,15 @@ import leaderboardIcon from '@/assets/icons/menu/leaderboard.svg'
 import profitIcon from '@/assets/icons/menu/profit.svg'
 import evaluationIcon from '@/assets/icons/menu/evaluation.svg'
 import payoutsIcon from '@/assets/icons/menu/payouts.svg'
-import questionIcon from '@/assets/icons/menu/question.svg'
+import questIcon from '@/assets/icons/menu/quest.svg'
+import tradingEduIcon from '@/assets/icons/menu/tradingEdu.svg'
+import ecosystemIcon from '@/assets/icons/menu/ecosystem.svg'
 
 enum MenuItem {
   Dashboard = 'Dashboard',
   Profile = 'Profile',
   Evaluation = 'Evaluation',
+  Quest = 'Quest',
   Payouts = 'Payouts',
   TradingEducation = 'TradingEducation',
   Leaderboard = 'Leaderboard',
@@ -45,6 +48,12 @@ const menuItems = [
     routeName: ROUTE_NAMES.Evaluation,
   },
   {
+    id: MenuItem.Quest,
+    label: 'Quest',
+    icon: questIcon,
+    routeName: ROUTE_NAMES.Quest,
+  },
+  {
     id: MenuItem.Payouts,
     label: 'Payouts',
     icon: payoutsIcon,
@@ -53,7 +62,7 @@ const menuItems = [
   {
     id: MenuItem.TradingEducation,
     label: 'Trading & Education',
-    icon: questionIcon,
+    icon: tradingEduIcon,
     routeName: ROUTE_NAMES.TradingEducation,
   },
   {
@@ -65,7 +74,7 @@ const menuItems = [
   {
     id: MenuItem.Ecosystem,
     label: 'Ecosystem & Dashboard',
-    icon: questionIcon,
+    icon: ecosystemIcon,
     routeName: ROUTE_NAMES.Ecosystem,
   },
 ]

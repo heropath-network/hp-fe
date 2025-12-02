@@ -1,17 +1,11 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import Profile from '@/templates/Profile/Profile.vue'
-import Dashboard from '@/templates/Dashboard/Dashboard.vue'
-import Evaluation from '@/templates/Evaluation/Evaluation.vue'
-import Payouts from '@/templates/Payouts/Payouts.vue'
-import TradingEducation from '@/templates/TradingEducation/TradingEducation.vue'
-import Leaderboard from '@/templates/Leaderboard/Leaderboard.vue'
-import Ecosystem from '@/templates/Ecosystem/Ecosystem.vue'
 
 export enum ROUTE_NAMES {
   Dashboard = 'dashboard',
   Profile = 'profile',
   Evaluation = 'evaluation',
   PurchaseEvaluation = 'purchase-evaluation',
+  Quest = 'quest',
   Payouts = 'payouts',
   TradingEducation = 'trading-education',
   Leaderboard = 'leaderboard',
@@ -26,17 +20,17 @@ const ROUTER_LIST = [
   {
     path: '/dashboard',
     name: ROUTE_NAMES.Dashboard,
-    component: Dashboard,
+    component: () => import('@/templates/Dashboard/Dashboard.vue'),
   },
   {
     path: '/profile',
     name: ROUTE_NAMES.Profile,
-    component: Profile,
+    component: () => import('@/templates/Profile/Profile.vue'),
   },
   {
     path: '/evaluation',
     name: ROUTE_NAMES.Evaluation,
-    component: Evaluation,
+    component: () => import('@/templates/Evaluation/Evaluation.vue'),
   },
   {
     path: '/purchase-evaluation',
@@ -47,24 +41,29 @@ const ROUTER_LIST = [
     },
   },
   {
+    path: '/quest',
+    name: ROUTE_NAMES.Quest,
+    component: () => import('@/templates/Quest/Quest.vue'),
+  },
+  {
     path: '/payouts',
     name: ROUTE_NAMES.Payouts,
-    component: Payouts,
+    component: () => import('@/templates/Payouts/Payouts.vue'),
   },
   {
     path: '/trading-education',
     name: ROUTE_NAMES.TradingEducation,
-    component: TradingEducation,
+    component: () => import('@/templates/TradingEducation/TradingEducation.vue'),
   },
   {
     path: '/leaderboard',
     name: ROUTE_NAMES.Leaderboard,
-    component: Leaderboard,
+    component: () => import('@/templates/Leaderboard/Leaderboard.vue'),
   },
   {
     path: '/ecosystem',
     name: ROUTE_NAMES.Ecosystem,
-    component: Ecosystem,
+    component: () => import('@/templates/Ecosystem/Ecosystem.vue'),
   },
 ]
 
