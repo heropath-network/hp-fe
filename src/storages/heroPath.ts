@@ -1,8 +1,15 @@
 import { computed, readonly, Ref } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
-import { UserEvaluationsKey, AccountShowInLeaderboardKey, UserPayoutsKey, UserWithdrawalHistoryKey } from './keys'
+import {
+  UserEvaluationsKey,
+  AccountShowInLeaderboardKey,
+  UserPayoutsKey,
+  UserWithdrawalHistoryKey,
+  UserQuestDiscountStatusKey,
+  UserQuestTaskStatusKey,
+} from './keys'
 import { EMPTY_ADDRESS } from '@/constants'
-import { UserEvaluation, UserPayouts, UserWithdrawalHistory } from '@/types/heroPath'
+import { UserEvaluation, UserPayouts, UserWithdrawalHistory, QuestDiscount, QuestTaskId } from '@/types/heroPath'
 
 export function useAccountShowInLeaderboard(address: Ref<string | undefined>) {
   const key = computed(() => {
@@ -116,5 +123,73 @@ export function useUserWithdrawalHistoryStorage(address: Ref<string | undefined>
     data: readonly(storage),
     clear,
     addWithdrawalHistory,
+  }
+}
+
+export function useUserQuestTaskStatusStorage(address: Ref<string | undefined>) {
+  const key = computed(() => {
+    return UserQuestTaskStatusKey.replace('{addr}', address.value ?? EMPTY_ADDRESS)
+  })
+
+  const defaultStatus: Record<QuestTaskId, boolean> = {
+    [QuestTaskId.FollowX]: false,
+    [QuestTaskId.TradePerp]: false,
+    [QuestTaskId.SwapPancake]: false,
+    [QuestTaskId.TradeMeme]: false,
+  }
+
+  const storage = useLocalStorage<Record<QuestTaskId, boolean>>(key, defaultStatus)
+
+  function clear() {
+    storage.value = defaultStatus
+  }
+
+  function updateTaskStatus(task: QuestTaskId, status: boolean) {
+    storage.value = {
+      ...storage.value,
+      [task]: status,
+    }
+  }
+
+  return {
+    data: readonly(storage),
+    clear,
+    updateTaskStatus,
+  }
+}
+
+export function useUserQuestDiscountStatusStorage(address: Ref<string | undefined>) {
+  const key = computed(() => {
+    return UserQuestDiscountStatusKey.replace('{addr}', address.value ?? EMPTY_ADDRESS)
+  })
+
+  const storage = useLocalStorage<QuestDiscount[]>(key, [])
+
+  function clear() {
+    storage.value = []
+  }
+
+  function addDiscountStatus(discount: QuestDiscount) {
+    storage.value = [...storage.value, discount]
+  }
+
+  function updateDiscountStatus(id: string, isUsed: boolean) {
+    const discounts = storage.value.map((discount) => {
+      if (discount.id === id) {
+        return {
+          ...discount,
+          isUsed,
+        }
+      }
+      return discount
+    })
+    storage.value = discounts
+  }
+
+  return {
+    data: readonly(storage),
+    clear,
+    addDiscountStatus,
+    updateDiscountStatus,
   }
 }

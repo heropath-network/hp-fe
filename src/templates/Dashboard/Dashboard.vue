@@ -188,18 +188,6 @@ watch(
             </button>
           </div>
         </div>
-        <button
-          type="button"
-          class="flex items-center ml-3 bg-[var(--hp-primary-green)] h-[40px] px-3 py-2.5 text-[var(--hp-black-color)] text-[14px] font-[500] leading-none transition hover:bg-[var(--hp-primary-green-hover)] active:bg-[var(--hp-primary-green-hover)]"
-        >
-          Open Trading Terminal
-          <span
-            class="icon-mask ml-1 rotate-[270deg] w-4 h-4"
-            :style="{
-              '--icon-url': `url(${ArrowIcon})`,
-            }"
-          />
-        </button>
       </div>
     </header>
 
@@ -229,6 +217,12 @@ watch(
             <p class="text-sm leading-5 text-[var(--hp-text-color)]">Total Volume</p>
           </div>
         </div>
+        <button
+          type="button"
+          class="flex items-center w-full justify-center bg-[var(--hp-primary-green)] h-[52px] py-2.5 text-[var(--hp-black-color)] text-[16px] font-[500] transition hover:bg-[var(--hp-primary-green-hover)] active:bg-[var(--hp-primary-green-hover)]"
+        >
+          Open Trading Terminal
+        </button>
       </div>
     </div>
 

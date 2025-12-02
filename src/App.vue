@@ -15,7 +15,10 @@ const showMenu = computed(() => !route.meta?.hideMenu)
     <Header />
     <div class="flex">
       <Menu v-if="showMenu" />
-      <main class="h-screen flex-1 overflow-auto pb-12 pt-20" :class="showMenu ? 'ml-[248px] px-8' : 'px-4 sm:px-6'">
+      <main
+        class="h-screen flex-1 overflow-auto pb-12 pt-20 relative"
+        :class="showMenu ? 'ml-[248px] px-8' : 'px-4 sm:px-6'"
+      >
         <div v-if="showMenu" class="mx-auto w-full max-w-[1160px]">
           <RouterView />
         </div>

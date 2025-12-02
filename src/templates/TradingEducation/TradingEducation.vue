@@ -75,24 +75,18 @@ const cardRows = computed(() => {
         </article>
       </div>
     </div>
-  </section>
 
-  <div
-    class="fixed bottom-4 left-1/2 z-20 w-full max-w-[1160px] -translate-x-1/2 px-4 sm:px-6"
-    role="presentation"
-  >
-    <div class="flex items-center justify-between bg-[var(--hp-bg-normal)] px-6 py-5 shadow-lg shadow-black/40">
-      <p class="text-xl font-semibold leading-7">Ready for Training?</p>
-      <button
-        type="button"
-        class="flex items-center gap-2 bg-[var(--hp-primary-green)] px-6 py-[14px] text-base font-medium text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)]"
-      >
-        Go to Training
-        <span
-          class="icon-mask h-[18px] w-[18px] rotate-[270deg]"
-          :style="{ '--icon-url': `url(${ArrowIcon})` }"
-        />
-      </button>
+    <div class="w-full">
+      <div class="flex items-center justify-between bg-[var(--hp-bg-normal)] px-6 py-5 shadow-lg shadow-black/40">
+        <p class="text-xl font-semibold leading-7">Ready for Training?</p>
+        <button
+          type="button"
+          class="flex items-center gap-2 bg-[var(--hp-primary-green)] px-6 py-[14px] text-base font-medium text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)]"
+        >
+          Go to Training
+          <span class="icon-mask h-[18px] w-[18px] rotate-[270deg]" :style="{ '--icon-url': `url(${ArrowIcon})` }" />
+        </button>
+      </div>
     </div>
-  </div>
+  </section>
 </template>
