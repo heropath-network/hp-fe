@@ -244,9 +244,6 @@
           <!-- Max. Position Slippage with edit icon -->
           <div v-else-if="(item as TradeDetailItem).key === 'maxSlippage'" class="flex items-center gap-1">
             <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif] text-right">{{ item.value }}</span>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M11.3333 4.66667L4.66667 11.3333M4.66667 4.66667L11.3333 11.3333" stroke="#9b9b9b" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
           </div>
           <!-- Regular value -->
           <span v-else class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif] text-right">{{ item.value }}</span>

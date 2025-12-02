@@ -2,16 +2,16 @@
   <Dialog :show="show" @close="$emit('close')">
     <template #title>{{ market }} - Margin Mode</template>
     
-    <div class="space-y-6">
+    <div class="space-y-6 margin-mode-dialog">
       <!-- Margin Mode Selection -->
-      <div class="flex gap-2">
+      <div class="flex bg-[#272727]">
         <button
           @click="localMarginMode = 'isolated'"
           :class="[
-            'flex-1 py-3 text-sm font-semibold transition',
+            'flex-1 px-0 py-2 text-sm font-medium transition',
             localMarginMode === 'isolated'
-              ? 'bg-teal-500 text-white'
-              : 'bg-gray-800 text-white'
+              ? 'bg-green-success text-gray-1000'
+              : 'text-gray-400'
           ]"
         >
           Isolated Margin
@@ -19,10 +19,10 @@
         <button
           @click="localMarginMode = 'cross'"
           :class="[
-            'flex-1 py-3 text-sm font-semibold transition',
+            'flex-1 px-0 py-2 text-sm font-medium transition',
             localMarginMode === 'cross'
-              ? 'bg-teal-500 text-white'
-              : 'bg-gray-800 text-white'
+              ? 'bg-green-success text-gray-1000'
+              : 'text-gray-400'
           ]"
         >
           Cross Margin
@@ -30,43 +30,69 @@
       </div>
 
       <!-- Adjust Leverage Section -->
-      <div v-if="localMarginMode === 'cross'">
-        <label class="mb-3 block text-sm font-medium text-gray-400">
-          Adjust Leverage
-        </label>
-        
-        <!-- Leverage Input with +/- buttons -->
-        <div class="mb-4 flex items-center justify-center gap-4">
-          <button
-            @click="decreaseLeverage"
-            :disabled="localLeverage <= 1"
-            class="flex h-10 w-10 items-center justify-center  border border-gray-700 bg-gray-800 text-white transition hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            -
-          </button>
-          <div class="text-2xl font-semibold text-white">
-            {{ localLeverage }}x
+      <div v-if="localMarginMode === 'cross'" class="flex flex-col gap-2">
+        <div class="bg-[#272727] p-3 flex flex-col gap-2">
+          <div class="flex items-center gap-1">
+            <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Adjust Leverage</span>
           </div>
-          <button
-            @click="increaseLeverage"
-            :disabled="localLeverage >= 100"
-            class="flex h-10 w-10 items-center justify-center border border-gray-700 bg-gray-800 text-white transition hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            +
-          </button>
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex-1 flex items-center">
+              <span class="text-[18px] leading-[24px] text-white font-semibold font-['IBM_Plex_Sans',sans-serif]">{{ localLeverage }}x</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                @click="decreaseLeverage"
+                :disabled="localLeverage <= 1"
+                class="flex h-8 w-8 items-center justify-center bg-[#373737] text-white transition hover:bg-[#323232] disabled:opacity-50 disabled:cursor-not-allowed font-['IBM_Plex_Sans',sans-serif]"
+              >
+                -
+              </button>
+              <button
+                @click="increaseLeverage"
+                :disabled="localLeverage >= 100"
+                class="flex h-8 w-8 items-center justify-center bg-[#373737] text-white transition hover:bg-[#323232] disabled:opacity-50 disabled:cursor-not-allowed font-['IBM_Plex_Sans',sans-serif]"
+              >
+                +
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Leverage Slider -->
         <div class="relative">
-          <input
-            v-model.number="localLeverage"
-            type="range"
-            min="1"
-            max="100"
-            step="1"
-            class="h-2 w-full cursor-pointer appearance-none bg-gray-800"
-          />
-          <div class="mt-2 flex justify-between text-xs text-gray-500">
+          <div class="relative h-4">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full h-1 bg-[#323232] rounded-full relative">
+                <div 
+                  class="absolute left-0 top-0 h-full bg-[#10c8a8] rounded-full"
+                  :style="{ width: `${((localLeverage - 1) / 99) * 100}%` }"
+                ></div>
+                <!-- Slider markers -->
+                <div class="absolute inset-0 flex justify-between items-center pointer-events-none">
+                  <div class="w-1 h-1 rounded-full bg-[#9b9b9b]"></div>
+                  <div class="w-1 h-1 rounded-full bg-[#9b9b9b]"></div>
+                  <div class="w-1 h-1 rounded-full bg-[#9b9b9b]"></div>
+                  <div class="w-1 h-1 rounded-full bg-[#9b9b9b]"></div>
+                  <div class="w-1 h-1 rounded-full bg-[#9b9b9b]"></div>
+                </div>
+              </div>
+            </div>
+            <input
+              v-model.number="localLeverage"
+              type="range"
+              min="1"
+              max="100"
+              step="1"
+              class="absolute inset-0 w-full h-4 opacity-0 cursor-pointer z-10"
+            />
+            <div 
+              class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg pointer-events-none z-20"
+              :style="{ left: `calc(${((localLeverage - 1) / 99) * 100}% - 8px)` }"
+            >
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-[#323232] rounded-full"></div>
+            </div>
+          </div>
+          <div class="mt-2 flex justify-between text-[12px] leading-[16px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">
             <span>1x</span>
             <span>25x</span>
             <span>50x</span>
@@ -77,21 +103,19 @@
       </div>
 
       <!-- Description Text -->
-      <div class=" bg-gray-900 p-4 text-xs leading-relaxed text-gray-400">
+      <div class="bg-[#272727] p-4 text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">
         <p v-if="localMarginMode === 'isolated'">
           Isolated Margin Mode: Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of a position reached 100%, the position will be liquidated. Margin can be added or removed to positions using this mode.
         </p>
-        <div v-else class="space-y-3 text-sm leading-relaxed">
-          <p>
-            Cross Margin Mode: All cross positions under the same margin asset share the same asset cross margin balance. In the event of liquidation, your assets full margin balance along with any remaining open positions under the asset may be forfeited.
-          </p>
-        </div>
+        <p v-else>
+          Cross Margin Mode: All cross positions under the same margin asset share the same asset cross margin balance. In the event of liquidation, your assets full margin balance along with any remaining open positions under the asset may be forfeited.
+        </p>
       </div>
 
       <!-- Confirm Button -->
       <button
         @click="handleConfirm"
-        class="w-full bg-teal-500 py-3 text-sm font-semibold text-white transition hover:bg-teal-600"
+        class="w-full py-[14px] text-[14px] font-medium text-center transition bg-green-success text-gray-1000 font-['IBM_Plex_Sans',sans-serif]"
       >
         Confirm
       </button>
@@ -162,12 +186,35 @@ function handleConfirm() {
 </script>
 
 <style scoped>
+.margin-mode-dialog {
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
 input[type='range']::-webkit-slider-thumb {
-  @apply h-4 w-4 cursor-pointer appearance-none rounded-full bg-teal-500;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 input[type='range']::-moz-range-thumb {
-  @apply h-4 w-4 cursor-pointer appearance-none rounded-full border-0 bg-teal-500;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 </style>
 

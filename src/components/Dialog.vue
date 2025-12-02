@@ -87,7 +87,7 @@ watch(
             >
               <DialogTitle
                 as="h3"
-                class="text-lg font-medium leading-6 text-[var(--hp-white-color)]"
+                class="text-lg font-medium leading-6 text-[var(--hp-white-color)] mb-4"
               >
                 <div class="flex items-center justify-between">
                   <span
