@@ -4,9 +4,12 @@ import { Popover, PopoverButton } from "@headlessui/vue";
 
 interface Props {
   content: string;
+  width?: number;
 }
 
-defineProps<Props>();
+defineProps<Props>(
+
+);
 
 const isOpen = ref(false);
 
@@ -37,10 +40,11 @@ function setOpen(value: boolean) {
       <div
         v-show="isOpen"
         class="tooltip-panel"
+        :style="{ width: width ? `${width}px` : '200px' }"
         @mouseenter="setOpen(true)"
         @mouseleave="setOpen(false)"
       >
-        <div class="tooltip-content">{{ content }}</div>
+        <div class="tooltip-content whitespace-pre-wrap">{{ content }}</div>
       </div>
     </transition>
   </Popover>
@@ -59,7 +63,6 @@ function setOpen(value: boolean) {
   bottom: 100%;
   margin-bottom: 8px;
   left: 50%;
-  width: 200px;
   transform: translateX(-50%);
 }
 
@@ -100,8 +103,7 @@ function setOpen(value: boolean) {
   font-size: 13px;
   line-height: 1.5;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  white-space: normal;
-  text-align: center;
+  text-align: left;
 }
 </style>
 

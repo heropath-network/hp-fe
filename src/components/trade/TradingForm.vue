@@ -54,7 +54,7 @@
     <div class="h-px w-full bg-[#272727]"></div>
 
     <!-- Main Content -->
-    <div class="flex-1 overflow-y-auto px-4 pt-4 flex flex-col gap-4">
+    <div class="flex-1  px-4 pt-4 flex flex-col gap-4">
       <!-- Market Price and Order Type Row -->
       <div class="flex flex-col gap-2">
         <div class="flex gap-2">
@@ -92,7 +92,7 @@
                   </svg>
                 </div>
               </button>
-              <div v-if="showOrderTypeMenu" class="absolute top-full mt-1 w-full bg-[#272727] overflow-hidden z-10 border border-[#373737]">
+              <div v-if="showOrderTypeMenu" class="absolute top-full mt-1 w-full bg-[#272727]  z-10 border border-[#373737]">
                 <button
                   v-for="type in ['market', 'limit', 'stop']"
                   :key="type"
@@ -124,7 +124,7 @@
                   type="number"
                   step="0.001"
                   @input="handleSizeInput"
-                  class="w-full bg-transparent text-[18px] leading-[24px] text-[#545454] font-semibold font-['IBM_Plex_Sans',sans-serif] outline-none placeholder:text-[#545454]"
+                  class="w-full bg-transparent text-[18px] leading-[24px] text-white font-semibold font-['IBM_Plex_Sans',sans-serif] outline-none placeholder:text-[#545454]"
                   placeholder="0.0"
                 />
               </div>
@@ -210,86 +210,41 @@
       </button>
 
       <!-- Trade Details Section -->
-      <div class="flex flex-col gap-2">
-        <div class="flex items-start justify-between">
+      <div class="flex flex-col gap-[8px]">
+        <div
+          v-for="(item, index) in tradeDetails"
+          :key="index"
+          class="flex items-start justify-between"
+        >
           <div class="flex flex-col">
-            <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Available Margin</span>
-            <div class="h-px w-full bg-[#272727] mt-0.5"></div>
+            <Tooltip :width="300" v-if="item.tooltip" :content="item.tooltip">
+              <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif] underline decoration-dotted decoration-[#9b9b9b] underline-offset-[2px]">
+                {{ item.label }}
+              </span>
+            </Tooltip>
+            <span v-else class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">
+              {{ item.label }}
+            </span>
+            <div v-if="item.tooltip" class="h-0 relative w-full mt-0.5">
+              <div class="absolute bottom-[-0.5px] left-0 right-0 top-[-0.5px] border-b border-dotted border-[#272727]"></div>
+            </div>
           </div>
-          <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif]">{{ formatCurrency(accountBalance) }}</span>
-        </div>
-
-        <div class="flex items-start justify-between">
-          <div class="flex flex-col">
-            <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Available Liquidity</span>
-            <div class="h-px w-full bg-[#272727] mt-0.5"></div>
-          </div>
-          <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif]">{{ availableLiquidity }}</span>
-        </div>
-
-        <div class="flex items-start justify-between">
-          <div class="flex flex-col">
-            <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Liquidity Source</span>
-            <div class="h-px w-full bg-[#272727] mt-0.5"></div>
-          </div>
-          <div class="flex items-center gap-1">
+          <!-- Liquidity Source with icon -->
+          <div v-if="(item as TradeDetailItem).key === 'liquiditySource'" class="flex items-center gap-1">
             <svg width="16" height="16" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M4 0L4.61803 2.76393L7.23607 1.23607L5.70811 3.8541L8.47214 4.47214L5.70811 5.09018L7.23607 7.70821L4.61803 6.18025L4 8.94428L3.38197 6.18025L0.763932 7.70821L2.29189 5.09018L-0.472136 4.47214L2.29189 3.8541L0.763932 1.23607L3.38197 2.76393L4 0Z" fill="#FFD700"/>
             </svg>
-            <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif]">Aster</span>
+            <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif]">{{ item.value }}</span>
           </div>
-        </div>
-
-        <div class="flex items-start justify-between">
-          <div class="flex flex-col">
-            <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Price Impact</span>
-          </div>
-          <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif] text-right">0%</span>
-        </div>
-
-        <div class="flex items-start justify-between">
-          <div class="flex flex-col">
-            <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Max. Position Slippage</span>
-            <div class="h-px w-full bg-[#272727] mt-0.5"></div>
-          </div>
-          <div class="flex items-center gap-1">
-            <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif] text-right">≤ 1.000%</span>
+          <!-- Max. Position Slippage with edit icon -->
+          <div v-else-if="(item as TradeDetailItem).key === 'maxSlippage'" class="flex items-center gap-1">
+            <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif] text-right">{{ item.value }}</span>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M11.3333 4.66667L4.66667 11.3333M4.66667 4.66667L11.3333 11.3333" stroke="#9b9b9b" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
           </div>
-        </div>
-
-        <div class="flex items-start justify-between">
-          <div class="flex flex-col">
-            <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Liq. Price</span>
-            <div class="h-px w-full bg-[#272727] mt-0.5"></div>
-          </div>
-          <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif] text-right">--</span>
-        </div>
-
-        <div class="flex items-start justify-between">
-          <div class="flex flex-col">
-            <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Margin Required</span>
-            <div class="h-px w-full bg-[#272727] mt-0.5"></div>
-          </div>
-          <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif] text-right">--</span>
-        </div>
-
-        <div class="flex items-start justify-between">
-          <div class="flex flex-col">
-            <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Open Cost</span>
-            <div class="h-px w-full bg-[#272727] mt-0.5"></div>
-          </div>
-          <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif] text-right">--</span>
-        </div>
-
-        <div class="flex items-start justify-between">
-          <div class="flex flex-col">
-            <span class="text-[13px] leading-[18px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">Max. ROE</span>
-            <div class="h-px w-full bg-[#272727] mt-0.5"></div>
-          </div>
-          <span class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif] text-right">--</span>
+          <!-- Regular value -->
+          <span v-else class="text-[13px] leading-[18px] text-white font-['IBM_Plex_Sans',sans-serif] text-right">{{ item.value }}</span>
         </div>
       </div>
 
@@ -393,7 +348,15 @@ import { formatCurrency } from '@/utils/bigint'
 import MarginModeDialog from '@/components/trade/MarginModeDialog.vue'
 import LiquiditySourcesDialog from '@/components/trade/LiquiditySourcesDialog.vue'
 import SourceLiquidityLabel from '@/components/common/SourceLiquidityLabel.vue'
+import Tooltip from '@/components/common/Tooltip.vue'
 import type { LiquiditySourceId } from '@/constants/liquiditySources'
+
+interface TradeDetailItem {
+  key: string
+  label: string
+  value: string
+  tooltip?: string
+}
 
 const tradeStore = useTradeStore()
 const {
@@ -655,6 +618,77 @@ const formattedMarginRatio = computed(() => `${marginRatioPercent.value.toFixed(
 
 const marginUsageAmount = computed(() => {
   return collateralLocked.value
+})
+
+// Trade Details array
+const tradeDetails = computed((): TradeDetailItem[] => {
+  // Get the first active liquidity source name, default to 'Aster'
+  const liquiditySourceName = activeLiquiditySources.value.length > 0 
+    ? activeLiquiditySources.value[0].name 
+    : 'Aster'
+
+  return [
+    {
+      key: 'availableMargin',
+      label: 'Available Margin',
+      value: formatCurrency(accountBalance.value)
+    },
+    {
+      key: 'availableLiquidity',
+      label: 'Available Liquidity',
+      value: availableLiquidity.value
+    },
+    {
+      key: 'liquiditySource',
+      label: 'Liquidity Source',
+      value: liquiditySourceName,
+      tooltip: `Traders can long up to 1,458.89 ETH at this moment.
+
+The available liquidity will change as the long positions open interest change.
+
+You can customize your preferred liquidity sources under Trading Settings if needed.`
+    },
+    {
+      key: 'priceImpact',
+      label: 'Price Impact',
+      value: '0%'
+    },
+    {
+      key: 'maxSlippage',
+      label: 'Max. Position Slippage',
+      value: '≤ 1.000%',
+    },
+    {
+      key: 'liqPrice',
+      label: 'Liq. Price',
+      value: '--',
+      tooltip: 'Please note when you use volatile assets as collateral, the liquidation price will be affected by both collateral and underlying asset prices.' 
+    },
+    {
+      key: 'marginRequired',
+      label: 'Margin Required',
+      value: '--',
+      tooltip: 'The margin required to be allocated from your cross account equity for opening this position.'
+    },
+    {
+      key: 'openCost',
+      label: 'Open Cost',
+      value: '--',
+      tooltip: `The position fee will be collected when you open and close a position; it will be deducted from your collateral when opening the position and will be preferentially deducted from the profits when closing the position. 
+
+Position Fee = Asset Price * Amount * Position Fee Rate. The position fee rate is fixed at 0.060%.
+
+Additional costs from spread and/or price impact will also be applied.
+
+Funding fee for each position will be tracked every 1 hour and settled as funding fees when you add changes to your positions.`
+    },
+    {
+      key: 'maxROE',
+      label: 'Max. ROE',
+      value: '--',
+      tooltip: '' // Will be added later
+    }
+  ]
 })
 
 // Close order type menu when clicking outside

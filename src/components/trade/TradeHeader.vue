@@ -13,7 +13,7 @@
       <!-- Account Balance -->
       <div class="flex items-center gap-2">
         <button
-          class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-[var(--hp-white-color)] transition hover:bg-[var(--hp-bg-normal)]"
+          class="flex items-center gap-2 px-2 py-1.5 text-sm text-[var(--hp-white-color)] transition hover:bg-[var(--hp-bg-normal)]"
         >
           <span class="font-medium">Training Account 1: {{ formatCurrency(accountBalance) }}</span>
           <svg class="h-4 w-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
