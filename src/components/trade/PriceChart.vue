@@ -580,6 +580,6 @@ watch(selectedOracle, (newOracle, oldOracle) => {
 <style scoped>
 .price-chart {
   height: 100%;
-  border-top: 1px solid #1e263f;
+  border-top: 1px solid #1D1D1D;
 }
 </style>
