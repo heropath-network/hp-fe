@@ -40,7 +40,9 @@ export function useDemoData() {
       'long',
       toBigInt('0.2'),
       toBigInt('49000'),
-      'limit'
+      'limit',
+      56, // BNB Chain
+      'aster', // Aster liquidity source
     )
 
     tradeStore.placeOrder(
@@ -48,7 +50,9 @@ export function useDemoData() {
       'short',
       toBigInt('1'),
       toBigInt('2950'),
-      'stop'
+      'stop',
+      42161, // Arbitrum
+      'four', // Four liquidity source
     )
 
     tradeStore.placeOrder(
@@ -56,7 +60,9 @@ export function useDemoData() {
       'long',
       toBigInt('10'),
       toBigInt('98'),
-      'limit'
+      'limit',
+      10, // Optimism
+      'gtrade', // gTrade liquidity source
     )
   }
 
