@@ -198,16 +198,15 @@
       <!-- Action Button -->
       <button
         @click="handleTrade"
-        :disabled="!isFormValid"
+        :disabled="isActionDisabled"
         :class="[
-          'w-full py-[14px] text-[14px] font-medium text-center transition',
-          isFormValid
-            ? ' text-neutral-950 opacity-100'
-            : ' text-neutral-950 opacity-50 cursor-not-allowed',
-          tradeSide === 'long' ? 'bg-green-success text-gray-1000' : 'bg-red-error text-gray-1000'
+          'w-full py-[14px] text-[14px] font-medium text-center transition flex items-center justify-center',
+          tradeSide === 'long' ? 'bg-green-success text-gray-1000' : 'bg-red-error text-gray-1000',
+          isActionDisabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100'
         ]"
       >
-        {{ isFormValid ? `${tradeSide === 'long' ? 'Buy' : 'Sell'} ${selectedMarket.split('/')[0]}` : 'Enter an amount' }}
+        <span>{{ submitButtonLabel }}</span>
+        <LoadingIcon v-if="signing" class="ml-2" :is-black="true" />
       </button>
 
       <!-- Trade Details Section -->
@@ -404,7 +403,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useChainId } from '@wagmi/vue'
+import { useChainId, useConnection, useSignTypedData } from '@wagmi/vue'
 import { useTradeStore } from '@/stores/tradeStore'
 import { useEvaluationAccount } from '@/composables/useEvaluationAccount'
 import { toBigInt, fromBigInt } from '@/utils/bigint'
@@ -413,6 +412,7 @@ import MarginModeDialog from '@/components/trade/MarginModeDialog.vue'
 import LiquiditySourcesDialog from '@/components/trade/LiquiditySourcesDialog.vue'
 import SourceLiquidityLabel from '@/components/common/SourceLiquidityLabel.vue'
 import Tooltip from '@/components/common/Tooltip.vue'
+import { LoadingIcon } from '@/components'
 import type { LiquiditySourceId } from '@/constants/liquiditySources'
 
 interface TradeDetailItem {
@@ -425,6 +425,8 @@ interface TradeDetailItem {
 const tradeStore = useTradeStore()
 const chainId = useChainId()
 const { selectedEvaluationId } = useEvaluationAccount()
+const { isConnected, address } = useConnection()
+const { signTypedDataAsync } = useSignTypedData()
 const {
   selectedMarket,
   accountBalance,
@@ -447,6 +449,7 @@ const showOrderTypeMenu = ref(false)
 const takeProfitStopLoss = ref(false)
 const showAccountBreakdown = ref(false)
 const showCrossBreakdown = ref(false)
+const signing = ref(false)
 
 const marginSetting = computed(() => tradeStore.getMarginSetting(selectedMarket.value))
 const activeLiquiditySourcesCount = computed(() => activeLiquiditySources.value.length)
@@ -562,6 +565,81 @@ const isFormValid = computed(() => {
   return hasSize && hasPrice && sufficientBalance
 })
 
+const isActionDisabled = computed(() => !isFormValid.value || signing.value || !isConnected.value)
+const submitButtonLabel = computed(() => {
+  if (signing.value) return 'Waiting for signature'
+  if (!isConnected.value) return 'Connect wallet'
+  if (!isFormValid.value) return 'Enter an amount'
+  return `${tradeSide.value === 'long' ? 'Buy' : 'Sell'} ${selectedMarket.value.split('/')[0]}`
+})
+
+function getSignaturePrices() {
+  const marketPrice = fromBigInt(currentMarketPrice.value, 2)
+  const inputPrice = price.value || marketPrice
+  const entryPrice = orderType.value === 'market' ? marketPrice : inputPrice
+  const triggerPrice = orderType.value === 'market' ? 'market' : inputPrice
+  return { entryPrice, triggerPrice }
+}
+
+async function requestTradeSignature(actionLabel: 'Open Position' | 'Place Order') {
+  if (!address.value) {
+    throw new Error('Wallet not connected')
+  }
+
+  const { entryPrice, triggerPrice } = getSignaturePrices()
+  const baseAsset = selectedMarket.value.split('/')[0] || ''
+  const messageLines = [
+    'Trade Confirmation',
+    `Action: ${actionLabel}`,
+    `Account: ${selectedEvaluationId.value ?? 'N/A'}`,
+    `Market: ${selectedMarket.value}`,
+    `Side: ${tradeSide.value}`,
+    `Order Type: ${orderType.value}`,
+    `Size: ${size.value || '0'} ${baseAsset}`,
+    `Price: $${entryPrice}`,
+    `Leverage: ${leverage.value}x`,
+  ]
+
+  if (orderType.value !== 'market') {
+    messageLines.push(`Trigger: $${triggerPrice}`)
+  }
+
+  const contents = `${messageLines.join('\n')}\n\n.`
+
+  await signTypedDataAsync({
+    types: {
+      Person: [{ name: 'wallet', type: 'address' }],
+      Trade: [
+        { name: 'account', type: 'Person' },
+        { name: 'action', type: 'string' },
+        { name: 'market', type: 'string' },
+        { name: 'side', type: 'string' },
+        { name: 'orderType', type: 'string' },
+        { name: 'size', type: 'string' },
+        { name: 'price', type: 'string' },
+        { name: 'triggerPrice', type: 'string' },
+        { name: 'leverage', type: 'uint256' },
+        { name: 'contents', type: 'string' },
+      ],
+    },
+    primaryType: 'Trade',
+    message: {
+      account: {
+        wallet: address.value,
+      },
+      action: actionLabel,
+      market: selectedMarket.value,
+      side: tradeSide.value,
+      orderType: orderType.value,
+      size: size.value || '0',
+      price: entryPrice,
+      triggerPrice,
+      leverage: BigInt(Math.max(1, Math.floor(leverage.value))),
+      contents,
+    },
+  })
+}
+
 function handlePercentageChange() {
   const maxSizeNum = parseFloat(maxSize.value) || 0
   if (maxSizeNum === 0) return
@@ -590,50 +668,58 @@ watch([maxSize, leverage, displayPrice], () => {
   }
 })
 
-function handleTrade() {
-  if (!isFormValid.value) return
+async function handleTrade() {
+  if (!isFormValid.value || !address.value) return
 
   const sizeValue = toBigInt(size.value)
   const collateralValue = calculatedCollateral.value
-  
-  if (orderType.value === 'market') {
-    // Open position immediately
-    // Get current liquiditySource
-    const currentLiquiditySource = tradeStore.getLiquiditySourceFromOracle(tradeStore.selectedOracle)
-    
-    tradeStore.openPosition(
-      selectedMarket.value,
-      tradeSide.value,
-      sizeValue,
-      currentMarketPrice.value,
-      leverage.value,
-      collateralValue,
-      chainId.value,
-      currentLiquiditySource,
-      selectedEvaluationId.value ?? undefined
-    )
+  const actionLabel: 'Open Position' | 'Place Order' = orderType.value === 'market' ? 'Open Position' : 'Place Order'
 
-    size.value = ''
-    sizePercentage.value = 0
-  } else {
-    const triggerPrice = toBigInt(price.value)
-    // Get current liquiditySource
-    const currentLiquiditySource = tradeStore.getLiquiditySourceFromOracle(tradeStore.selectedOracle)
-    
-    tradeStore.placeOrder(
-      selectedMarket.value,
-      tradeSide.value,
-      sizeValue,
-      triggerPrice,
-      orderType.value as 'limit' | 'stop',
-      chainId.value,
-      currentLiquiditySource,
-      selectedEvaluationId.value ?? undefined
-    )
+  signing.value = true
 
-    price.value = ''
-    size.value = ''
-    sizePercentage.value = 0
+  try {
+    await requestTradeSignature(actionLabel)
+
+    if (orderType.value === 'market') {
+      const currentLiquiditySource = tradeStore.getLiquiditySourceFromOracle(tradeStore.selectedOracle)
+      
+      tradeStore.openPosition(
+        selectedMarket.value,
+        tradeSide.value,
+        sizeValue,
+        currentMarketPrice.value,
+        leverage.value,
+        collateralValue,
+        chainId.value,
+        currentLiquiditySource,
+        selectedEvaluationId.value ?? undefined
+      )
+
+      size.value = ''
+      sizePercentage.value = 0
+    } else {
+      const triggerPrice = toBigInt(price.value)
+      const currentLiquiditySource = tradeStore.getLiquiditySourceFromOracle(tradeStore.selectedOracle)
+      
+      tradeStore.placeOrder(
+        selectedMarket.value,
+        tradeSide.value,
+        sizeValue,
+        triggerPrice,
+        orderType.value as 'limit' | 'stop',
+        chainId.value,
+        currentLiquiditySource,
+        selectedEvaluationId.value ?? undefined
+      )
+
+      price.value = ''
+      size.value = ''
+      sizePercentage.value = 0
+    }
+  } catch (error) {
+    console.error('Trade signing failed:', error)
+  } finally {
+    signing.value = false
   }
 }
 
