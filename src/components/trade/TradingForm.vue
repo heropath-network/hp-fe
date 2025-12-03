@@ -558,6 +558,7 @@ const positionSizeUSD = computed(() => {
 const MAINTENANCE_MARGIN_RATE = 0.005 // 0.5% (500 bps / 10000)
 const POSITION_FEE_RATE = 0.0006 // 0.060%
 const SPREAD_ESTIMATE_RATE = 0.0001 // 0.01% estimated spread/price impact
+const SAFE_MARGIN = 0.01 // 1% safety margin to account for price changes when using 100%
 
 const liquidationPrice = computed(() => {
   const entryPrice = parseFloat(displayPrice.value) || 0
@@ -651,9 +652,11 @@ const maxSize = computed(() => {
   const priceNum = parseFloat(displayPrice.value) || 0
   if (priceNum === 0) return '0.0'
   
-  // Max size = (Available Balance * Leverage) / Price
+  // Max size = (Available Balance * (1 - SAFE_MARGIN) * Leverage) / Price
+  // SAFE_MARGIN is applied to account for price changes when using 100%
   const availableBalance = parseFloat(fromBigInt(accountBalance.value, 18))
-  const maxSizeValue = (availableBalance * leverage.value) / priceNum
+  const safeBalance = availableBalance * (1 - SAFE_MARGIN)
+  const maxSizeValue = (safeBalance * leverage.value) / priceNum
   return maxSizeValue.toFixed(4)
 })
 
