@@ -58,15 +58,51 @@
       <!-- Market Price and Order Type Row -->
       <div class="flex flex-col gap-2">
         <div class="flex gap-2">
-          <!-- Market Price Input -->
+          <!-- Market Price / Limit Price Input -->
           <div class="flex-1 relative">
             <div class="bg-[#272727] p-3 flex flex-col gap-2">
               <div class="flex items-center gap-2">
-                <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Market Price</span>
+                <span class="text-[13px] leading-[18px] text-[#9b9b9b]">
+                  {{ orderType === 'market' ? 'Market Price' : 'Limit Price' }}
+                </span>
+                <i 
+                  v-if="orderType !== 'market'"
+                  class="iconfont icon-question text-[#9b9b9b] text-[12px] cursor-help"
+                  title="Limit order price"
+                ></i>
               </div>
               <div class="flex items-center gap-1">
+                <!-- Price mark for limit orders -->
+                <span 
+                  v-if="orderType === 'limit'"
+                  class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold price-mark"
+                >
+                  {{ tradeSide === 'long' ? '≤' : '≥' }}
+                </span>
+                <!-- Price mark for stop orders -->
+                <span 
+                  v-if="orderType === 'stop'"
+                  class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold price-mark"
+                >
+                  {{ tradeSide === 'long' ? '≥' : '≤' }}
+                </span>
                 <span class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold">$</span>
-                <span class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold">{{ formatPrice(displayPrice) }}</span>
+                <!-- Input for limit/stop orders -->
+                <input
+                  v-if="orderType !== 'market'"
+                  v-model="price"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.0"
+                  class="max-w-[95px] flex-1 bg-transparent text-[18px] leading-[24px] text-white font-semibold outline-none placeholder:text-[#545454]"
+                />
+                <!-- Display for market orders -->
+                <span 
+                  v-else
+                  class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold"
+                >
+                  {{ formatPrice(displayPrice) }}
+                </span>
               </div>
             </div>
             <!-- Source Liquidity Label -->
@@ -92,7 +128,7 @@
                   </svg>
                 </div>
               </button>
-              <div v-if="showOrderTypeMenu" class="absolute top-full mt-1 w-full bg-[#272727]  z-10 border border-[#373737]">
+              <div v-if="showOrderTypeMenu" class="absolute top-full mt-1 w-full bg-[#272727]  z-50 border border-[#373737]">
                 <button
                   v-for="type in ['market', 'limit', 'stop']"
                   :key="type"
@@ -797,6 +833,17 @@ watch([maxSize, leverage, displayPrice], () => {
   }
 })
 
+// Initialize price when switching to limit/stop order type
+watch(orderType, (newType, oldType) => {
+  if ((newType === 'limit' || newType === 'stop') && oldType === 'market') {
+    // Initialize with current market price but don't update automatically
+    const currentPrice = fromBigInt(currentMarketPrice.value, 2)
+    if (!price.value || price.value === '') {
+      price.value = currentPrice
+    }
+  }
+})
+
 /**
  * Handles trade execution
  * 
@@ -1016,6 +1063,14 @@ function handleClickOutside(event: MouseEvent) {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  
+  // Initialize price if order type is limit/stop
+  if (orderType.value === 'limit' || orderType.value === 'stop') {
+    const currentPrice = fromBigInt(currentMarketPrice.value, 2)
+    if (!price.value || price.value === '') {
+      price.value = currentPrice
+    }
+  }
 })
 
 onUnmounted(() => {
@@ -1081,5 +1136,12 @@ input[type='checkbox']:checked::after {
   color: white;
   font-size: 12px;
   font-weight: bold;
+}
+
+.price-mark {
+  margin-right: 4px;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 24px;
 }
 </style>
