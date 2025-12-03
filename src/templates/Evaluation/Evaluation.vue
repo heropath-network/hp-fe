@@ -27,10 +27,10 @@ type StepRow =
       isFee?: boolean
     }
 
-const stepTabs = [
-  { label: '1 Step', value: EvaluationSteps.Step1 },
-  { label: '2 Step', value: EvaluationSteps.Step2 },
-]
+// const stepTabs = [
+//   { label: '1 Step', value: EvaluationSteps.Step1 },
+//   // { label: '2 Step', value: EvaluationSteps.Step2 },
+// ]
 
 const planTabs = [
   { label: 'Classic Plan', value: EvaluationPlan.Classic },
@@ -104,7 +104,7 @@ function handleFeeClick(index: number) {
     <h1 class="text-2xl font-semibold leading-[32px]">Evaluation</h1>
 
     <div class="flex flex-col gap-4">
-      <div class="flex items-center gap-3">
+      <!-- <div class="flex items-center gap-3">
         <button
           v-for="tab in stepTabs"
           :key="tab.value"
@@ -119,7 +119,7 @@ function handleFeeClick(index: number) {
         >
           {{ tab.label }}
         </button>
-      </div>
+      </div> -->
 
       <div v-if="activeStep === EvaluationSteps.Step1" class="flex items-center gap-3">
         <button
