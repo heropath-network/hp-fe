@@ -18,7 +18,7 @@
           v-for="source in sources"
           :key="source.id"
           type="button"
-          class="flex w-full items-center justify-between gap-3 border bg-[#272727] px-4 py-3 text-left transition border-solid border-[#272727] hover:border-[#373737]"
+          class="flex w-full items-center justify-between gap-3 border bg-[#272727] px-4 py-[11px] text-left transition border-solid border-[#272727] hover:border-[#373737]"
           @click="handleToggle(source.id)"
         >
           <div class="flex items-center gap-3">
