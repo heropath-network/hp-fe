@@ -42,6 +42,8 @@ export interface TradeHistory {
   entryPrice: bigint
   exitPrice: bigint
   pnl: bigint
+  collateral: bigint
+  leverage: number
   timestamp: number
   closeTimestamp: number
   chainId: number
@@ -61,11 +63,16 @@ type StoredOrder = Omit<Order, 'size' | 'triggerPrice'> & {
   triggerPrice: string
 }
 
-type StoredTradeHistory = Omit<TradeHistory, 'size' | 'entryPrice' | 'exitPrice' | 'pnl'> & {
+type StoredTradeHistory = Omit<
+  TradeHistory,
+  'size' | 'entryPrice' | 'exitPrice' | 'pnl' | 'collateral' | 'leverage'
+> & {
   size: string
   entryPrice: string
   exitPrice: string
   pnl: string
+  collateral?: string // Optional for backward compatibility
+  leverage?: number // Optional for backward compatibility
 }
 
 export function useUserPositionsStorage(address: Ref<string | undefined>) {
@@ -220,16 +227,26 @@ export function useUserTradeHistoryStorage(address: Ref<string | undefined>) {
       entryPrice: history.entryPrice.toString(),
       exitPrice: history.exitPrice.toString(),
       pnl: history.pnl.toString(),
+      collateral: history.collateral.toString(),
     }
   }
 
   function fromStored(stored: StoredTradeHistory): TradeHistory {
+    // Calculate default collateral from size if not present (for backward compatibility)
+    // Estimate collateral as size / leverage, default leverage to 1 if not present
+    const defaultLeverage = stored.leverage ?? 1
+    const defaultCollateral = stored.collateral
+      ? BigInt(stored.collateral)
+      : BigInt(stored.size) / BigInt(defaultLeverage)
+
     return {
       ...stored,
       size: BigInt(stored.size),
       entryPrice: BigInt(stored.entryPrice),
       exitPrice: BigInt(stored.exitPrice),
       pnl: BigInt(stored.pnl),
+      collateral: defaultCollateral,
+      leverage: defaultLeverage,
     }
   }
 
