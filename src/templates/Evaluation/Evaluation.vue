@@ -10,22 +10,22 @@ import {
 } from '@/types/evaluation'
 import { ROUTE_NAMES } from '@/router'
 import BaseIcon from '@/components/BaseIcon.vue'
+import { useUserQuestDiscountStatusStorage } from '@/storages/heroPath'
+import { useConnection } from '@wagmi/vue'
+import { QUEST_DISCOUNT_AMOUNT } from '@/constants'
+
+type StepRowCommon = {
+  label: string
+  formatter: (value: number) => string
+  highlight?: boolean
+  isFee?: boolean
+  values?: string[] // formatted 值，tableRows 会填充
+  rawValues?: number[] // 原始数值，tableRows 也应填充
+}
 
 type StepRow =
-  | {
-      key: keyof EvaluationStep1Config
-      label: string
-      formatter: (value: number) => string
-      highlight?: boolean
-      isFee?: boolean
-    }
-  | {
-      key: keyof EvaluationStep2Config
-      label: string
-      formatter: (value: number) => string
-      highlight?: boolean
-      isFee?: boolean
-    }
+  | ({ key: keyof EvaluationStep1Config } & StepRowCommon)
+  | ({ key: keyof EvaluationStep2Config } & StepRowCommon)
 
 // const stepTabs = [
 //   { label: '1 Step', value: EvaluationSteps.Step1 },
@@ -37,6 +37,14 @@ const planTabs = [
   { label: 'Pro Plan', value: EvaluationPlan.Pro },
   { label: 'Turbo Plan', value: EvaluationPlan.Turbo },
 ]
+
+const { address } = useConnection()
+
+const { data: discountData } = useUserQuestDiscountStatusStorage(address)
+
+const unusedDiscounts = computed(() => {
+  return discountData.value.filter((item) => !item.isUsed)
+})
 
 const activeStep = ref<EvaluationSteps>(EvaluationSteps.Step1)
 const activePlan = ref<EvaluationPlan>(EvaluationPlan.Classic)
@@ -101,7 +109,21 @@ function handleFeeClick(index: number) {
 
 <template>
   <section class="mt-4 flex flex-col gap-6 text-[var(--hp-white-color)]">
-    <h1 class="text-2xl font-semibold leading-[32px]">Evaluation</h1>
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-semibold leading-[32px]">Evaluation</h1>
+      <div
+        class="h-[40px] flex items-center px-[12px] py-[10px] border-[1px] cursor-pointer text-[14px] font-[500] border-[var(--hp-primary-green)] text-[var(--hp-primary-green)]"
+        @click="
+          () => {
+            router.push({ name: ROUTE_NAMES.Quest })
+          }
+        "
+      >
+        <BaseIcon name="discount" size="20" class="mr-1 text-[var(--hp-primary-green)]" />
+        Discount: {{ unusedDiscounts.length }}
+        <BaseIcon name="arrow" size="16" class="ml-1 rotate-[-90deg]" />
+      </div>
+    </div>
 
     <div class="flex flex-col gap-4">
       <!-- <div class="flex items-center gap-3">
@@ -167,7 +189,20 @@ function handleFeeClick(index: number) {
                   class="flex h-10 w-[104px] items-center justify-center bg-[var(--hp-primary-green)] text-[16px] font-medium text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)]"
                   @click="handleFeeClick(cellIndex)"
                 >
-                  {{ value }}
+                  <template v-if="!!unusedDiscounts.length">
+                    <div class="font-[500]">
+                      <template v-if="tableData[cellIndex].fee - QUEST_DISCOUNT_AMOUNT <= 0">Free</template>
+                      <template v-else>
+                        <div class="text-[16px] leading-4">
+                          {{ formatFee(tableData[cellIndex].fee - QUEST_DISCOUNT_AMOUNT) }}
+                        </div>
+                        <div class="text-[14px] leading-[14px] line-through">{{ value }}</div>
+                      </template>
+                    </div>
+                  </template>
+                  <template v-else>
+                    {{ value }}
+                  </template>
                 </button>
               </template>
               <template v-else>

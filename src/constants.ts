@@ -17,4 +17,4 @@ export const ORACLE_NAMES: Record<ProjectId, string> = {
   [ProjectId.FOUR_MEME]: 'Four.meme',
 }
 
-const QUEST_DISCOUNT_AMOUNT = 50 // USD
+export const QUEST_DISCOUNT_AMOUNT = 50 // USD
