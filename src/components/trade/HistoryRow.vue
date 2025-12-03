@@ -59,11 +59,11 @@
         <div
           :class="[
             'text-[13px] leading-[18px] font-normal',
-            trade.pnl >= 0 ? 'text-white' : 'text-[#ff4e59]'
+            pnlBreakdown.netPnl >= 0 ? 'text-white' : 'text-[#ff4e59]'
           ]"
           :title="`Gross PnL: ${formatCurrency(pnlBreakdown.grossPnl)}\nFees: ${formatCurrency(pnlBreakdown.totalFees)}\nNet PnL: ${formatCurrency(pnlBreakdown.netPnl)}`"
         >
-          {{ formatCurrency(trade.pnl) }}
+          {{ formatCurrency(pnlBreakdown.netPnl) }}
         </div>
         <div
           :class="[
