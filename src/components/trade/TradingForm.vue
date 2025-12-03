@@ -807,7 +807,7 @@ const collateralLocked = computed(() => {
   return positions.value.reduce((sum, pos) => sum + pos.collateral, BigInt(0))
 })
 
-const accountValueUsd = computed(() => collateralLocked.value + accountBalance.value + totalPnL.value)
+const accountValueUsd = computed(() => accountBalance.value + totalPnL.value)
 
 function leverageToBigInt(value: number): bigint {
   const normalized = Number.isFinite(value) ? Math.max(1, Math.floor(value)) : 1
