@@ -72,6 +72,6 @@ export const LIQUIDITY_SOURCES: LiquiditySourceInfo[] = [
         maxShort: 8.45,
       },
     },
-    enabledByDefault: false,
+    enabledByDefault: true,
   },
 ]
