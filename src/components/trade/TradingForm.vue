@@ -716,6 +716,14 @@ async function requestTradeSignature(actionLabel: 'Open Position' | 'Place Order
 
   const contents = `${messageLines.join('\n')}\n\n.`
 
+  // Ensure leverage is a safe integer and convert to BigInt via string to avoid precision issues
+  const leverageValue = Math.max(1, Math.floor(leverage.value))
+  if (!Number.isSafeInteger(leverageValue)) {
+    throw new Error(`Leverage value ${leverageValue} is not a safe integer`)
+  }
+  // Convert to BigInt - viem accepts BigInt for uint256 types
+  const leverageBigInt = BigInt(leverageValue.toString())
+  
   await signTypedDataAsync({
     types: {
       Person: [{ name: 'wallet', type: 'address' }],
@@ -744,10 +752,10 @@ async function requestTradeSignature(actionLabel: 'Open Position' | 'Place Order
       size: size.value || '0',
       price: entryPrice,
       triggerPrice,
-      leverage: BigInt(Math.max(1, Math.floor(leverage.value))),
+      leverage: leverageBigInt,
       contents,
     },
-  })
+  } as any)
 }
 
 function handlePercentageChange() {
