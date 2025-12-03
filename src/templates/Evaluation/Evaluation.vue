@@ -1,18 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { STEP1, STEP2 } from '@/config/evaluation'
-import {
-  EvaluationPlan,
-  EvaluationSteps,
-  type EvaluationStep1Config,
-  type EvaluationStep2Config,
-} from '@/types/evaluation'
+import { EvaluationPlan, type EvaluationConfig } from '@/types/evaluation'
 import { ROUTE_NAMES } from '@/router'
 import BaseIcon from '@/components/BaseIcon.vue'
 import { useUserQuestDiscountStatusStorage } from '@/storages/heroPath'
 import { useConnection } from '@wagmi/vue'
 import { QUEST_DISCOUNT_AMOUNT } from '@/constants'
+import { EvaluationPlanConfig } from '@/config/evaluation'
 
 type StepRowCommon = {
   label: string
@@ -23,19 +18,12 @@ type StepRowCommon = {
   rawValues?: number[]
 }
 
-type StepRow =
-  | ({ key: keyof EvaluationStep1Config } & StepRowCommon)
-  | ({ key: keyof EvaluationStep2Config } & StepRowCommon)
-
-// const stepTabs = [
-//   { label: '1 Step', value: EvaluationSteps.Step1 },
-//   // { label: '2 Step', value: EvaluationSteps.Step2 },
-// ]
+type EvaluationRow = { key: keyof EvaluationConfig } & StepRowCommon
 
 const planTabs = [
-  { label: 'Classic Plan', value: EvaluationPlan.Classic },
-  { label: 'Pro Plan', value: EvaluationPlan.Pro },
-  { label: 'Turbo Plan', value: EvaluationPlan.Turbo },
+  { label: 'Champion Plan', value: EvaluationPlan.ChampionPlan },
+  { label: 'Hero Plan', value: EvaluationPlan.HeroPlan },
+  { label: 'Legend Plan', value: EvaluationPlan.LegendPlan },
 ]
 
 const { address } = useConnection()
@@ -46,8 +34,7 @@ const unusedDiscounts = computed(() => {
   return discountData.value.filter((item) => !item.isUsed)
 })
 
-const activeStep = ref<EvaluationSteps>(EvaluationSteps.Step1)
-const activePlan = ref<EvaluationPlan>(EvaluationPlan.Classic)
+const activePlan = ref<EvaluationPlan>(EvaluationPlan.ChampionPlan)
 const router = useRouter()
 
 const formatCurrency = (value: number) => `$${value.toLocaleString()}`
@@ -56,31 +43,20 @@ const formatPercent = (value: number) => `${value}%`
 const formatSplit = (value: number) => `Up to ${formatPercent(value)}`
 const formatLeverage = (value: number) => `Up to ${value}x`
 
-const rowsStep1: StepRow[] = [
+const evaluationRows: EvaluationRow[] = [
   { key: 'accountSize', label: 'Account Size', formatter: formatCurrency, highlight: true },
   { key: 'profitSplit', label: 'Profit Split', formatter: formatSplit },
-  { key: 'step1Goal', label: 'Step 1 goal', formatter: formatCurrency },
+  { key: 'profitGoal', label: 'Profit Goal', formatter: formatCurrency },
   { key: 'maxDailyLoss', label: 'Max.daily loss', formatter: formatPercent },
   { key: 'maxDrawdown', label: 'Max. drawdown', formatter: formatPercent },
   { key: 'leverage', label: 'Leverage', formatter: formatLeverage },
   { key: 'fee', label: 'Evaluation Fee', formatter: formatFee, isFee: true },
 ]
 
-const rowsStep2: StepRow[] = [
-  { key: 'accountSize', label: 'Account Size', formatter: formatCurrency, highlight: true },
-  { key: 'profitSplit', label: 'Profit Split', formatter: formatSplit },
-  { key: 'step1Goal', label: 'Step 1 goal', formatter: formatCurrency },
-  { key: 'step2Goal', label: 'Step 2 goal', formatter: formatCurrency },
-  { key: 'maxDailyLoss', label: 'Max.daily loss', formatter: formatPercent },
-  { key: 'maxDrawdown', label: 'Max. drawdown', formatter: formatPercent },
-  { key: 'leverage', label: 'Leverage', formatter: formatLeverage },
-  { key: 'fee', label: 'Evaluation Fee', formatter: formatFee, isFee: true },
-]
-
-const tableData = computed(() => (activeStep.value === EvaluationSteps.Step1 ? STEP1[activePlan.value] : STEP2))
+const tableData = computed(() => EvaluationPlanConfig[activePlan.value])
 
 const tableRows = computed(() => {
-  const definition = activeStep.value === EvaluationSteps.Step1 ? rowsStep1 : rowsStep2
+  const definition = evaluationRows
 
   return definition.map((row) => ({
     ...row,
@@ -92,14 +68,12 @@ const columnCount = computed(() => tableData.value.length)
 
 function handleFeeClick(index: number) {
   const payload = {
-    step: activeStep.value,
-    plan: activeStep.value === EvaluationSteps.Step1 ? activePlan.value : undefined,
+    plan: activePlan.value,
     selection: tableData.value[index],
   }
   router.push({
     name: ROUTE_NAMES.PurchaseEvaluation,
     query: {
-      step: payload.step,
       plan: payload.plan,
       level: tableData.value[index]?.level,
     },
@@ -143,7 +117,7 @@ function handleFeeClick(index: number) {
         </button>
       </div> -->
 
-      <div v-if="activeStep === EvaluationSteps.Step1" class="flex items-center gap-3">
+      <div class="flex items-center gap-3">
         <button
           v-for="tab in planTabs"
           :key="tab.value"

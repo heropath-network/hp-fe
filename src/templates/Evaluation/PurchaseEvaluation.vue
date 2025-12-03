@@ -1,22 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { STEP1, STEP2 } from '@/config/evaluation'
 import { ROUTE_NAMES } from '@/router'
-import {
-  EvaluationPlan,
-  EvaluationSteps,
-  type EvaluationStep1Config,
-  type EvaluationStep2Config,
-} from '@/types/evaluation'
+import { EvaluationPlan, EvaluationConfig } from '@/types/evaluation'
 import { useConnection, useSignTypedData } from '@wagmi/vue'
 import { TOKEN_PRICES, PaymentTokens } from '@/config/paymentTokens'
 import { useUserEvaluationsStorage } from '@/storages/heroPath'
 import { generateTimeBasedSixDigitId } from '@/utils/common'
 import { BaseIcon, LoadingIcon } from '@/components'
 import { usePaymentTokenPrices } from '@/use/usePaymentTokenPrices'
-
-type AccountOption = EvaluationStep1Config | EvaluationStep2Config
+import { EvaluationPlanConfig } from '@/config/evaluation'
 
 const requireSymbolIcon = (symbol: string) => {
   return new URL(`/src/assets/icons/tokens/${symbol}.svg`, import.meta.url).href
@@ -24,15 +17,10 @@ const requireSymbolIcon = (symbol: string) => {
 
 const { prices: apiPrices } = usePaymentTokenPrices()
 
-// const stepTabs = [
-//   { label: '1 Step', value: EvaluationSteps.Step1 },
-//   // { label: '2 Step', value: EvaluationSteps.Step2 },
-// ]
-
 const planTabs = [
-  { label: 'Classic Plan', value: EvaluationPlan.Classic },
-  { label: 'Pro Plan', value: EvaluationPlan.Pro },
-  { label: 'Turbo Plan', value: EvaluationPlan.Turbo },
+  { label: 'Champion Plan', value: EvaluationPlan.ChampionPlan },
+  { label: 'Hero Plan', value: EvaluationPlan.HeroPlan },
+  { label: 'Legend Plan', value: EvaluationPlan.LegendPlan },
 ]
 
 const { signTypedDataAsync } = useSignTypedData()
@@ -47,8 +35,7 @@ const paymentTokens = PaymentTokens
 const route = useRoute()
 const router = useRouter()
 
-const activeStep = ref<EvaluationSteps>(EvaluationSteps.Step1)
-const activePlan = ref<EvaluationPlan>(EvaluationPlan.Classic)
+const activePlan = ref<EvaluationPlan>(EvaluationPlan.ChampionPlan)
 const selectedAccountIndex = ref(0)
 const showAccountDropdown = ref(false)
 const showTokenDropdown = ref(false)
@@ -60,10 +47,8 @@ const agreeProgram = ref(false)
 const agreeRefund = ref(false)
 const pendingLevel = ref<number | null>(null)
 
-const activePlanList = computed(() => (activeStep.value === EvaluationSteps.Step1 ? planTabs : []))
-
-const accountOptions = computed<AccountOption[]>(() => {
-  return activeStep.value === EvaluationSteps.Step1 ? STEP1[activePlan.value] : STEP2
+const accountOptions = computed<EvaluationConfig[]>(() => {
+  return EvaluationPlanConfig[activePlan.value]
 })
 
 watch(
@@ -90,8 +75,7 @@ const purchaseTotal = computed(() => (basePrice.value + profitSplitFee.value).to
 
 const productLabel = computed(() => {
   const size = selectedAccount.value?.accountSize ?? 0
-  const stepLabel = activeStep.value === EvaluationSteps.Step1 ? '1 Step' : '2 Step'
-  return `$${size.toLocaleString()} - ${stepLabel}`
+  return `$${size.toLocaleString()}`
 })
 
 function formatCurrency(value: number | string) {
@@ -117,11 +101,7 @@ function selectToken(token: (typeof paymentTokens)[number]) {
 // }
 
 function initFromQuery() {
-  const { step, plan, level } = route.query
-
-  if (step === EvaluationSteps.Step2 || step === EvaluationSteps.Step1) {
-    activeStep.value = step as EvaluationSteps
-  }
+  const { plan, level } = route.query
 
   if (plan && Object.values(EvaluationPlan).includes(plan as EvaluationPlan)) {
     activePlan.value = plan as EvaluationPlan
@@ -175,8 +155,7 @@ const confirmButtonDisabled = computed(() => {
 
 async function handlePurchase() {
   const payload = {
-    step: activeStep.value,
-    plan: activeStep.value === EvaluationSteps.Step1 ? activePlan.value : undefined,
+    plan: activePlan.value,
     account: selectedAccount.value,
     token: selectedToken.value,
     profitSplit: profitSplitChecked.value,
@@ -254,25 +233,9 @@ async function handlePurchase() {
       <div class="space-y-6 bg-[var(--hp-bg-normal)] p-6">
         <div class="space-y-4">
           <p class="text-lg font-semibold">Evaluation Type</p>
-          <!-- <div class="flex flex-wrap gap-3">
+          <div class="flex flex-wrap gap-3">
             <button
-              v-for="tab in stepTabs"
-              :key="tab.value"
-              type="button"
-              class="px-4 py-[14px] text-base font-medium"
-              :class="
-                tab.value === activeStep
-                  ? 'bg-[var(--hp-primary-green)] text-[var(--hp-black-color)]'
-                  : 'text-[var(--hp-text-color)] hover:text-[var(--hp-white-color)]'
-              "
-              @click="toggleStep(tab.value)"
-            >
-              {{ tab.label }}
-            </button>
-          </div> -->
-          <div v-if="activePlanList.length" class="flex flex-wrap gap-3">
-            <button
-              v-for="tab in activePlanList"
+              v-for="tab in planTabs"
               :key="tab.value"
               type="button"
               class="px-4 py-[14px] text-base font-medium"
