@@ -1,16 +1,6 @@
 <template>
   <div class="flex h-full flex-col bg-[var(--hp-bg-dark)]">
     <div class="overflow-x-auto">
-      <div class="flex items-center gap-2 p-4">
-        <button 
-          v-if="orders.length > 0"
-          class="bg-red-error px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-error/90" 
-          @click="clearAllOrders"
-          title="Remove all orders from storage"
-        >
-          Clear Storage
-        </button>
-      </div>
       <table class="w-full text-sm"> 
         <thead class="border-b border-gray-800">
           <tr class="text-xs text-gray-400">
