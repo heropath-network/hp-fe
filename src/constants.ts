@@ -16,3 +16,5 @@ export const ORACLE_NAMES: Record<ProjectId, string> = {
   [ProjectId.MUX_V3]: 'Aster',
   [ProjectId.FOUR_MEME]: 'Four.meme',
 }
+
+const QUEST_DISCOUNT_AMOUNT = 50 // USD
