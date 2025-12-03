@@ -142,7 +142,7 @@ watch(
           <button
             type="button"
             class="flex h-[40px] w-full items-center justify-between rounded border px-4 py-3 text-left text-base font-medium active:bg-transparent focus:outline-none focus:ring-0"
-            :style="{ borderColor: showEvaluationDropdown ? 'var(--hp-primary-green)' : 'var(--hp-line-light-color)' }"
+            :style="{ borderColor: showEvaluationDropdown ? 'var(--hp-primary-green)' : 'var(--hp-line-normal-color)' }"
             @click="showEvaluationDropdown = !showEvaluationDropdown"
           >
             <div class="flex flex-col">
@@ -162,33 +162,35 @@ watch(
             v-if="showEvaluationDropdown"
             class="absolute right-0 top-[calc(100%+8px)] z-20 w-full min-w-[280px] overflow-hidden border border-[var(--hp-line-light-color)] bg-[var(--hp-bg-light)]"
           >
-            <div v-if="!evaluationList.length" class="px-4 py-3 text-sm text-[var(--hp-white-color)]">
-              No evaluation accounts
-            </div>
-            <button
-              v-for="evaluation in evaluationList"
-              :key="evaluation.accountId"
-              type="button"
-              class="flex w-full items-center cursor-pointer justify-between px-4 py-3 text-left transition hover:bg-[var(--hp-bg-light)] group"
-              :class="[
-                selectedEvaluationId === evaluation.accountId
-                  ? 'text-[var(--hp-primary-green)]'
-                  : 'text-[var(--hp-white-color)]',
-              ]"
-              @click="selectEvaluation(evaluation.accountId)"
-            >
-              <div
-                class="text-base font-semibold text-[var(--hp-text-color)] group-hover:text-[var(--hp-white-color)]"
-                :class="[selectedEvaluationId === evaluation.accountId && 'opacity-70']"
+            <template v-if="!evaluationList.length">
+              <div class="px-4 py-3 text-sm text-[var(--hp-white-color)]">No evaluation accounts</div>
+            </template>
+            <template v-else>
+              <button
+                v-for="evaluation in evaluationList"
+                :key="evaluation.accountId"
+                type="button"
+                class="flex w-full items-center cursor-pointer justify-between px-4 py-3 text-left transition bg-[var(--hp-line-normal-color)] hover:bg-[var(--hp-line-light-color)] group"
+                :class="[
+                  selectedEvaluationId === evaluation.accountId
+                    ? 'text-[var(--hp-primary-green)]'
+                    : 'text-[var(--hp-white-color)]',
+                ]"
+                @click="selectEvaluation(evaluation.accountId)"
               >
-                {{
-                  `${getAccountTypeLabel(evaluation.accountType)} #${evaluation.accountId}: $${formatNumber(
-                    evaluation.evaluationConfig.accountSize,
-                    0,
-                  )}`
-                }}
-              </div>
-            </button>
+                <div
+                  class="text-base font-semibold text-[var(--hp-text-color)] group-hover:text-[var(--hp-white-color)]"
+                  :class="[selectedEvaluationId === evaluation.accountId && 'opacity-70']"
+                >
+                  {{
+                    `${getAccountTypeLabel(evaluation.accountType)} #${evaluation.accountId}: $${formatNumber(
+                      evaluation.evaluationConfig.accountSize,
+                      0,
+                    )}`
+                  }}
+                </div>
+              </button>
+            </template>
           </div>
         </div>
       </div>
@@ -258,7 +260,7 @@ watch(
 
         <article class="relative flex h-[100px] flex-col justify-center gap-2 bg-[var(--hp-bg-light)] px-6 py-5">
           <div
-            class="absolute left-0 top-0 rounded-sm bg-[var(--hp-line-light-color)] px-2 py-1 text-[12px] leading-4 text-[var(--hp-text-color)]"
+            class="absolute left-0 top-0 rounded-sm bg-[var(--hp-line-normal-color)] px-2 py-1 text-[12px] leading-4 text-[var(--hp-text-color)]"
           >
             Prior Day Balance: (<span class="text-[var(--hp-white-color)]">
               ${{ formatNumber(priorDayBalance, 2) }}</span

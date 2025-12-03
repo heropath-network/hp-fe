@@ -294,7 +294,7 @@ async function handlePurchase() {
                   v-for="(item, idx) in accountOptions"
                   :key="item.level"
                   type="button"
-                  class="flex w-full items-center justify-between px-4 py-3 text-left transition hover:bg-[var(--hp-line-light-color)]"
+                  class="flex w-full items-center cursor-pointer justify-between px-4 py-3 text-left transition bg-[var(--hp-line-normal-color)] hover:bg-[var(--hp-line-light-color)] group"
                   :class="idx === selectedAccountIndex ? 'text-[var(--hp-text-color)]' : 'text-[var(--hp-white-color)]'"
                   @click="selectAccount(idx)"
                 >
@@ -338,7 +338,7 @@ async function handlePurchase() {
                     v-for="method in PayMethod"
                     :key="method.value"
                     type="button"
-                    class="flex w-full items-center justify-between px-4 py-3 text-left transition hover:bg-[var(--hp-line-light-color)]"
+                    class="flex w-full items-center justify-between px-4 py-3 text-left transition bg-[var(--hp-line-normal-color)] hover:bg-[var(--hp-line-light-color)]"
                     @click="selectPayMethod(method)"
                   >
                     <div
@@ -393,7 +393,7 @@ async function handlePurchase() {
                     v-for="token in paymentTokens"
                     :key="token.symbol"
                     type="button"
-                    class="flex w-full items-center justify-between px-4 py-3 text-left transition hover:bg-[var(--hp-line-light-color)]"
+                    class="flex w-full items-center justify-between px-4 py-3 text-left transition bg-[var(--hp-line-normal-color)] hover:bg-[var(--hp-line-light-color)]"
                     @click="selectToken(token)"
                   >
                     <div
@@ -434,7 +434,7 @@ async function handlePurchase() {
             </div>
           </div>
 
-          <div class="h-px w-full bg-[var(--hp-line-light-color)]" />
+          <div class="h-px w-full bg-[var(--hp-line-normal-color)]" />
 
           <div class="space-y-3">
             <label class="flex cursor-pointer items-center gap-2 text-sm text-[var(--hp-text-color)]">
@@ -443,7 +443,7 @@ async function handlePurchase() {
             </label>
             <div
               v-if="affiliateChecked"
-              class="flex flex-col gap-3 border border-[var(--hp-line-light-color)] p-4 md:flex-row md:items-center md:justify-between"
+              class="flex flex-col gap-3 border border-[var(--hp-line-normal-color)] p-4 md:flex-row md:items-center md:justify-between"
             >
               <div class="flex flex-1 items-center gap-3">
                 <input

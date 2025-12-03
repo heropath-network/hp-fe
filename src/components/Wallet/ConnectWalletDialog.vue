@@ -120,7 +120,7 @@ tryOnMounted(() => {
             </template>
           </span>
         </div>
-        <div class="h-[1px] my-4 w-full bg-[var(--hp-line-light-color)]"></div>
+        <div class="h-[1px] my-4 w-full bg-[var(--hp-line-normal-color)]"></div>
         <div
           class="flex justify-between items-center cursor-pointer h-[52px] px-[16px] py-[10px] bg-[var(--hp-bg-light)] border-[1px] border-[var(--hp-bg-light)] hover:border-[var(--hp-primary-green)] mt-2 first:mt-0"
         >
