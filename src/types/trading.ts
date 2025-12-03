@@ -1,5 +1,5 @@
 export interface Position {
-  accountId: number
+  accountId: string
   id: string
   market: string
   side: 'long' | 'short'
@@ -12,7 +12,7 @@ export interface Position {
 }
 
 export interface Order {
-  accountId: number
+  accountId: string
   id: string
   market: string
   side: 'long' | 'short'
@@ -23,11 +23,12 @@ export interface Order {
 }
 
 export interface TradeHistory {
-  accountId: number
+  accountId: string
   id: string
   market: string
   side: 'long' | 'short'
   size: bigint
+  isOpen: boolean
   entryPrice: bigint
   exitPrice: bigint
   pnl: bigint

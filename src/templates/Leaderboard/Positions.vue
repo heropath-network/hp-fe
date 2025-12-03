@@ -170,7 +170,7 @@ const SortIcon = defineComponent({
 
         <div
           :class="[index % 2 === 0 ? 'bg-[var(--hp-bg-light)]' : 'bg-[var(--hp-bg-normal)]']"
-          class="grid grid-cols-[220px_140px_100px_110px_170px_135px_1fr] items-center gap-6 px-6 py-4 pt-6 text-base text-[var(--hp-white-color)]"
+          class="grid grid-cols-[220px_140px_100px_110px_170px_135px_1fr] h-[72px] gap-6 px-6 py-4 pt-6 text-base text-[var(--hp-white-color)]"
         >
           <div class="flex items-center gap-2">
             <div class="relative flex h-6 w-6 items-center justify-center">

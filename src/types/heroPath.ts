@@ -1,8 +1,8 @@
-import { EvaluationStep1Config, EvaluationStep2Config } from './evaluation'
+import { EvaluationConfig } from './evaluation'
 
 export interface UserEvaluation {
   accountId: string
-  evaluationConfig: EvaluationStep1Config | EvaluationStep2Config
+  evaluationConfig: EvaluationConfig
   accountType: 'funded' | 'evaluation' | 'trading'
   accountStatus: 'active' | 'inactive'
   displayStatus: {
@@ -18,6 +18,7 @@ export interface UserWithdrawalHistory {
   address: string
   status: 'success' | 'pending' | 'failed'
 }
+
 export interface UserPayouts {
   withdrawnAmount: number
 }

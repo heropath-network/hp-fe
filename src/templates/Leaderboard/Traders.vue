@@ -143,7 +143,7 @@ const SortIcon = defineComponent({
         v-for="(row, index) in formattedRows"
         :key="row.address + index"
         :class="[index % 2 === 0 ? 'bg-[var(--hp-bg-light)]' : 'bg-[var(--hp-bg-normal)]']"
-        class="grid grid-cols-[196px_205px_165px_116px_116px_1fr] items-center gap-6 px-6 py-4 text-base text-[var(--hp-white-color)]"
+        class="grid grid-cols-[196px_205px_165px_116px_116px_1fr] h-[72px] items-center gap-6 px-6 py-4 text-base text-[var(--hp-white-color)]"
       >
         <div class="flex items-center gap-2">
           <div class="relative flex h-6 w-6 items-center justify-center">
