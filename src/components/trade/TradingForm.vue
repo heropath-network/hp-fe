@@ -186,13 +186,46 @@
       </div>
 
       <!-- Take Profit / Stop Loss Checkbox -->
-      <div class="flex items-center gap-2">
-        <input
-          type="checkbox"
-          v-model="takeProfitStopLoss"
-          class="w-4 h-4 border border-[#9b9b9b] bg-transparent"
-        />
-        <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Take Profit / Stop Loss</span>
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            v-model="takeProfitStopLoss"
+            class="w-4 h-4 border border-[#9b9b9b] bg-transparent"
+          />
+          <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Take Profit / Stop Loss</span>
+        </div>
+        
+        <!-- Take Profit / Stop Loss Inputs -->
+        <div v-if="takeProfitStopLoss" class="flex gap-2 min-w-0 max-w-full">
+          <!-- Take Profit Input -->
+          <div class="flex-1 bg-[#272727] h-[32px] px-3 flex items-center gap-1">
+            <span class="text-[13px] leading-[18px] text-[#9b9b9b]">TP:</span>
+            <span class="text-[13px] leading-[18px] text-[#9b9b9b]">{{ tradeSide === 'long' ? '≥' : '≤' }}</span>
+            <span class="text-[13px] leading-[18px] text-white">$</span>
+            <input
+              v-model="takeProfit"
+              type="number"
+              step="0.01"
+              placeholder="None"
+              class="max-w-[80px] flex flex-1 bg-transparent text-[13px] leading-[18px] text-[#9b9b9b] outline-none placeholder:text-[#9b9b9b]"
+            />
+          </div>
+          
+          <!-- Stop Loss Input -->
+          <div class="flex-1 bg-[#272727] h-[32px] px-3 flex items-center gap-1">
+            <span class="text-[13px] leading-[18px] text-[#9b9b9b]">SL:</span>
+            <span class="text-[13px] leading-[18px] text-[#9b9b9b]">{{ tradeSide === 'long' ? '≤' : '≥' }}</span>
+            <span class="text-[13px] leading-[18px] text-white">$</span>
+            <input
+              v-model="stopLoss"
+              type="number"
+              step="0.01"
+              placeholder="None"
+              class="max-w-[80px] flex flex-1 bg-transparent text-[13px] leading-[18px] text-[#9b9b9b] outline-none placeholder:text-[#9b9b9b]"
+            />
+          </div>
+        </div>
       </div>
 
       <!-- Action Button -->
@@ -447,6 +480,8 @@ const showMarginModeDialog = ref(false)
 const showLiquiditySourcesDialog = ref(false)
 const showOrderTypeMenu = ref(false)
 const takeProfitStopLoss = ref(false)
+const takeProfit = ref('')
+const stopLoss = ref('')
 const showAccountBreakdown = ref(false)
 const showCrossBreakdown = ref(false)
 const signing = ref(false)
