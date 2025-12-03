@@ -668,6 +668,17 @@ watch([maxSize, leverage, displayPrice], () => {
   }
 })
 
+/**
+ * Handles trade execution
+ * 
+ * Note: All positions and orders are automatically saved to LocalStorage
+ * through the tradeStore methods (openPosition, placeOrder).
+ * Storage is keyed by wallet address and persists across page reloads.
+ * 
+ * Storage management methods available via tradeStore:
+ * - clearPositions(), removePosition(id), removePositionsByMarket(market), etc.
+ * - clearOrders(), removeOrder(id), removeOrdersByMarket(market), etc.
+ */
 async function handleTrade() {
   if (!isFormValid.value || !address.value) return
 
@@ -683,6 +694,7 @@ async function handleTrade() {
     if (orderType.value === 'market') {
       const currentLiquiditySource = tradeStore.getLiquiditySourceFromOracle(tradeStore.selectedOracle)
       
+      // This automatically saves to LocalStorage via useUserPositionsStorage
       tradeStore.openPosition(
         selectedMarket.value,
         tradeSide.value,
@@ -701,6 +713,7 @@ async function handleTrade() {
       const triggerPrice = toBigInt(price.value)
       const currentLiquiditySource = tradeStore.getLiquiditySourceFromOracle(tradeStore.selectedOracle)
       
+      // This automatically saves to LocalStorage via useUserOrdersStorage
       tradeStore.placeOrder(
         selectedMarket.value,
         tradeSide.value,

@@ -173,8 +173,13 @@ function getTimeframe(): string {
   return `${diffDays}d`
 }
 
+/**
+ * Closes a position and removes it from storage
+ * This calculates PnL and updates account balance, then removes from LocalStorage
+ */
 function closePosition(positionId: string) {
   if (confirm('Are you sure you want to close this position?')) {
+    // closePosition automatically updates storage via tradeStore
     tradeStore.closePosition(positionId)
   }
 }

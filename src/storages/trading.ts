@@ -111,6 +111,18 @@ export function useUserPositionsStorage(address: Ref<string | undefined>) {
     storage.value = storage.value.filter((p) => p.id !== positionId)
   }
 
+  function removePositionsByMarket(market: string) {
+    storage.value = storage.value.filter((p) => p.market !== market)
+  }
+
+  function removePositionsByAccountId(accountId: string) {
+    storage.value = storage.value.filter((p) => p.accountId !== accountId)
+  }
+
+  function removePositionsByChainId(chainId: number) {
+    storage.value = storage.value.filter((p) => p.chainId !== chainId)
+  }
+
   const positions = computed(() => {
     return storage.value.map(fromStored)
   })
@@ -121,6 +133,9 @@ export function useUserPositionsStorage(address: Ref<string | undefined>) {
     addPosition,
     updatePositions,
     removePosition,
+    removePositionsByMarket,
+    removePositionsByAccountId,
+    removePositionsByChainId,
   }
 }
 
@@ -163,6 +178,18 @@ export function useUserOrdersStorage(address: Ref<string | undefined>) {
     storage.value = storage.value.filter((o) => o.id !== orderId)
   }
 
+  function removeOrdersByMarket(market: string) {
+    storage.value = storage.value.filter((o) => o.market !== market)
+  }
+
+  function removeOrdersByAccountId(accountId: string) {
+    storage.value = storage.value.filter((o) => o.accountId !== accountId)
+  }
+
+  function removeOrdersByChainId(chainId: number) {
+    storage.value = storage.value.filter((o) => o.chainId !== chainId)
+  }
+
   const orders = computed(() => {
     return storage.value.map(fromStored)
   })
@@ -173,6 +200,9 @@ export function useUserOrdersStorage(address: Ref<string | undefined>) {
     addOrder,
     updateOrders,
     removeOrder,
+    removeOrdersByMarket,
+    removeOrdersByAccountId,
+    removeOrdersByChainId,
   }
 }
 

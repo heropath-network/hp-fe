@@ -438,5 +438,17 @@ export const useTradeStore = defineStore('trade', () => {
     cancelOrder,
     setLiquiditySourceEnabled,
     toggleLiquiditySource,
+
+    // Storage management methods
+    clearPositions: positionsStorage.clear,
+    removePosition: positionsStorage.removePosition,
+    removePositionsByMarket: positionsStorage.removePositionsByMarket,
+    removePositionsByAccountId: positionsStorage.removePositionsByAccountId,
+    removePositionsByChainId: positionsStorage.removePositionsByChainId,
+    clearOrders: ordersStorage.clear,
+    removeOrder: ordersStorage.removeOrder,
+    removeOrdersByMarket: ordersStorage.removeOrdersByMarket,
+    removeOrdersByAccountId: ordersStorage.removeOrdersByAccountId,
+    removeOrdersByChainId: ordersStorage.removeOrdersByChainId,
   }
 })
