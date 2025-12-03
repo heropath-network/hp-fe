@@ -20,58 +20,66 @@
 
     <!-- Right: Account Info and Controls -->
     <div class="flex items-center gap-2">
-      <!-- Account Selector -->
-      <Menu as="div" class="relative inline-block text-left" v-slot="{ open }">
-        <MenuButton
-          class="flex items-center gap-1 px-2 py-[6px] text-[14px] font-medium leading-[20px]  transition-colors hover:bg-[#5dd88a] hover:text-gray-950 focus:outline-none"
-          :class="open ? 'bg-[#6CE99E] text-neutral-950' : 'text-white'"
-          >
-          <span v-if="selectedAccount">
-            {{ selectedAccount.label }}
-          </span>
-          <span v-else>Select Evaluation</span>
-          <i class="iconfont icon-down" :class="open ? 'rotate-180' : ''"></i>
-        </MenuButton>
-
-        <transition
-          enter-active-class="transition duration-100 ease-out"
-          enter-from-class="transform scale-95 opacity-0"
-          enter-to-class="transform scale-100 opacity-100"
-          leave-active-class="transition duration-75 ease-in"
-          leave-from-class="transform scale-100 opacity-100"
-          leave-to-class="transform scale-95 opacity-0"
+      <!-- Account Selector or New Evaluation Button -->
+      <template v-if="!accounts.length">
+        <button
+          type="button"
+          class="flex items-center gap-1 px-2 py-[6px] text-[14px] font-medium leading-[20px] bg-[#6CE99E] text-gray-950 transition-colors hover:bg-[#5dd88a] focus:outline-none"
+          @click="router.push({ name: ROUTE_NAMES.Evaluation })"
         >
-          <MenuItems
-            class="absolute right-0 z-[9999] mt-2 w-[280px] origin-top-right bg-[#272727] border border-[#373737] shadow-[0px_4px_8px_0px_rgba(0,2,10,0.25)] focus:outline-none"
+          New Evaluation
+        </button>
+      </template>
+      <template v-else>
+        <Menu as="div" class="relative inline-block text-left" v-slot="{ open }">
+          <MenuButton
+            class="flex items-center gap-1 px-2 py-[6px] text-[14px] font-medium leading-[20px]  transition-colors hover:bg-[#5dd88a] hover:text-gray-950 focus:outline-none"
+            :class="open ? 'bg-[#6CE99E] text-neutral-950' : 'text-white'"
+            >
+            <span v-if="selectedAccount">
+              {{ selectedAccount.label }}
+            </span>
+            <span v-else>Select Evaluation</span>
+            <i class="iconfont icon-down" :class="open ? 'rotate-180' : ''"></i>
+          </MenuButton>
+
+          <transition
+            enter-active-class="transition duration-100 ease-out"
+            enter-from-class="transform scale-95 opacity-0"
+            enter-to-class="transform scale-100 opacity-100"
+            leave-active-class="transition duration-75 ease-in"
+            leave-from-class="transform scale-100 opacity-100"
+            leave-to-class="transform scale-95 opacity-0"
           >
-              <div class="flex flex-col py-3">
-                <div v-if="!accounts.length" class="px-4 py-3 text-sm text-gray-400">
-                  No evaluation accounts
-                </div>
-                <MenuItem
-                  v-for="account in accounts"
-                  :key="account.id"
-                  v-slot="{ active }"
-                >
-                  <button
-                    @click="selectAccount(account)"
-                    :class="[
-                      'flex items-center gap-[10px] px-2 py-2.5 w-full text-left transition-colors ',
-                      account.id === selectedEvaluationId ? 'text-gray-400 opacity-50' : 'text-gray-400',
-                      account.id !== selectedEvaluationId && active ? 'bg-[#373737] !text-white' : ''
-                    ]"
+            <MenuItems
+              class="absolute right-0 z-[9999] mt-2 w-[280px] origin-top-right bg-[#272727] border border-[#373737] shadow-[0px_4px_8px_0px_rgba(0,2,10,0.25)] focus:outline-none"
+            >
+                <div class="flex flex-col py-3">
+                  <MenuItem
+                    v-for="account in accounts"
+                    :key="account.id"
+                    v-slot="{ active }"
                   >
-                    <span
-                      class="text-[14px] font-medium leading-[20px]"
+                    <button
+                      @click="selectAccount(account)"
+                      :class="[
+                        'flex items-center gap-[10px] px-2 py-2.5 w-full text-left transition-colors ',
+                        account.id === selectedEvaluationId ? 'text-gray-400 opacity-50' : 'text-gray-400',
+                        account.id !== selectedEvaluationId && active ? 'bg-[#373737] !text-white' : ''
+                      ]"
                     >
-                      {{ account.label }}
-                    </span>
-                  </button>
-                </MenuItem>
-              </div>
-            </MenuItems>
-          </transition>
-      </Menu>
+                      <span
+                        class="text-[14px] font-medium leading-[20px]"
+                      >
+                        {{ account.label }}
+                      </span>
+                    </button>
+                  </MenuItem>
+                </div>
+              </MenuItems>
+            </transition>
+        </Menu>
+      </template>
 
       <!-- Divider -->
       <div class="h-5 w-px bg-[#272727]"></div>
@@ -133,6 +141,7 @@
 
 <script setup lang="ts">
 import { computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useChainId, useSwitchChain } from '@wagmi/vue'
 import { arbitrum, bsc, optimism } from '@wagmi/vue/chains'
 import { toBigInt } from '@/utils/bigint'
@@ -144,6 +153,7 @@ import ArbitrumIcon from '@/assets/img/arbitrum.svg'
 import BSCIcon from '@/assets/img/BSC.svg'
 import OptimismIcon from '@/assets/img/optimism.svg'
 import ConnectWalletButton from '@/views/Header/ConnectWalletButton.vue'
+import { ROUTE_NAMES } from '@/router'
 
 interface Account {
   id: string
@@ -151,6 +161,7 @@ interface Account {
   balance: bigint
 }
 
+const router = useRouter()
 const tradeStore = useTradeStore()
 
 // Use the shared composable for account balance logic
