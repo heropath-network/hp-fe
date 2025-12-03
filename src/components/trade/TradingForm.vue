@@ -513,15 +513,81 @@ const positionSizeUSD = computed(() => {
   return (sizeNum * priceNum * leverage.value).toFixed(2)
 })
 
+// Constants for calculations
+const MAINTENANCE_MARGIN_RATE = 0.005 // 0.5% (500 bps / 10000)
+const POSITION_FEE_RATE = 0.0006 // 0.060%
+const SPREAD_ESTIMATE_RATE = 0.0001 // 0.01% estimated spread/price impact
+
 const liquidationPrice = computed(() => {
   const entryPrice = parseFloat(displayPrice.value) || 0
-  const adjustmentFactor = entryPrice / leverage.value
+  
+  if (entryPrice === 0 || leverage.value === 0) {
+    return '--'
+  }
+  
+  // Liquidation price calculation
+  // Formula: liqPrice = entryPrice ± (entryPrice / leverage) * (1 - maintenanceMarginRate)
+  // For long: price decreases, for short: price increases
+  const priceAdjustment = (entryPrice / leverage.value) * (1 - MAINTENANCE_MARGIN_RATE)
   
   if (tradeSide.value === 'long') {
-    return (entryPrice - adjustmentFactor).toFixed(2)
+    const liqPrice = entryPrice - priceAdjustment
+    return liqPrice > 0 ? `$${liqPrice.toFixed(2)}` : '--'
   } else {
-    return (entryPrice + adjustmentFactor).toFixed(2)
+    const liqPrice = entryPrice + priceAdjustment
+    return liqPrice > 0 ? `$${liqPrice.toFixed(2)}` : '--'
   }
+})
+
+const marginRequired = computed(() => {
+  const sizeNum = parseFloat(size.value) || 0
+  const priceNum = parseFloat(displayPrice.value) || 0
+  
+  if (sizeNum === 0 || priceNum === 0 || leverage.value === 0) {
+    return '--'
+  }
+  
+  // Margin Required = Position Size * Price / Leverage
+  const margin = (sizeNum * priceNum) / leverage.value
+  return `$${margin.toFixed(2)}`
+})
+
+const openCost = computed(() => {
+  const sizeNum = parseFloat(size.value) || 0
+  const priceNum = parseFloat(displayPrice.value) || 0
+  
+  if (sizeNum === 0 || priceNum === 0) {
+    return '--'
+  }
+  
+  // Position fee = Asset Price * Amount * Position Fee Rate
+  const positionFee = sizeNum * priceNum * POSITION_FEE_RATE
+  
+  // Estimated spread/price impact cost
+  const spreadCost = sizeNum * priceNum * SPREAD_ESTIMATE_RATE
+  
+  // Total open cost
+  const totalCost = positionFee + spreadCost
+  return `$${totalCost.toFixed(2)}`
+})
+
+const maxROE = computed(() => {
+  const sizeNum = parseFloat(size.value) || 0
+  const priceNum = parseFloat(displayPrice.value) || 0
+  
+  if (sizeNum === 0 || priceNum === 0 || leverage.value === 0) {
+    return '--'
+  }
+  
+  // Max ROE represents the maximum profit percentage relative to margin
+  // Max profit is typically: (leverage - 1) * margin, but limited by pool capacity
+  // For a simplified calculation: Max ROE ≈ (leverage - 1) * 100%
+  // This represents the theoretical maximum return if price moves favorably
+  const theoreticalMaxRoe = (leverage.value - 1) * 100
+  
+  // Cap at reasonable maximum (900% as seen in mux-fe for some protocols)
+  const cappedRoe = Math.min(theoreticalMaxRoe, 900)
+  return `${cappedRoe.toFixed(0)}%`
 })
 
 const tradingFee = computed(() => {
@@ -847,19 +913,19 @@ You can customize your preferred liquidity sources under Trading Settings if nee
     {
       key: 'liqPrice',
       label: 'Liq. Price',
-      value: '--',
+      value: liquidationPrice.value,
       tooltip: 'Please note when you use volatile assets as collateral, the liquidation price will be affected by both collateral and underlying asset prices.' 
     },
     {
       key: 'marginRequired',
       label: 'Margin Required',
-      value: '--',
+      value: marginRequired.value,
       tooltip: 'The margin required to be allocated from your cross account equity for opening this position.'
     },
     {
       key: 'openCost',
       label: 'Open Cost',
-      value: '--',
+      value: openCost.value,
       tooltip: `The position fee will be collected when you open and close a position; it will be deducted from your collateral when opening the position and will be preferentially deducted from the profits when closing the position. 
 
 Position Fee = Asset Price * Amount * Position Fee Rate. The position fee rate is fixed at 0.060%.
@@ -871,8 +937,8 @@ Funding fee for each position will be tracked every 1 hour and settled as fundin
     {
       key: 'maxROE',
       label: 'Max. ROE',
-      value: '--',
-      tooltip: '' // Will be added later
+      value: maxROE.value,
+      tooltip: 'Max. ROE (Return on Equity) represents the maximum profit percentage you can achieve relative to your margin. When the Max. ROE is reached, the position may be automatically closed by the pool\'s Auto-Deleveraging (ADL) setup.'
     }
   ]
 })
