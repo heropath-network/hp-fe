@@ -36,13 +36,11 @@
 
             <div class="px-4 pb-4">
               <div class="relative flex items-center gap-2 bg-[#272727] px-4 py-2">
-                <svg class="w-[18px] h-[18px] text-[#9b9b9b] pointer-events-none shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+                <i class="iconfont icon-search text-[18px] text-[#9B9B9B]"></i>
                 <input
                   v-model="searchQuery"
                   type="text"
-                  class="flex-1 bg-transparent border-none outline-none text-base leading-6 text-white placeholder:text-[#9b9b9b] placeholder:opacity-75"
+                  class="flex-1 bg-transparent border-none outline-none text-base leading-6 text-white placeholder:text-[#9B9B9B] placeholder:opacity-75"
                   placeholder="Search Market"
                 />
                 <button
@@ -83,7 +81,7 @@
                   v-for="market in sortedMarkets"
                   :key="market"
                   @click="selectMarket(market)"
-                  class="w-full flex items-center gap-4 px-4 py-2 bg-[#272727] border cursor-pointer transition-all"
+                  class="w-full flex items-center gap-4 px-4 py-[7px] bg-[#272727] border cursor-pointer transition-all"
                   :class="[
                     selectedMarket === market
                       ? 'border-[#6ce99e]'
