@@ -36,7 +36,7 @@
     <td class="px-4 py-6 text-right">
       <div class="flex flex-col gap-1 items-end">
         <div class="text-[13px] leading-[18px] text-white font-normal">
-          ${{ getMarkPrice(position.market) }}
+          ${{ getPositionSizeUSD() }}
         </div>
         <div class="text-[13px] leading-[18px] text-[#9b9b9b] font-normal whitespace-nowrap">
           {{ formatNumber(position.size, 4) }}
@@ -126,7 +126,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useTradeStore } from '@/stores/tradeStore'
-import { formatNumber, formatCurrency, formatPercentage, fromBigInt } from '@/utils/bigint'
+import { formatNumber, formatCurrency, fromBigInt } from '@/utils/bigint'
 import { calculatePositionPnL } from '@/utils/pnl'
 import type { Position } from '@/storages/trading'
 import MarketIcon from '@/components/common/MarketIcon.vue'
@@ -141,6 +141,13 @@ const tradeStore = useTradeStore()
 function getMarkPrice(market: string): string {
   const price = tradeStore.marketPrices[market]?.price
   return price ? fromBigInt(price, 2) : '0.00'
+}
+
+function getPositionSizeUSD(): string {
+  // Position value in USD = collateral * leverage
+  // This matches the calculation used in PnL and represents the notional position value
+  const positionValue = props.position.collateral * BigInt(props.position.leverage)
+  return formatCurrency(positionValue, 2).replace('$', '')
 }
 
 // Calculate comprehensive PnL with fees
