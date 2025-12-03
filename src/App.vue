@@ -21,12 +21,11 @@ const isTradePage = computed(() => route.path === "/trade");
       <Menu v-if="showMenu" />
       <main
         class="h-screen flex-1 overflow-auto pb-12 pt-20 relative"
-        :class="showMenu ? 'ml-[248px] px-8' : 'px-4 sm:px-6'"
+        :class="showMenu ? 'ml-[248px]' : ''"
       >
-        <div v-if="showMenu" class="mx-auto w-full max-w-[1160px]">
+        <div class="hp-container">
           <RouterView />
         </div>
-        <RouterView v-else />
       </main>
     </div>
   </div>

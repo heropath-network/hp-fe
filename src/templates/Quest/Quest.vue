@@ -128,7 +128,7 @@ watch(
 <template>
   <section
     ref="containerDom"
-    class="mx-auto mt-4 flex w-full max-w-[1160px] flex-col gap-6 px-4 pb-28 text-[var(--hp-white-color)] sm:px-6"
+    class="mt-4 flex flex-col gap-6 pb-28 text-[var(--hp-white-color)]"
   >
     <header class="flex flex-col gap-2">
       <h1 class="text-2xl font-semibold leading-8">Hero&apos;s Rebirth - Get Evaluation Opportunities</h1>

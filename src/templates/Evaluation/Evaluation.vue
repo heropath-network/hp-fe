@@ -19,8 +19,8 @@ type StepRowCommon = {
   formatter: (value: number) => string
   highlight?: boolean
   isFee?: boolean
-  values?: string[] // formatted 值，tableRows 会填充
-  rawValues?: number[] // 原始数值，tableRows 也应填充
+  values?: string[]
+  rawValues?: number[]
 }
 
 type StepRow =

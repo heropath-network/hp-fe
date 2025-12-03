@@ -59,7 +59,7 @@ const communityProjects: EcosystemLink[] = [
 </script>
 
 <template>
-  <section class="mx-auto mt-4 flex w-full max-w-[1160px] flex-col gap-12 px-4 text-[var(--hp-white-color)] sm:px-6">
+  <section class="mt-4 flex flex-col gap-12 text-[var(--hp-white-color)]">
     <div class="flex flex-col gap-6">
       <header class="flex flex-col gap-2">
         <h1 class="text-2xl font-semibold leading-8">Governance &amp; Updates</h1>

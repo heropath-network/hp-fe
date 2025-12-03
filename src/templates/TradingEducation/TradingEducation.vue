@@ -32,7 +32,7 @@ const cardRows = computed(() => {
 
 <template>
   <section
-    class="mx-auto mt-4 flex w-full max-w-[1160px] flex-col gap-12 px-4 pb-28 text-[var(--hp-white-color)] sm:px-6"
+    class="mt-4 flex flex-col gap-12 pb-28 text-[var(--hp-white-color)]"
   >
     <div class="w-full">
       <div class="flex items-center justify-between bg-[var(--hp-bg-normal)] px-6 py-5 shadow-lg shadow-black/40">
