@@ -1,6 +1,6 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import TradeView from "@/views/TradeView.vue";
-import TcTestRemoveMeCFourMeme from "@/views/TcTestRemoveMeCFourMeme.vue";
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import TradeView from '@/views/TradeView.vue'
+import TcTestRemoveMeCFourMeme from '@/views/TcTestRemoveMeCFourMeme.vue'
 
 export enum ROUTE_NAMES {
   Dashboard = 'dashboard',
@@ -78,7 +78,7 @@ const ROUTER_LIST: RouteRecordRaw[] = [
     name: 'tc-c',
     component: TcTestRemoveMeCFourMeme,
   },
-];
+]
 
 const router = createRouter({
   history: createWebHistory(),
