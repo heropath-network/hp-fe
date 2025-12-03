@@ -213,6 +213,7 @@ watch(
 
 function selectAccount(account: Account) {
   selectEvaluationBase(account.id)
+  router.push({ name: ROUTE_NAMES.Dashboard })
 }
 
 
