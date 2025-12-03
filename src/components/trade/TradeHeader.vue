@@ -26,7 +26,10 @@
           class="flex items-center gap-1 px-2 py-[6px] text-[14px] font-medium leading-[20px]  transition-colors hover:bg-[#5dd88a] hover:text-gray-950 focus:outline-none"
           :class="open ? 'bg-[#6CE99E] text-neutral-950' : 'text-white'"
           >
-          <span>{{ selectedAccount.label }}: {{ formatCurrency(selectedAccount.balance) }}</span>
+          <span v-if="selectedAccount">
+            {{ selectedAccount.label }}
+          </span>
+          <span v-else>Select Evaluation</span>
           <i class="iconfont icon-down" :class="open ? 'rotate-180' : ''"></i>
         </MenuButton>
 
@@ -42,6 +45,9 @@
             class="absolute right-0 z-[9999] mt-2 w-[280px] origin-top-right bg-[#272727] border border-[#373737] shadow-[0px_4px_8px_0px_rgba(0,2,10,0.25)] focus:outline-none"
           >
               <div class="flex flex-col py-3">
+                <div v-if="!accounts.length" class="px-4 py-3 text-sm text-gray-400">
+                  No evaluation accounts
+                </div>
                 <MenuItem
                   v-for="account in accounts"
                   :key="account.id"
@@ -51,14 +57,14 @@
                     @click="selectAccount(account)"
                     :class="[
                       'flex items-center gap-[10px] px-2 py-2.5 w-full text-left transition-colors ',
-                      account.id === selectedAccount.id ? 'text-gray-400 opacity-50' : 'text-gray-400',
-                      account.id !== selectedAccount.id && active ? 'bg-[#373737] !text-white' : ''
+                      account.id === selectedEvaluationId ? 'text-gray-400 opacity-50' : 'text-gray-400',
+                      account.id !== selectedEvaluationId && active ? 'bg-[#373737] !text-white' : ''
                     ]"
                   >
                     <span
                       class="text-[14px] font-medium leading-[20px]"
                     >
-                      {{ account.label }}: {{ formatCurrency(account.balance) }}
+                      {{ account.label }}
                     </span>
                   </button>
                 </MenuItem>
@@ -126,10 +132,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useChainId, useSwitchChain } from '@wagmi/vue'
+import { computed, ref, watch } from 'vue'
+import { useConnection, useChainId, useSwitchChain } from '@wagmi/vue'
 import { arbitrum, bsc, optimism } from '@wagmi/vue/chains'
-import { formatCurrency } from '@/utils/bigint'
+import { toBigInt } from '@/utils/bigint'
+import { formatNumber, getAccountTypeLabel } from '@/utils/common'
+import { useUserEvaluationsStorage } from '@/storages/heroPath'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 import ArbitrumIcon from '@/assets/img/arbitrum.svg'
 import BSCIcon from '@/assets/img/BSC.svg'
@@ -142,34 +150,52 @@ interface Account {
   balance: bigint
 }
 
-// Mock accounts data - replace with actual data from store/API
-const accounts = ref<Account[]>([
-  {
-    id: 'training-1',
-    label: 'Training Account 1',
-    balance: BigInt(5000) * BigInt(10 ** 18),
-  },
-  {
-    id: 'evaluation-1',
-    label: 'Evaluation Account 1',
-    balance: BigInt(5000) * BigInt(10 ** 18),
-  },
-  {
-    id: 'evaluation-2',
-    label: 'Evaluation Account 2',
-    balance: BigInt(10000) * BigInt(10 ** 18),
-  },
-  {
-    id: 'funded-1',
-    label: 'Funded Account 1',
-    balance: BigInt(5000) * BigInt(10 ** 18),
-  },
-])
+const { address } = useConnection()
+const { data: evaluations } = useUserEvaluationsStorage(address)
 
-const selectedAccount = ref<Account>(accounts.value[0])
+// Filter evaluations that should be shown (same logic as Dashboard)
+const evaluationList = computed(() => {
+  return evaluations.value?.filter((item) => item.displayStatus.showDrawdown) || []
+})
+
+// Convert evaluations to Account format
+const accounts = computed<Account[]>(() => {
+  return evaluationList.value.map((evaluation) => {
+    const accountSize = evaluation.evaluationConfig.accountSize
+    const label = `${getAccountTypeLabel(evaluation.accountType)} #${evaluation.accountId}: $${formatNumber(accountSize, 0)}`
+    return {
+      id: evaluation.accountId,
+      label,
+      balance: toBigInt(accountSize),
+    }
+  })
+})
+
+const selectedEvaluationId = ref<string | null>(null)
+const selectedAccount = computed<Account | null>(() => {
+  if (!selectedEvaluationId.value) {
+    return accounts.value[0] || null
+  }
+  return accounts.value.find((account) => account.id === selectedEvaluationId.value) || accounts.value[0] || null
+})
+
+// Watch for changes in evaluation list and auto-select first one
+watch(
+  evaluationList,
+  (list) => {
+    if (!list.length) {
+      selectedEvaluationId.value = null
+      return
+    }
+    if (!selectedEvaluationId.value || !list.some((item) => item.accountId === selectedEvaluationId.value)) {
+      selectedEvaluationId.value = list[0].accountId
+    }
+  },
+  { immediate: true },
+)
 
 function selectAccount(account: Account) {
-  selectedAccount.value = account
+  selectedEvaluationId.value = account.id
   // TODO: Update store/API with selected account
 }
 
