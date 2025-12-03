@@ -5,6 +5,7 @@ import { useUserEvaluationsStorage } from '@/storages/heroPath'
 import { computed, ref, watch } from 'vue'
 import { useDayCountDown } from '@/use/useDayCountDown'
 import BaseIcon from '@/components/BaseIcon.vue'
+import router, { ROUTE_NAMES } from '@/router'
 
 const { remainingText: dayCountDown } = useDayCountDown()
 
@@ -218,6 +219,11 @@ watch(
         <button
           type="button"
           class="flex items-center w-full justify-center bg-[var(--hp-primary-green)] h-[52px] py-2.5 text-[var(--hp-black-color)] text-[16px] font-[500] transition hover:bg-[var(--hp-primary-green-hover)] active:bg-[var(--hp-primary-green-hover)]"
+          @click="
+            () => {
+              router.push({ name: ROUTE_NAMES.Trade })
+            }
+          "
         >
           Open Trading Terminal
         </button>

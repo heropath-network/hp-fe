@@ -5,8 +5,9 @@ import { HpDialog, LoadingIcon } from '@/components'
 import { useConnectors, useChainId, useConnect, useConnection } from '@wagmi/vue'
 import MetaMaskIcon from '@/assets/icons/wallet/MetaMask.svg'
 import WalletConnectIcon from '@/assets/icons/wallet/WalletConnect.svg'
-import TokenPocketIcon from '@/assets/icons/wallet/TokenPocket.svg'
+import TrustWalletIcon from '@/assets/icons/wallet/TrustWallet.svg'
 import BinanceWalletIcon from '@/assets/icons/wallet/BinanceWallet.svg'
+import EmailIcon from '@/assets/icons/wallet/Email.svg'
 
 const emits = defineEmits<{
   (e: 'close'): void
@@ -29,6 +30,13 @@ type WalletItem = {
 
 const wallets = computed<WalletItem[]>(() => [
   {
+    name: 'Trust Wallet',
+    connector: connectors.value.find((c) => c.name === 'Trust Wallet'),
+    icon: TrustWalletIcon,
+    firstCloseDialog: false,
+    disabled: false,
+  },
+  {
     name: 'MetaMask',
     connector:
       connectors.value.find((c) => c.name === 'MetaMask') || connectors.value.find((c) => c.name === 'Injected'),
@@ -41,13 +49,6 @@ const wallets = computed<WalletItem[]>(() => [
     connector: connectors.value.find((c) => c.name === 'WalletConnect'),
     icon: WalletConnectIcon,
     firstCloseDialog: true,
-    disabled: false,
-  },
-  {
-    name: 'Token Pocket',
-    connector: connectors.value.find((c) => c.name === 'TokenPocket'),
-    icon: TokenPocketIcon,
-    firstCloseDialog: false,
     disabled: false,
   },
   {
@@ -118,6 +119,15 @@ tryOnMounted(() => {
               <div class="inline-block h-2 w-2 rounded-full bg-[var(--hp-text-green)]"></div>
             </template>
           </span>
+        </div>
+        <div class="h-[1px] my-4 w-full bg-[var(--hp-line-light-color)]"></div>
+        <div
+          class="flex justify-between items-center cursor-pointer h-[52px] px-[16px] py-[10px] bg-[var(--hp-bg-light)] border-[1px] border-[var(--hp-bg-light)] hover:border-[var(--hp-primary-green)] mt-2 first:mt-0"
+        >
+          <div class="flex items-center">
+            <img class="w-8 h-8 mr-3" :src="EmailIcon" alt="Email Login in" />
+            <span class="text-[16px] leading-6 font-semibold text-[var(--hp-white-color)]">Email Login In</span>
+          </div>
         </div>
       </div>
     </template>
