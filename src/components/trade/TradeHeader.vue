@@ -119,30 +119,22 @@
       <!-- Divider -->
       <div class="h-5 w-px bg-[#272727]"></div>
 
-      <!-- Wallet Address -->
-      <div class="flex items-center gap-1 px-2 py-1.5">
-        <div class="flex items-center justify-center shrink-0">
-          <Avatar :address="walletAddress" :size="20" />
-        </div>
-        <span class="text-[14px] font-medium leading-[20px] text-[#9b9b9b]">
-          {{ ellipsisMiddle(walletAddress) }}
-        </span>
-      </div>
+      <!-- Wallet Connect Button -->
+      <ConnectWalletButton />
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useConnection, useChainId, useSwitchChain } from '@wagmi/vue'
+import { useChainId, useSwitchChain } from '@wagmi/vue'
 import { arbitrum, bsc, optimism } from '@wagmi/vue/chains'
 import { formatCurrency } from '@/utils/bigint'
-import { ellipsisMiddle } from '@/utils/common'
-import Avatar from '@/components/Wallet/Avatar.vue'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 import ArbitrumIcon from '@/assets/img/arbitrum.svg'
 import BSCIcon from '@/assets/img/BSC.svg'
 import OptimismIcon from '@/assets/img/optimism.svg'
+import ConnectWalletButton from '@/views/Header/ConnectWalletButton.vue'
 
 interface Account {
   id: string
@@ -181,8 +173,6 @@ function selectAccount(account: Account) {
   // TODO: Update store/API with selected account
 }
 
-const { address } = useConnection()
-const walletAddress = computed(() => address.value || '0x0000000000000000000000000000000000000000')
 
 // Chain selector logic
 interface Chain {
