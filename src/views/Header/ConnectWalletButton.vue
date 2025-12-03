@@ -1,35 +1,30 @@
 <script lang="ts" setup>
-import { ref } from "vue";
-import { useConnection } from "@wagmi/vue";
-import Avatar from "@/components/Wallet/Avatar.vue";
-import { ellipsisMiddle } from "@/utils/common";
-import ConnectedWalletInfoDialog from "./ConnectedWalletInfoDialog.vue";
-import emitter from "@/event";
-import { WALLET_EVENTS } from "@/event/walletEvent";
+import { ref } from 'vue'
+import { useConnection } from '@wagmi/vue'
+import Avatar from '@/components/Wallet/Avatar.vue'
+import { ellipsisMiddle } from '@/utils/common'
+import ConnectedWalletInfoDialog from './ConnectedWalletInfoDialog.vue'
+import emitter from '@/event'
+import { WALLET_EVENTS } from '@/event/walletEvent'
 
 const emits = defineEmits<{
-  (e: "close"): void;
-}>();
+  (e: 'close'): void
+}>()
 
-const showInfoDialog = ref(false);
+const showInfoDialog = ref(false)
 
-const { address, isConnected } = useConnection();
+const { address, isConnected } = useConnection()
 
 const showConnectWalletInfoDialog = () => {
-  emitter.emit(WALLET_EVENTS.SHOW_WALLET_CONNECTOR_MODAL);
-};
+  emitter.emit(WALLET_EVENTS.SHOW_WALLET_CONNECTOR_MODAL)
+}
 </script>
 
 <template>
   <template v-if="isConnected">
-    <div
-      class="flex items-center cursor-pointer group gap-1"
-      @click="showInfoDialog = true"
-    >
+    <div class="flex items-center cursor-pointer group gap-1" @click="showInfoDialog = true">
       <Avatar :address="address" :size="20" />
-      <span
-        class="mx-1 text-sm text-[var(--hp-text-color)] group-hover:text-[var(--hp-primary-green)]"
-      >
+      <span class="mx-1 text-sm text-[var(--hp-text-color)] group-hover:text-[var(--hp-primary-green)]">
         {{ ellipsisMiddle(address) }}
       </span>
     </div>
@@ -43,8 +38,5 @@ const showConnectWalletInfoDialog = () => {
       Connect Wallet
     </button>
   </template>
-  <ConnectedWalletInfoDialog
-    v-if="showInfoDialog"
-    @close="showInfoDialog = false"
-  />
+  <ConnectedWalletInfoDialog v-if="showInfoDialog" @close="showInfoDialog = false" />
 </template>
