@@ -98,7 +98,7 @@ const tradeStore = useTradeStore()
 
 function getMarkPrice(market: string): string {
   const price = tradeStore.marketPrices[market]?.price
-  return price ? fromBigInt(price, 2) : '0.00'
+  return price ? formatNumber(BigInt(price), 2) : '0.00'
 }
 
 function getTimeframe(): string {
