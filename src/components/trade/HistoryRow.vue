@@ -101,7 +101,7 @@
 <script setup lang="ts">
 import { useTradeStore } from '@/stores/tradeStore'
 import { formatNumber, formatCurrency, formatPercentage } from '@/utils/bigint'
-import type { TradeHistory } from '@/stores/tradeStore'
+import type { TradeHistory } from '@/storages/trading'
 import MarketIcon from '@/components/common/MarketIcon.vue'
 import ChainLabel from '@/components/common/ChainLabel.vue'
 

@@ -86,7 +86,7 @@
 <script setup lang="ts">
 import { useTradeStore } from '@/stores/tradeStore'
 import { formatNumber, fromBigInt } from '@/utils/bigint'
-import type { Order } from '@/stores/tradeStore'
+import type { Order } from '@/storages/trading'
 import MarketIcon from '@/components/common/MarketIcon.vue'
 import ChainLabel from '@/components/common/ChainLabel.vue'
 
