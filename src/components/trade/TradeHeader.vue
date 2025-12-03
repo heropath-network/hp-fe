@@ -13,7 +13,7 @@
         <button
           class="flex items-center justify-center h-[32px] px-4 py-3 text-[14px] font-semibold leading-[20px] text-white"
         >
-          Trade
+          Evaluation Mode
         </button>
       </div>
     </div>
