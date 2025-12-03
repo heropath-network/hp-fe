@@ -95,7 +95,7 @@ async function handleWithdraw() {
 </script>
 
 <template>
-  <section class="mx-auto mt-4 flex w-full max-w-[1160px] flex-col gap-10 px-4 text-[var(--hp-white-color)] sm:px-6">
+  <section class="mt-4 flex flex-col gap-10 text-[var(--hp-white-color)]">
     <h1 class="text-2xl font-semibold leading-8">Payouts</h1>
 
     <div class="flex flex-col gap-6 bg-[var(--hp-bg-normal)] p-6">

@@ -239,7 +239,7 @@ async function handlePurchase() {
 </script>
 
 <template>
-  <section class="min-h-screen bg-[var(--hp-bg-dark)] text-[var(--hp-white-color)] px-4 pb-12 pt-10">
+  <section class="min-h-screen bg-[var(--hp-bg-dark)] text-[var(--hp-white-color)] pb-12 pt-10">
     <div class="mx-auto flex w-full max-w-[720px] items-center gap-3">
       <button
         type="button"
