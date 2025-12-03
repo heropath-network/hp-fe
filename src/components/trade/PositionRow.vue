@@ -89,7 +89,7 @@
         <div
           :class="[
             'text-[13px] leading-[18px] font-normal',
-            getPositionPnL() >= 0 ? 'text-white' : 'text-[#ff4e59]'
+            getPositionPnL() >= 0 ? 'text-green-success' : 'text-red-error'
           ]"
           :title="`Gross PnL: ${formatCurrency(pnlBreakdown.grossPnl)}\nFees: ${formatCurrency(pnlBreakdown.totalFees)}\nNet PnL: ${formatCurrency(pnlBreakdown.netPnl)}`"
         >
@@ -98,7 +98,7 @@
         <div
           :class="[
             'text-[13px] leading-[18px] font-normal',
-            getPositionPnLPercent() >= 0 ? 'text-white' : 'text-[#9b9b9b]'
+            getPositionPnLPercent() >= 0 ? 'text-green-success' : 'text-red-error'
           ]"
         >
           {{ formatPnLPercentage(getPositionPnLPercent()) }}
@@ -153,10 +153,14 @@ function getPositionSizeUSD(): string {
 // Calculate comprehensive PnL with fees
 const pnlBreakdown = computed(() => {
   const currentPrice = tradeStore.marketPrices[props.position.market]?.price || props.position.entryPrice
+  
+  // Ensure side is correctly passed - it should be 'long' or 'short'
+  const side = props.position.side === 'short' ? 'short' : 'long'
+  
   return calculatePositionPnL(
     props.position.entryPrice,
     currentPrice,
-    props.position.side,
+    side,
     props.position.size,
     props.position.leverage,
     props.position.collateral,

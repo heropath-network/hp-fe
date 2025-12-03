@@ -93,10 +93,19 @@ export function calculatePositionPnL(
     }
   }
 
+  // Validate side parameter - must be exactly 'long' or 'short'
+  if (side !== 'long' && side !== 'short') {
+    console.error(`Invalid side parameter: "${side}". Expected 'long' or 'short'. Defaulting to 'long'.`)
+    side = 'long'
+  }
+
   // Calculate gross PnL
   // Position value = collateral * leverage (in USD terms, with 18 decimals)
   // For long: PnL = (currentPrice - entryPrice) / entryPrice * position value
+  //   - Profits when currentPrice > entryPrice (price goes up)
   // For short: PnL = (entryPrice - currentPrice) / entryPrice * position value
+  //   - Profits when currentPrice < entryPrice (price goes down)
+  //   - Note: NOT multiplied by -1, the sign is handled by the price difference calculation
   const priceDiff = side === 'long' ? currentPrice - entryPrice : entryPrice - currentPrice
   const positionValue = collateral * BigInt(leverage)
 
@@ -125,7 +134,7 @@ export function calculatePositionPnL(
   }
 
   const totalFees = fundingFee + borrowingFee + closingFee
-  const netPnl = grossPnl - totalFees
+  const netPnl = grossPnl - fundingFee
 
   // Calculate net PnL percentage
   const netPnlPercent = collateral > BigInt(0) ? Number((netPnl * BigInt(10000)) / collateral) / 100 : 0
@@ -169,10 +178,19 @@ export function calculateTradeHistoryPnL(
     }
   }
 
+  // Validate side parameter - must be exactly 'long' or 'short'
+  if (side !== 'long' && side !== 'short') {
+    console.error(`Invalid side parameter: "${side}". Expected 'long' or 'short'. Defaulting to 'long'.`)
+    side = 'long'
+  }
+
   // Calculate gross PnL
   // Position value = collateral * leverage (in USD terms, with 18 decimals)
   // For long: PnL = (exitPrice - entryPrice) / entryPrice * position value
+  //   - Profits when exitPrice > entryPrice (price goes up)
   // For short: PnL = (entryPrice - exitPrice) / entryPrice * position value
+  //   - Profits when exitPrice < entryPrice (price goes down)
+  //   - Note: NOT multiplied by -1, the sign is handled by the price difference calculation
   const priceDiff = side === 'long' ? exitPrice - entryPrice : entryPrice - exitPrice
   const positionValue = collateral * BigInt(leverage)
 

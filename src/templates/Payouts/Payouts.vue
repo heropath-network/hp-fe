@@ -77,6 +77,9 @@ async function handleWithdraw() {
 
   try {
     withdrawing.value = true
+    // Convert amount to BigInt - viem accepts BigInt for uint256 types
+    // USDC has 6 decimals, so multiply by 1e6
+    const amountBigInt = BigInt(Math.floor(numeric * 1e6))
     await signTypedDataAsync({
       types: {
         Person: [{ name: 'wallet', type: 'address' }],
@@ -94,9 +97,9 @@ async function handleWithdraw() {
         },
         token: TOKEN_SYMBOL,
         address: USDC_TOKEN_ADDRESS,
-        amount: BigInt(numeric),
+        amount: amountBigInt,
       },
-    })
+    } as any)
     addWithdrawalHistory(historyData)
     updateWithdrawnAmount(payoutsInfo.value.withdrawnAmount + numeric)
     amount.value = ''

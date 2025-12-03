@@ -59,7 +59,7 @@
         <div
           :class="[
             'text-[13px] leading-[18px] font-normal',
-            pnlBreakdown.netPnl >= 0 ? 'text-white' : 'text-[#ff4e59]'
+            pnlBreakdown.netPnl >= 0 ? 'text-green-success' : 'text-red-error'
           ]"
           :title="`Gross PnL: ${formatCurrency(pnlBreakdown.grossPnl)}\nFees: ${formatCurrency(pnlBreakdown.totalFees)}\nNet PnL: ${formatCurrency(pnlBreakdown.netPnl)}`"
         >
@@ -68,7 +68,7 @@
         <div
           :class="[
             'text-[13px] leading-[18px] font-normal',
-            getPnLPercent() >= 0 ? 'text-white' : 'text-[#9b9b9b]'
+            getPnLPercent() >= 0 ? 'text-green-success' : 'text-red-error'
           ]"
         >
           {{ formatPnLPercentage(getPnLPercent()) }}
