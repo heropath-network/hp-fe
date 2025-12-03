@@ -56,6 +56,8 @@ export function getAccountTypeLabel(type: string) {
       return 'Funded'
     case 'evaluation':
       return 'Evaluation'
+    case 'trading':
+      return 'Trading'
     default:
       return 'Unknown'
   }

@@ -6,16 +6,26 @@ import { computed, ref, watch } from 'vue'
 import { useDayCountDown } from '@/use/useDayCountDown'
 import BaseIcon from '@/components/BaseIcon.vue'
 import router, { ROUTE_NAMES } from '@/router'
+import { useUserTradeHistoryStorage } from '@/storages/trading'
+import { getAccountHistoryPnl, getAccountTotalVolume } from '@/use/evaluation'
 
 const { remainingText: dayCountDown } = useDayCountDown()
 
 const { address, isConnected } = useConnection()
 const { data: evaluations } = useUserEvaluationsStorage(address)
+const { data: allTradeHistory } = useUserTradeHistoryStorage(address)
 
 const selectedEvaluationId = ref<string | null>(null)
 const selectedEvaluation = computed(
   () => evaluations.value?.find((evaluation) => evaluation.accountId === selectedEvaluationId.value) || null,
 )
+
+const accountTradeHistory = computed(() => {
+  if (!selectedEvaluation.value) {
+    return []
+  }
+  return allTradeHistory.value.filter((trade) => trade.accountId === selectedEvaluation.value!.accountId)
+})
 
 const evaluationList = computed(() => {
   return evaluations.value.filter((item) => item.displayStatus.showDrawdown)
@@ -46,15 +56,14 @@ const accountSize = computed(() => {
 })
 
 const pnl = computed(() => {
-  // TODO
-  return 0
+  return Number(getAccountHistoryPnl(accountTradeHistory.value))
 })
 
 const accountBalance = computed(() => {
   if (!selectedEvaluation.value) {
     return 0
   }
-  return selectedEvaluation.value.evaluationConfig.accountSize + pnl.value
+  return accountSize.value + pnl.value
 })
 
 const priorDayBalance = computed(() => {
@@ -65,8 +74,7 @@ const priorDayBalance = computed(() => {
 })
 
 const totalVolume = computed(() => {
-  // TODO
-  return 0
+  return Number(getAccountTotalVolume(accountTradeHistory.value))
 })
 
 const targetEquity = computed(() => {

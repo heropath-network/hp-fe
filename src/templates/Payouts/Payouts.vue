@@ -2,21 +2,25 @@
 import { ellipsisMiddle, formatDate, formatNumber, getWithdrawalStatusLabel } from '@/utils/common'
 import { computed, ref } from 'vue'
 import { useConnection, useSignTypedData } from '@wagmi/vue'
-import { useUserPayoutsStorage, useUserWithdrawalHistoryStorage } from '@/storages/heroPath'
+import { useUserPayoutsStorage, useUserWithdrawalHistoryStorage, useUserEvaluationsStorage } from '@/storages/heroPath'
 import { LoadingIcon } from '@/components'
 import { UserWithdrawalHistory } from '@/types/heroPath'
+import { useUserTradeHistoryStorage } from '@/storages/trading'
+import { getAccountHistoryPnl } from '@/use/evaluation'
 
-const MIN_WITHDRAWAL_AMOUNT = 50
 const USDC_TOKEN_ADDRESS = '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d'
 const TOKEN_SYMBOL = 'USDC'
 const PAYOUT_NETWORK = 'BEP20'
+const SHARE_OF_PROFIT = 0.9
 
 const { isConnected, address } = useConnection()
 const { signTypedDataAsync } = useSignTypedData()
 const withdrawing = ref(false)
 
+const { data: evaluations } = useUserEvaluationsStorage(address)
 const { data: payoutsInfo, updateWithdrawnAmount } = useUserPayoutsStorage(address)
 const { data: withdrawalHistory, addWithdrawalHistory } = useUserWithdrawalHistoryStorage(address)
+const { data: allTradeHistory } = useUserTradeHistoryStorage(address)
 
 const amount = ref('')
 
@@ -31,9 +35,19 @@ function handleAmountInput(event: Event) {
   amount.value = value
 }
 
+const fundedTradeHistory = computed(() => {
+  const fundedAccountIds = evaluations.value
+    .filter((item) => item.accountType === 'funded')
+    .map((item) => item.accountId)
+  return allTradeHistory.value.filter((trade) => fundedAccountIds.includes(trade.accountId))
+})
+
+const totalPnl = computed(() => {
+  return Number(getAccountHistoryPnl(fundedTradeHistory.value)) * SHARE_OF_PROFIT
+})
+
 const profitAvailable = computed(() => {
-  // TODO
-  return 100000
+  return totalPnl.value - payoutsInfo.value.withdrawnAmount
 })
 
 const totalAccountProfit = computed(() => {
@@ -42,7 +56,7 @@ const totalAccountProfit = computed(() => {
 
 const isValidAmount = computed(() => {
   const numeric = parseFloat(amount.value)
-  return !Number.isNaN(numeric) && numeric >= MIN_WITHDRAWAL_AMOUNT && numeric <= profitAvailable.value
+  return !Number.isNaN(numeric) && numeric <= profitAvailable.value
 })
 
 const confirmIsDisabled = computed(() => {
