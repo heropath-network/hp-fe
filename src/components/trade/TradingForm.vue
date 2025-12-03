@@ -128,12 +128,15 @@
                   placeholder="0.0"
                 />
               </div>
-              <div class="flex items-center gap-1 justify-end">
+              <button
+                @click="showMarketSelect = true"
+                class="flex items-center gap-1 justify-end cursor-pointer hover:opacity-80 transition"
+              >
                 <span class="text-[16px] leading-[24px] text-white font-medium text-right">{{ selectedMarket.split('/')[0] }}</span>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M4 6L8 10L12 6" stroke="#9b9b9b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-              </div>
+              </button>
             </div>
           </div>
 
@@ -430,6 +433,7 @@
       @close="showLiquiditySourcesDialog = false"
       @toggle="handleLiquiditySourceToggle"
     />
+    <MarketSelect :show="showMarketSelect" @close="showMarketSelect = false" />
   </div>
 </template>
 
@@ -443,6 +447,7 @@ import { toBigInt, fromBigInt } from '@/utils/bigint'
 import { formatCurrency } from '@/utils/bigint'
 import MarginModeDialog from '@/components/trade/MarginModeDialog.vue'
 import LiquiditySourcesDialog from '@/components/trade/LiquiditySourcesDialog.vue'
+import MarketSelect from '@/components/trade/MarketSelect.vue'
 import SourceLiquidityLabel from '@/components/common/SourceLiquidityLabel.vue'
 import Tooltip from '@/components/common/Tooltip.vue'
 import { LoadingIcon } from '@/components'
@@ -478,6 +483,7 @@ const sizePercentage = ref(0)
 const leverage = ref(10)
 const showMarginModeDialog = ref(false)
 const showLiquiditySourcesDialog = ref(false)
+const showMarketSelect = ref(false)
 const showOrderTypeMenu = ref(false)
 const takeProfitStopLoss = ref(false)
 const takeProfit = ref('')
