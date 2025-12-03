@@ -23,6 +23,12 @@ const planTabs = [
   { label: 'Legend Plan', value: EvaluationPlan.LegendPlan },
 ]
 
+const PayMethod = [
+  { label: 'Crypto', value: 'Crypto' },
+  { label: 'Binance Pay', value: 'BinancePay' },
+  { label: 'Credit Card', value: 'CreditCard' },
+]
+
 const { signTypedDataAsync } = useSignTypedData()
 const { isConnected, address } = useConnection()
 
@@ -39,7 +45,9 @@ const activePlan = ref<EvaluationPlan>(EvaluationPlan.ChampionPlan)
 const selectedAccountIndex = ref(0)
 const showAccountDropdown = ref(false)
 const showTokenDropdown = ref(false)
+const showPayMethodDropdown = ref(false)
 const selectedToken = ref(paymentTokens[0])
+const selectedPayMethod = ref(PayMethod[0])
 const profitSplitChecked = ref(false)
 const affiliateChecked = ref(false)
 const affiliateCode = ref('')
@@ -93,12 +101,10 @@ function selectToken(token: (typeof paymentTokens)[number]) {
   showTokenDropdown.value = false
 }
 
-// function toggleStep(step: EvaluationSteps) {
-//   activeStep.value = step
-//   if (step === EvaluationSteps.Step2) {
-//     activePlan.value = EvaluationPlan.Classic
-//   }
-// }
+function selectPayMethod(method: (typeof PayMethod)[number]) {
+  selectedPayMethod.value = method
+  showPayMethodDropdown.value = false
+}
 
 function initFromQuery() {
   const { plan, level } = route.query
@@ -296,59 +302,106 @@ async function handlePurchase() {
           </div>
 
           <!-- Payment -->
-          <div class="space-y-2 border border-[var(--hp-line-light-color)] p-4">
-            <div class="flex items-center justify-between text-sm text-[var(--hp-text-color)]">
-              <span>Pay <span class="text-[var(--hp-primary-green)]">*</span></span>
-              <span>
-                Balance:
-                {{
-                  Number(selectedToken.balance ?? 0).toLocaleString(undefined, {
-                    minimumFractionDigits: Number(selectedToken.formatDecimals ?? 0),
-                    maximumFractionDigits: Number(selectedToken.formatDecimals ?? 0),
-                  })
-                }}
-              </span>
-            </div>
-            <div class="relative">
-              <button
-                type="button"
-                class="flex w-full items-center justify-between text-lg font-semibold group"
-                @click="showTokenDropdown = !showTokenDropdown"
-              >
-                <div class="flex items-center gap-2">
-                  <img class="h-[22px] w-[22px]" :src="requireSymbolIcon(selectedToken.symbol)" />
-                  <span>{{ selectedToken.symbol }}</span>
-                </div>
-                <BaseIcon
-                  name="downArrow"
-                  size="12"
-                  class="text-[var(--hp-text-color)] transition-transform duration-200 group-hover:text-[var(--hp-primary-green)]"
-                  :class="showTokenDropdown ? 'rotate-180' : ''"
-                />
-              </button>
-
-              <!-- backdrop to capture outside clicks and close the dropdown -->
-              <div v-if="showTokenDropdown" class="fixed inset-0 z-10" @click="showTokenDropdown = false" />
-
-              <div
-                v-if="showTokenDropdown"
-                class="absolute left-[-17px] top-[42px] z-20 mt-2 w-[calc(100%+34px)] overflow-hidden border border-[var(--hp-line-light-color)] bg-[var(--hp-bg-light)]"
-              >
+          <div class="flex justify-between">
+            <div class="border border-[var(--hp-line-light-color)] p-4 w-[calc(50%-6px)]">
+              <div class="flex items-center justify-between text-sm text-[var(--hp-text-color)]">
+                <span>Pay Method <span class="text-[var(--hp-primary-green)]">*</span></span>
+              </div>
+              <div class="relative">
                 <button
-                  v-for="token in paymentTokens"
-                  :key="token.symbol"
                   type="button"
-                  class="flex w-full items-center justify-between px-4 py-3 text-left transition hover:bg-[var(--hp-line-light-color)]"
-                  @click="selectToken(token)"
+                  class="flex w-full items-center justify-between text-lg font-semibold group"
+                  @click="showPayMethodDropdown = !showPayMethodDropdown"
                 >
-                  <div
-                    class="flex items-center gap-2"
-                    :class="[selectedToken.symbol === token.symbol ? 'opacity-60' : '']"
-                  >
-                    <img class="h-[22px] w-[22px]" :src="requireSymbolIcon(token.symbol)" />
-                    <span class="text-base font-semibold text-[var(--hp-white-color)]">{{ token.symbol }}</span>
+                  <div class="flex items-center gap-2">
+                    <span>{{ selectedPayMethod.label }}</span>
                   </div>
+                  <BaseIcon
+                    name="downArrow"
+                    size="12"
+                    class="text-[var(--hp-text-color)] transition-transform duration-200 group-hover:text-[var(--hp-primary-green)]"
+                    :class="showPayMethodDropdown ? 'rotate-180' : ''"
+                  />
                 </button>
+
+                <!-- backdrop to capture outside clicks and close the dropdown -->
+                <div v-if="showPayMethodDropdown" class="fixed inset-0 z-10" @click="showPayMethodDropdown = false" />
+
+                <div
+                  v-if="showPayMethodDropdown"
+                  class="absolute left-[-17px] top-[42px] z-20 mt-2 w-[calc(100%+34px)] overflow-hidden border border-[var(--hp-line-light-color)] bg-[var(--hp-bg-light)]"
+                >
+                  <button
+                    v-for="method in PayMethod"
+                    :key="method.value"
+                    type="button"
+                    class="flex w-full items-center justify-between px-4 py-3 text-left transition hover:bg-[var(--hp-line-light-color)]"
+                    @click="selectPayMethod(method)"
+                  >
+                    <div
+                      class="flex items-center gap-2"
+                      :class="[selectedPayMethod.value === method.value ? 'opacity-60' : '']"
+                    >
+                      <span class="text-base font-semibold text-[var(--hp-white-color)]">{{ method.label }}</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="border border-[var(--hp-line-light-color)] p-4 w-[calc(50%-6px)]">
+              <div class="flex items-center justify-between text-sm text-[var(--hp-text-color)]">
+                <span>Pay <span class="text-[var(--hp-primary-green)]">*</span></span>
+                <span>
+                  Balance:
+                  {{
+                    Number(selectedToken.balance ?? 0).toLocaleString(undefined, {
+                      minimumFractionDigits: Number(selectedToken.formatDecimals ?? 0),
+                      maximumFractionDigits: Number(selectedToken.formatDecimals ?? 0),
+                    })
+                  }}
+                </span>
+              </div>
+              <div class="relative">
+                <button
+                  type="button"
+                  class="flex w-full items-center justify-between text-lg font-semibold group"
+                  @click="showTokenDropdown = !showTokenDropdown"
+                >
+                  <div class="flex items-center gap-2">
+                    <img class="h-[22px] w-[22px]" :src="requireSymbolIcon(selectedToken.symbol)" />
+                    <span>{{ selectedToken.symbol }}</span>
+                  </div>
+                  <BaseIcon
+                    name="downArrow"
+                    size="12"
+                    class="text-[var(--hp-text-color)] transition-transform duration-200 group-hover:text-[var(--hp-primary-green)]"
+                    :class="showTokenDropdown ? 'rotate-180' : ''"
+                  />
+                </button>
+
+                <!-- backdrop to capture outside clicks and close the dropdown -->
+                <div v-if="showTokenDropdown" class="fixed inset-0 z-10" @click="showTokenDropdown = false" />
+
+                <div
+                  v-if="showTokenDropdown"
+                  class="absolute left-[-17px] top-[42px] z-20 mt-2 w-[calc(100%+34px)] overflow-hidden border border-[var(--hp-line-light-color)] bg-[var(--hp-bg-light)]"
+                >
+                  <button
+                    v-for="token in paymentTokens"
+                    :key="token.symbol"
+                    type="button"
+                    class="flex w-full items-center justify-between px-4 py-3 text-left transition hover:bg-[var(--hp-line-light-color)]"
+                    @click="selectToken(token)"
+                  >
+                    <div
+                      class="flex items-center gap-2"
+                      :class="[selectedToken.symbol === token.symbol ? 'opacity-60' : '']"
+                    >
+                      <img class="h-[22px] w-[22px]" :src="requireSymbolIcon(token.symbol)" />
+                      <span class="text-base font-semibold text-[var(--hp-white-color)]">{{ token.symbol }}</span>
+                    </div>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
