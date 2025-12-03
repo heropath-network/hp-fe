@@ -143,15 +143,13 @@
 import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useChainId, useSwitchChain } from '@wagmi/vue'
-import { arbitrum, bsc, optimism } from '@wagmi/vue/chains'
+import { bsc } from '@wagmi/vue/chains'
 import { toBigInt } from '@/utils/bigint'
 import { formatNumber, getAccountTypeLabel } from '@/utils/common'
 import { useEvaluationAccount } from '@/composables/useEvaluationAccount'
 import { useTradeStore } from '@/stores/tradeStore'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
-import ArbitrumIcon from '@/assets/img/arbitrum.svg'
 import BSCIcon from '@/assets/img/BSC.svg'
-import OptimismIcon from '@/assets/img/optimism.svg'
 import ConnectWalletButton from '@/views/Header/ConnectWalletButton.vue'
 import { ROUTE_NAMES } from '@/router'
 
@@ -230,16 +228,6 @@ const availableChains: Chain[] = [
     id: bsc.id,
     name: 'BNB Chain',
     icon: BSCIcon,
-  },
-  {
-    id: arbitrum.id,
-    name: 'Arbitrum',
-    icon: ArbitrumIcon,
-  },
-  {
-    id: optimism.id,
-    name: 'Optimism',
-    icon: OptimismIcon,
   },
 ]
 
