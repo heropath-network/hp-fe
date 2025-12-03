@@ -132,12 +132,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { useConnection, useChainId, useSwitchChain } from '@wagmi/vue'
+import { computed, watch } from 'vue'
+import { useChainId, useSwitchChain } from '@wagmi/vue'
 import { arbitrum, bsc, optimism } from '@wagmi/vue/chains'
 import { toBigInt } from '@/utils/bigint'
 import { formatNumber, getAccountTypeLabel } from '@/utils/common'
-import { useUserEvaluationsStorage } from '@/storages/heroPath'
+import { useEvaluationAccount } from '@/composables/useEvaluationAccount'
+import { useTradeStore } from '@/stores/tradeStore'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 import ArbitrumIcon from '@/assets/img/arbitrum.svg'
 import BSCIcon from '@/assets/img/BSC.svg'
@@ -150,13 +151,15 @@ interface Account {
   balance: bigint
 }
 
-const { address } = useConnection()
-const { data: evaluations } = useUserEvaluationsStorage(address)
+const tradeStore = useTradeStore()
 
-// Filter evaluations that should be shown (same logic as Dashboard)
-const evaluationList = computed(() => {
-  return evaluations.value?.filter((item) => item.displayStatus.showDrawdown) || []
-})
+// Use the shared composable for account balance logic
+const {
+  evaluationList,
+  selectedEvaluationId,
+  accountBalance,
+  selectEvaluation: selectEvaluationBase,
+} = useEvaluationAccount()
 
 // Convert evaluations to Account format
 const accounts = computed<Account[]>(() => {
@@ -171,7 +174,6 @@ const accounts = computed<Account[]>(() => {
   })
 })
 
-const selectedEvaluationId = ref<string | null>(null)
 const selectedAccount = computed<Account | null>(() => {
   if (!selectedEvaluationId.value) {
     return accounts.value[0] || null
@@ -179,24 +181,19 @@ const selectedAccount = computed<Account | null>(() => {
   return accounts.value.find((account) => account.id === selectedEvaluationId.value) || accounts.value[0] || null
 })
 
-// Watch for changes in evaluation list and auto-select first one
+// Update tradeStore accountBalance when selected evaluation changes
 watch(
-  evaluationList,
-  (list) => {
-    if (!list.length) {
-      selectedEvaluationId.value = null
-      return
-    }
-    if (!selectedEvaluationId.value || !list.some((item) => item.accountId === selectedEvaluationId.value)) {
-      selectedEvaluationId.value = list[0].accountId
+  accountBalance,
+  (balance) => {
+    if (balance > 0) {
+      tradeStore.accountBalance = toBigInt(balance)
     }
   },
   { immediate: true },
 )
 
 function selectAccount(account: Account) {
-  selectedEvaluationId.value = account.id
-  // TODO: Update store/API with selected account
+  selectEvaluationBase(account.id)
 }
 
 
