@@ -94,14 +94,14 @@ function initializeActiveItem() {
 }
 
 watch(
-    () => route.name,
-    (routeName) => {
-      if (routeName && routeName !== ROUTE_NAMES.Trade) {
-        initializeActiveItem();
-      }
-    },
-    { immediate: true }
-);
+  () => route.name,
+  (routeName) => {
+    if (routeName && routeName !== ROUTE_NAMES.Trade) {
+      initializeActiveItem()
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -127,7 +127,7 @@ watch(
           class="shrink-0 transition-colors"
           :class="
             item.id === activeItemId
-              ? 'text-[var(--hp-primary-green)]'
+              ? 'text-[var(--hp-primary-green)] stroke-[var(--hp-primary-green)]'
               : 'text-[var(--hp-text-color)] group-hover:text-[var(--hp-white-color)]'
           "
         />
