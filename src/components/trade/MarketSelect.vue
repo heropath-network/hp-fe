@@ -65,7 +65,7 @@
                   :active="selectedCategory === tag.value"
                   @click="selectedCategory = tag.value"
                 >
-                  {{ tag.label }} <span v-if="tag.label === 'All'">({{ tag.count }})</span>
+                  {{ tag.label }} <span>({{ tag.count }})</span>
                 </CategoryTag>
               </div>
             </div>
@@ -87,41 +87,15 @@
                   :class="[
                     selectedMarket === market
                       ? 'border-[#6ce99e]'
-                      : 'border-[#373737]'
+                      : 'border-transparent hover:border-[#373737]'
                   ]"
                 >
                   <button
                     @click.stop="toggleFavorite(market)"
                     class="flex-shrink-0 w-4 h-4 flex items-center justify-center transition-colors bg-transparent border-none cursor-pointer p-0"
                   >
-                    <svg
-                      v-if="isFavorite(market)"
-                      class="w-4 h-4"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8 1.5L9.545 5.818L14 6.318L10.5 9.182L11.09 13.682L8 11.682L4.91 13.682L5.5 9.182L2 6.318L6.455 5.818L8 1.5Z"
-                        fill="#FFB110"
-                        stroke="#FFB110"
-                        stroke-width="0.5"
-                      />
-                    </svg>
-                    <svg
-                      v-else
-                      class="w-4 h-4"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8 1.5L9.545 5.818L14 6.318L10.5 9.182L11.09 13.682L8 11.682L4.91 13.682L5.5 9.182L2 6.318L6.455 5.818L8 1.5Z"
-                        fill="none"
-                        stroke="#9b9b9b"
-                        stroke-width="1"
-                      />
-                    </svg>
+                    <i class="iconfont icon-mark" v-show="isFavorite(market)"></i>
+                    <i class="iconfont icon-mark-unselected" v-show="!isFavorite(market)"></i>
                   </button>
                   <MarketIcon :symbol="market" :size="32" />
                   <div class="flex flex-col items-start justify-center flex-1 min-w-0">
@@ -278,18 +252,21 @@ const sortedMarkets = computed(() => {
   }
   
   return markets.sort((a, b) => {
+    const aIsFavorite = isFavorite(a)
+    const bIsFavorite = isFavorite(b)
+    
+    // Favorites first
+    if (aIsFavorite && !bIsFavorite) return -1
+    if (!aIsFavorite && bIsFavorite) return 1
+    
+    // Then by category
     const aCategory = getCategoryOrder(a)
     const bCategory = getCategoryOrder(b)
-    
     if (aCategory !== bCategory) {
       return aCategory - bCategory
     }
     
-    const aIsFavorite = isFavorite(a)
-    const bIsFavorite = isFavorite(b)
-    if (aIsFavorite && !bIsFavorite) return -1
-    if (!aIsFavorite && bIsFavorite) return 1
-    
+    // Then alphabetically
     return a.localeCompare(b)
   })
 })
@@ -336,5 +313,21 @@ watch(() => props.show, (newValue) => {
 .scrollbar-thin:hover::-webkit-scrollbar-thumb {
   background: #373737;
   opacity: 1;
+}
+
+button .iconfont {
+  font-size: 16px;
+}
+
+button .iconfont.icon-mark {
+  color: #FFB110;
+}
+
+button .iconfont.icon-mark-unselected {
+  color: #9b9b9b;
+}
+
+button:hover .iconfont.icon-mark-unselected {
+  color: #FFB110;
 }
 </style>
