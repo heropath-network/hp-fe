@@ -17,6 +17,7 @@ import {
   type Order,
   type TradeHistory,
 } from '@/storages/trading'
+import { calculateTradeHistoryPnL, calculatePositionPnL } from '@/utils/pnl'
 
 export interface MarketPrice {
   symbol: string
@@ -135,11 +136,20 @@ export const useTradeStore = defineStore('trade', () => {
   const totalPnL = computed(() => {
     let totalPnL = BigInt(0)
     for (const pos of positions.value) {
+      // Get current market price for this position's market
       const currentPrice = marketPrices.value[pos.market]?.price || pos.entryPrice
-      const priceDiff = currentPrice - pos.entryPrice
-      const multiplier = pos.side === 'long' ? BigInt(1) : BigInt(-1)
-      const positionPnL = ((priceDiff * pos.size) / pos.entryPrice) * multiplier
-      totalPnL += positionPnL
+      // Use the same PnL calculation as PositionRow - this automatically updates when marketPrices change
+      const pnlBreakdown = calculatePositionPnL(
+        pos.entryPrice,
+        currentPrice,
+        pos.side,
+        pos.size,
+        pos.leverage,
+        pos.collateral,
+        pos.timestamp,
+        true, // Include fees
+      )
+      totalPnL += pnlBreakdown.netPnl
     }
     return totalPnL
   })
@@ -282,9 +292,19 @@ export const useTradeStore = defineStore('trade', () => {
     if (!position) return
 
     const currentPrice = marketPrices.value[position.market]?.price || position.entryPrice
-    const priceDiff = currentPrice - position.entryPrice
-    const multiplier = position.side === 'long' ? BigInt(1) : BigInt(-1)
-    const pnl = ((priceDiff * position.size) / position.entryPrice) * multiplier
+
+    // Calculate comprehensive PnL with fees
+    const pnlBreakdown = calculateTradeHistoryPnL(
+      position.entryPrice,
+      currentPrice,
+      position.side,
+      position.size,
+      position.leverage,
+      position.collateral,
+      position.timestamp,
+      Date.now(),
+      true, // Include fees
+    )
 
     const historyEntry: TradeHistory = {
       id: position.id,
@@ -294,7 +314,9 @@ export const useTradeStore = defineStore('trade', () => {
       size: position.size,
       entryPrice: position.entryPrice,
       exitPrice: currentPrice,
-      pnl,
+      pnl: pnlBreakdown.netPnl, // Store net PnL (after fees)
+      collateral: position.collateral,
+      leverage: position.leverage,
       timestamp: position.timestamp,
       closeTimestamp: Date.now(),
       chainId: position.chainId,
@@ -303,7 +325,8 @@ export const useTradeStore = defineStore('trade', () => {
     const allTradeHistory = [historyEntry, ...tradeHistoryStorage.data.value]
     tradeHistoryStorage.updateTradeHistory(allTradeHistory)
 
-    accountBalance.value += position.collateral + pnl
+    // Account balance update uses net PnL
+    accountBalance.value += position.collateral + pnlBreakdown.netPnl
 
     const updatedPositions = allPositions.filter((p) => p.id !== positionId)
     positionsStorage.updatePositions(updatedPositions)
