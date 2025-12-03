@@ -96,10 +96,6 @@ const maxDailyLossEquityLimit = computed(() => {
   return priorDayBalance.value * (1 - selectedEvaluation.value.evaluationConfig.maxDailyLoss / 100)
 })
 
-const highWaterMark = computed(() => {
-  return 0
-})
-
 const showEvaluationDropdown = ref(false)
 
 function selectEvaluation(id: string) {
@@ -244,12 +240,6 @@ watch(
         </article>
 
         <article class="relative flex h-[100px] flex-col justify-center gap-2 bg-[var(--hp-bg-light)] px-6 py-5">
-          <div
-            class="absolute left-0 top-0 rounded-sm bg-[var(--hp-line-light-color)] px-2 py-1 text-[12px] leading-4 text-[var(--hp-text-color)]"
-          >
-            High Water Mark: (<span class="text-[var(--hp-white-color)]">${{ formatNumber(highWaterMark, 2) }}</span
-            >)
-          </div>
           <div>
             <p class="text-xl font-semibold leading-7 text-[var(--hp-text-red)]">
               ${{ formatNumber(maxDrawdownEquityLimit, 2) }}
@@ -272,7 +262,7 @@ watch(
             <p class="text-xl font-semibold leading-7 text-[var(--hp-text-red)]">
               ${{ formatNumber(maxDailyLossEquityLimit, 2) }}
             </p>
-            <p class="text-sm leading-5 text-[var(--hp-text-color)]">Max.daily loss Equity Limit</p>
+            <p class="text-sm leading-5 text-[var(--hp-text-color)]">Max.Daily Loss Equity Limit</p>
           </div>
         </article>
       </div>
