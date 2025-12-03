@@ -131,8 +131,13 @@ function formatTimestamp(timestamp: number): string {
   return `${days}d ago`
 }
 
+/**
+ * Cancels an order and removes it from storage
+ * This automatically updates LocalStorage via tradeStore.cancelOrder()
+ */
 function cancelOrder(orderId: string) {
   if (confirm('Are you sure you want to cancel this order?')) {
+    // cancelOrder automatically updates storage via tradeStore
     tradeStore.cancelOrder(orderId)
   }
 }

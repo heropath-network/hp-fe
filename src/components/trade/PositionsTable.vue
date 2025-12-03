@@ -1,15 +1,6 @@
 <template>
   <div class="flex h-full flex-col bg-[var(--hp-bg-dark)]">
     <div class="overflow-x-auto">
-      <div class="flex items-center gap-2">
-        <button class="bg-gray-700 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-gray-600" @click="loadAllDemoData">
-         Load Demo Data
-        </button>
-
-        <button class="bg-gray-700 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-gray-600" @click="clearAllData">
-         Clear All Data
-        </button>
-      </div>
       <table class="w-full text-sm">
         <thead class="border-b border-gray-800">
           <tr class="text-xs text-gray-400">
@@ -50,12 +41,9 @@ import { computed } from 'vue'
 import { useTradeStore } from '@/stores/tradeStore'
 import PositionRow from './PositionRow.vue'
 import noDataIcon from '@/assets/img/no-data.svg'
-import { useDemoData } from '@/composables/useDemoData'
 
 const tradeStore = useTradeStore()
 
 const positions = computed(() => tradeStore.positions)
-
-const { loadAllDemoData, clearAllData } = useDemoData()
 </script>
 

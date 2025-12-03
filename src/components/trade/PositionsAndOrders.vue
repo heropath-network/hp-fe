@@ -95,6 +95,10 @@ function getTabCount(key: 'positions' | 'orders' | 'history'): number {
   return 0
 }
 
+/**
+ * Closes all positions and removes them from storage
+ * Each position is closed individually, calculating PnL and updating storage
+ */
 function closeAllPositions() {
   if (confirm('Are you sure you want to close all positions?')) {
     const positionIds = positions.value.map(p => p.id)
@@ -102,6 +106,10 @@ function closeAllPositions() {
   }
 }
 
+/**
+ * Cancels all orders and removes them from storage
+ * Each order is cancelled individually and removed from LocalStorage
+ */
 function cancelAllOrders() {
   if (confirm('Are you sure you want to cancel all orders?')) {
     const orderIds = orders.value.map(o => o.id)
