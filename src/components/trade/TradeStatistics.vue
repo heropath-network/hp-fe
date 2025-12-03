@@ -147,8 +147,34 @@
                   v-for="oracle in allOracleOptions"
                   :key="oracle.value"
                   v-slot="{ active }"
+                  :disabled="oracle.disabled"
                 >
+                  <Tooltip
+                    v-if="oracle.disabled"
+                    :content="`This oracle doesn't support ${selectedMarket}`"
+                  >
+                    <div class="w-full">
+                      <button
+                        @click.prevent
+                        :class="[
+                          oracle.value === selectedOracleName ? 'text-gray-300' : '',
+                          'opacity-50 cursor-not-allowed text-white',
+                          'group flex w-full items-center gap-2 px-4 py-2 text-sm transition'
+                        ]"
+                      >
+                        <div class="relative h-4 w-4 shrink-0">
+                          <img
+                            :src="getChartSourceIcon(oracle.label)"
+                            :alt="oracle.label"
+                            class="h-full w-full object-contain"
+                          />
+                        </div>
+                        {{ oracle.label }}
+                      </button>
+                    </div>
+                  </Tooltip>
                   <button
+                    v-else
                     @click="handleOracleSelect(oracle.value)"
                     :class="[
                       active ? 'bg-gray-800 text-gray-200' : '',
@@ -186,6 +212,8 @@ import MarketIcon from '@/components/common/MarketIcon.vue'
 import Tooltip from '@/components/common/Tooltip.vue'
 import SourceLiquidityLabel from '@/components/common/SourceLiquidityLabel.vue'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
+import { getAvailableOraclesForMarket } from '@/utils/oracleMatching'
+import { ProjectId, ORACLE_NAMES } from '@/constants'
 
 const tradeStore = useTradeStore()
 const marketStatus = useMarketStatus()
@@ -198,11 +226,15 @@ const oracleSources = computed(() => tradeStore.oracleSources)
 const selectedOracleName = computed(() => tradeStore.currentOracleName)
 
 const allOracleOptions = computed(() => {
+  const availableOracles = getAvailableOraclesForMarket(selectedMarket.value)
+  const availableOracleNames = availableOracles.map(id => ORACLE_NAMES[id])
+  
   return oracleSources.value.map(oracle => {
+    const isSupported = availableOracleNames.includes(oracle)
     return {
       label: oracle,
       value: oracle,
-      disabled: false
+      disabled: !isSupported
     }
   })
 })
