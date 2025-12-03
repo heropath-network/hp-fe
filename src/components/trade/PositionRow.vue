@@ -50,9 +50,6 @@
         <div class="text-[13px] leading-[18px] text-white font-normal">
           ${{ formatNumber(position.entryPrice, 2) }}
         </div>
-        <div class="text-[13px] leading-[18px] text-[#9b9b9b] font-normal whitespace-nowrap">
-          {{ formatNumber(position.size, 4) }}
-        </div>
       </div>
     </td>
     
@@ -61,9 +58,6 @@
       <div class="flex flex-col gap-1 items-end">
         <div class="text-[13px] leading-[18px] text-white font-normal">
           ${{ getMarkPrice(position.market) }}
-        </div>
-        <div class="text-[13px] leading-[18px] text-[#9b9b9b] font-normal whitespace-nowrap">
-          {{ formatNumber(position.size, 4) }} ({{ formatPercentage(Math.abs(getPositionPnLPercent() / position.leverage), 0) }})
         </div>
       </div>
     </td>
@@ -97,8 +91,9 @@
             'text-[13px] leading-[18px] font-normal',
             getPositionPnL() >= 0 ? 'text-white' : 'text-[#ff4e59]'
           ]"
+          :title="`Gross PnL: ${formatCurrency(pnlBreakdown.grossPnl)}\nFees: ${formatCurrency(pnlBreakdown.totalFees)}\nNet PnL: ${formatCurrency(pnlBreakdown.netPnl)}`"
         >
-          {{ getPositionPnL() >= 0 ? '' : '- ' }}{{ formatCurrency(getPositionPnL() >= 0 ? getPositionPnL() : getPositionPnL() * BigInt(-1)) }}
+          {{ formatCurrency(getPositionPnL()) }}
         </div>
         <div
           :class="[
@@ -106,7 +101,7 @@
             getPositionPnLPercent() >= 0 ? 'text-white' : 'text-[#9b9b9b]'
           ]"
         >
-          {{ getPositionPnLPercent() >= 0 ? '' : '- ' }}{{ formatPercentage(Math.abs(getPositionPnLPercent()), 2) }}
+          {{ formatPnLPercentage(getPositionPnLPercent()) }}
         </div>
       </div>
     </td>
@@ -129,8 +124,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useTradeStore } from '@/stores/tradeStore'
-import { formatNumber, formatCurrency, formatPercentage, calculatePnLPercentage, fromBigInt } from '@/utils/bigint'
+import { formatNumber, formatCurrency, formatPercentage, fromBigInt } from '@/utils/bigint'
+import { calculatePositionPnL } from '@/utils/pnl'
 import type { Position } from '@/storages/trading'
 import MarketIcon from '@/components/common/MarketIcon.vue'
 import ChainLabel from '@/components/common/ChainLabel.vue'
@@ -146,16 +143,32 @@ function getMarkPrice(market: string): string {
   return price ? fromBigInt(price, 2) : '0.00'
 }
 
-function getPositionPnL(): bigint {
+// Calculate comprehensive PnL with fees
+const pnlBreakdown = computed(() => {
   const currentPrice = tradeStore.marketPrices[props.position.market]?.price || props.position.entryPrice
-  const priceDiff = currentPrice - props.position.entryPrice
-  const multiplier = props.position.side === 'long' ? BigInt(1) : BigInt(-1)
-  return (priceDiff * props.position.size) / props.position.entryPrice * multiplier
+  return calculatePositionPnL(
+    props.position.entryPrice,
+    currentPrice,
+    props.position.side,
+    props.position.size,
+    props.position.leverage,
+    props.position.collateral,
+    props.position.timestamp,
+    true // Include fees
+  )
+})
+
+function getPositionPnL(): bigint {
+  return pnlBreakdown.value.netPnl
 }
 
 function getPositionPnLPercent(): number {
-  const currentPrice = tradeStore.marketPrices[props.position.market]?.price || props.position.entryPrice
-  return calculatePnLPercentage(props.position.entryPrice, currentPrice, props.position.side) * props.position.leverage
+  return pnlBreakdown.value.netPnlPercent
+}
+
+function formatPnLPercentage(value: number): string {
+  const sign = value >= 0 ? '+' : ''
+  return `${sign}${value.toFixed(2)}%`
 }
 
 function getTimeframe(): string {

@@ -61,16 +61,17 @@
             'text-[13px] leading-[18px] font-normal',
             trade.pnl >= 0 ? 'text-white' : 'text-[#ff4e59]'
           ]"
+          :title="`Gross PnL: ${formatCurrency(pnlBreakdown.grossPnl)}\nFees: ${formatCurrency(pnlBreakdown.totalFees)}\nNet PnL: ${formatCurrency(pnlBreakdown.netPnl)}`"
         >
-          {{ trade.pnl >= 0 ? '' : '- ' }}{{ formatCurrency(trade.pnl >= 0 ? trade.pnl : trade.pnl * BigInt(-1)) }}
+          {{ formatCurrency(trade.pnl) }}
         </div>
         <div
           :class="[
             'text-[13px] leading-[18px] font-normal',
-            trade.pnl >= 0 ? 'text-white' : 'text-[#9b9b9b]'
+            getPnLPercent() >= 0 ? 'text-white' : 'text-[#9b9b9b]'
           ]"
         >
-          {{ getPnLPercent() >= 0 ? '' : '- ' }}{{ formatPercentage(Math.abs(getPnLPercent()), 2) }}
+          {{ formatPnLPercentage(getPnLPercent()) }}
         </div>
       </div>
     </td>
@@ -99,8 +100,9 @@
 </template>
 
 <script setup lang="ts">
-import { useTradeStore } from '@/stores/tradeStore'
-import { formatNumber, formatCurrency, formatPercentage } from '@/utils/bigint'
+import { computed } from 'vue'
+import { formatNumber, formatCurrency } from '@/utils/bigint'
+import { calculateTradeHistoryPnL } from '@/utils/pnl'
 import type { TradeHistory } from '@/storages/trading'
 import MarketIcon from '@/components/common/MarketIcon.vue'
 import ChainLabel from '@/components/common/ChainLabel.vue'
@@ -109,9 +111,41 @@ const props = defineProps<{
   trade: TradeHistory
 }>()
 
-const tradeStore = useTradeStore()
+// Calculate comprehensive PnL breakdown (for display purposes, trade.pnl already has net PnL)
+const pnlBreakdown = computed(() => {
+  // Use stored values if available, otherwise calculate
+  if (props.trade.collateral && props.trade.leverage) {
+    return calculateTradeHistoryPnL(
+      props.trade.entryPrice,
+      props.trade.exitPrice,
+      props.trade.side,
+      props.trade.size,
+      props.trade.leverage,
+      props.trade.collateral,
+      props.trade.timestamp,
+      props.trade.closeTimestamp,
+      true // Include fees
+    )
+  }
+  // Fallback for old trades without collateral/leverage
+  return {
+    grossPnl: props.trade.pnl,
+    grossPnlPercent: 0,
+    fundingFee: BigInt(0),
+    borrowingFee: BigInt(0),
+    closingFee: BigInt(0),
+    totalFees: BigInt(0),
+    netPnl: props.trade.pnl,
+    netPnlPercent: 0,
+  }
+})
 
 function getPnLPercent(): number {
+  // Use calculated net PnL percentage if available
+  if (pnlBreakdown.value.netPnlPercent !== 0) {
+    return pnlBreakdown.value.netPnlPercent
+  }
+  // Fallback calculation for old trades
   if (props.trade.entryPrice === BigInt(0)) return 0
   const priceDiff = props.trade.exitPrice - props.trade.entryPrice
   const multiplier = props.trade.side === 'long' ? 1 : -1
@@ -126,6 +160,11 @@ function formatDate(timestamp: number): string {
     hour: '2-digit',
     minute: '2-digit'
   })
+}
+
+function formatPnLPercentage(value: number): string {
+  const sign = value >= 0 ? '+' : ''
+  return `${sign}${value.toFixed(2)}%`
 }
 
 function formatDuration(start: number, end: number): string {
