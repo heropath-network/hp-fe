@@ -147,7 +147,7 @@
                 <span class="text-[12px] leading-[16px] text-[#9b9b9b] text-right">%</span>
               </div>
               <!-- Slider -->
-              <div class="relative h-4 w-[217px]">
+              <div class="relative h-4 w-[217px] px-2">
                 <div class="absolute inset-0 flex items-center">
                   <div class="w-full h-1 bg-[#323232] rounded-full relative">
                     <div 
@@ -175,7 +175,7 @@
                 />
                 <div 
                   class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg pointer-events-none z-20"
-                  :style="{ left: `calc(${sizePercentage}% - 8px)` }"
+                  :style="{ left: sizePercentage > 50 ? `calc(${sizePercentage}% - 16px)` : `calc(${sizePercentage}%)` }"
                 >
                   <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-[#323232] rounded-full"></div>
                 </div>
