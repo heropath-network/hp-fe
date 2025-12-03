@@ -6,7 +6,7 @@
     <div class="flex items-center gap-5">
       <!-- Logo -->
       <div class="flex items-center h-[21px]">
-        <span class="text-white font-semibold text-lg leading-[21px]">MUX</span>
+        <span class="text-white font-semibold text-lg leading-[21px]">Hero PATH</span>
       </div>
       <!-- Navigation -->
       <div class="flex items-center">
