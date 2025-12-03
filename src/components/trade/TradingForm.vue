@@ -262,16 +262,59 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <!-- Margin Usage (with dropdown) -->
+          <!-- Account Equity (with dropdown) -->
+          <div class="flex items-start justify-between">
+            <div class="flex items-center gap-1 cursor-pointer" @click="showAccountBreakdown = !showAccountBreakdown">
+              <div class="flex flex-col">
+                <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Account Equity</span>
+                <div class="h-px w-full bg-[#272727] mt-0.5"></div>
+              </div>
+              <svg 
+                width="16" 
+                height="16" 
+                viewBox="0 0 16 16" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+                class="transition-transform duration-200"
+                :class="showAccountBreakdown ? 'rotate-180' : ''"
+              >
+                <path d="M4 6L8 10L12 6" stroke="#9b9b9b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span class="text-[13px] leading-[18px] text-white">{{ formatCurrency(accountValueUsd) }}</span>
+          </div>
+
+          <!-- Your Balance (shown when Account Equity is expanded) -->
+          <div v-show="showAccountBreakdown" class="flex items-start justify-between ml-4">
+            <div class="flex flex-col">
+              <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Your Balance</span>
+              <div class="h-px w-full bg-[#272727] mt-0.5"></div>
+            </div>
+            <span class="text-[13px] leading-[18px] text-white">{{ formatCurrency(accountBalance) }}</span>
+          </div>
+
+          <!-- Unrealized PnL (shown when Account Equity is expanded) -->
+          <div v-show="showAccountBreakdown" class="flex items-start justify-between ml-4">
+            <div class="flex flex-col">
+              <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Unrealized PnL</span>
+              <div class="h-px w-full bg-[#272727] mt-0.5"></div>
+            </div>
+            <span 
+              class="text-[13px] leading-[18px]"
+              :class="totalPnL >= 0n ? 'text-green-500' : 'text-red-500'"
+            >
+              {{ formatCurrency(totalPnL) }}
+            </span>
+          </div>
+
+         
           <div class="flex items-start justify-between">
             <div class="flex items-center gap-1">
               <div class="flex flex-col">
                 <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Margin Usage</span>
                 <div class="h-px w-full bg-[#272727] mt-0.5"></div>
               </div>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 6L8 10L12 6" stroke="#9b9b9b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+              
             </div>
             <div class="flex flex-col items-end">
               <span class="text-[13px] leading-[18px] text-white">{{ formatCurrency(marginUsageAmount) }}</span>
@@ -297,14 +340,22 @@
             <span class="text-[13px] leading-[18px] text-white">{{ effectiveLeverageDisplay }}</span>
           </div>
 
-          <!-- Cross Margin Ratio -->
+          <!-- Cross Margin Ratio (with dropdown) -->
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1 cursor-pointer" @click="showCrossBreakdown = !showCrossBreakdown">
               <div class="flex flex-col">
                 <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Cross Margin Ratio</span>
                 <div class="h-px w-full bg-[#272727] mt-0.5"></div>
               </div>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg 
+                width="16" 
+                height="16" 
+                viewBox="0 0 16 16" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+                class="transition-transform duration-200"
+                :class="showCrossBreakdown ? 'rotate-180' : ''"
+              >
                 <path d="M4 6L8 10L12 6" stroke="#9b9b9b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
@@ -318,6 +369,15 @@
                 <div class="w-0.5 h-3 bg-[#323232]"></div>
               </div>
             </div>
+          </div>
+
+          <!-- Maintenance Margin (shown when Cross Margin Ratio is expanded) -->
+          <div v-show="showCrossBreakdown" class="flex items-start justify-between ml-4">
+            <div class="flex flex-col">
+              <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Maintenance Margin</span>
+              <div class="h-px w-full bg-[#272727] mt-0.5"></div>
+            </div>
+            <span class="text-[13px] leading-[18px] text-white">{{ formatCurrency(maintenanceMarginUsd) }}</span>
           </div>
         </div>
       </div>
@@ -383,6 +443,8 @@ const showMarginModeDialog = ref(false)
 const showLiquiditySourcesDialog = ref(false)
 const showOrderTypeMenu = ref(false)
 const takeProfitStopLoss = ref(false)
+const showAccountBreakdown = ref(false)
+const showCrossBreakdown = ref(false)
 
 const marginSetting = computed(() => tradeStore.getMarginSetting(selectedMarket.value))
 const activeLiquiditySourcesCount = computed(() => activeLiquiditySources.value.length)
