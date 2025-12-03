@@ -102,6 +102,9 @@ function selectToken(token: (typeof paymentTokens)[number]) {
 }
 
 function selectPayMethod(method: (typeof PayMethod)[number]) {
+  if (method.value === 'CreditCard' || method.value === 'BinancePay') {
+    return
+  }
   selectedPayMethod.value = method
   showPayMethodDropdown.value = false
 }
