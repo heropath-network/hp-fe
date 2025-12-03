@@ -181,13 +181,21 @@ const selectedAccount = computed<Account | null>(() => {
   return accounts.value.find((account) => account.id === selectedEvaluationId.value) || accounts.value[0] || null
 })
 
-// Update tradeStore accountBalance when selected evaluation changes
+// Update tradeStore accountBalance and currentAccountId when selected evaluation changes
 watch(
   accountBalance,
   (balance) => {
     if (balance > 0) {
       tradeStore.accountBalance = toBigInt(balance)
     }
+  },
+  { immediate: true },
+)
+
+watch(
+  selectedEvaluationId,
+  (accountId) => {
+    tradeStore.currentAccountId = accountId
   },
   { immediate: true },
 )

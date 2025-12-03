@@ -406,6 +406,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useChainId } from '@wagmi/vue'
 import { useTradeStore } from '@/stores/tradeStore'
+import { useEvaluationAccount } from '@/composables/useEvaluationAccount'
 import { toBigInt, fromBigInt } from '@/utils/bigint'
 import { formatCurrency } from '@/utils/bigint'
 import MarginModeDialog from '@/components/trade/MarginModeDialog.vue'
@@ -423,6 +424,7 @@ interface TradeDetailItem {
 
 const tradeStore = useTradeStore()
 const chainId = useChainId()
+const { selectedEvaluationId } = useEvaluationAccount()
 const {
   selectedMarket,
   accountBalance,
@@ -607,7 +609,8 @@ function handleTrade() {
       leverage.value,
       collateralValue,
       chainId.value,
-      currentLiquiditySource
+      currentLiquiditySource,
+      selectedEvaluationId.value ?? undefined
     )
 
     size.value = ''
@@ -624,7 +627,8 @@ function handleTrade() {
       triggerPrice,
       orderType.value as 'limit' | 'stop',
       chainId.value,
-      currentLiquiditySource
+      currentLiquiditySource,
+      selectedEvaluationId.value ?? undefined
     )
 
     price.value = ''

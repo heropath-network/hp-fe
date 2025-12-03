@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
+import { useConnection } from '@wagmi/vue'
 import { ProjectId, ORACLE_NAMES } from '@/constants'
 import { autoSelectOracle } from '@/utils/oracleMatching'
 import {
@@ -8,46 +9,14 @@ import {
   LiquiditySourceInfo,
   SupportedLiquidityAsset,
 } from '@/constants/liquiditySources'
-
-export interface Position {
-  id: string
-  market: string
-  side: 'long' | 'short'
-  size: bigint
-  entryPrice: bigint
-  leverage: number
-  collateral: bigint
-  liquidationPrice: bigint
-  timestamp: number
-  chainId: number
-  liquiditySource: LiquiditySourceId
-}
-
-export interface Order {
-  id: string
-  market: string
-  side: 'long' | 'short'
-  size: bigint
-  triggerPrice: bigint
-  orderType: 'limit' | 'stop'
-  timestamp: number
-  chainId: number
-  liquiditySource: LiquiditySourceId
-}
-
-export interface TradeHistory {
-  id: string
-  market: string
-  side: 'long' | 'short'
-  size: bigint
-  entryPrice: bigint
-  exitPrice: bigint
-  pnl: bigint
-  timestamp: number
-  closeTimestamp: number
-  chainId: number
-  liquiditySource: LiquiditySourceId
-}
+import {
+  useUserPositionsStorage,
+  useUserOrdersStorage,
+  useUserTradeHistoryStorage,
+  type Position,
+  type Order,
+  type TradeHistory,
+} from '@/storages/trading'
 
 export interface MarketPrice {
   symbol: string
@@ -90,6 +59,13 @@ function readMarginSettingsFromStorage(): Record<string, MarginSetting> {
 }
 
 export const useTradeStore = defineStore('trade', () => {
+  const { address } = useConnection()
+
+  // Initialize storage
+  const positionsStorage = useUserPositionsStorage(address)
+  const ordersStorage = useUserOrdersStorage(address)
+  const tradeHistoryStorage = useUserTradeHistoryStorage(address)
+
   const selectedMarket = ref('BTC/USD')
   const marketPrices = ref<Record<string, MarketPrice>>({})
 
@@ -121,13 +97,25 @@ export const useTradeStore = defineStore('trade', () => {
 
   const currentOracleName = computed(() => ORACLE_NAMES[selectedOracle.value])
 
-  const positions = ref<Position[]>([])
-
-  const orders = ref<Order[]>([])
-
-  const tradeHistory = ref<TradeHistory[]>([])
-
   const accountBalance = ref<bigint>(BigInt(10000) * BigInt(10 ** 18)) // 10,000 USD
+  const currentAccountId = ref<string | null>(null)
+
+  // Store refs - use storage data directly, filtered by currentAccountId
+  // Filtered by current account
+  const positions = computed(() => {
+    if (!currentAccountId.value) return []
+    return positionsStorage.data.value.filter((p) => p.accountId === currentAccountId.value)
+  })
+
+  const orders = computed(() => {
+    if (!currentAccountId.value) return []
+    return ordersStorage.data.value.filter((o) => o.accountId === currentAccountId.value)
+  })
+
+  const tradeHistory = computed(() => {
+    if (!currentAccountId.value) return []
+    return tradeHistoryStorage.data.value.filter((h) => h.accountId === currentAccountId.value)
+  })
   const marginSettings = ref<Record<string, MarginSetting>>(readMarginSettingsFromStorage())
   const liquiditySourceSettings = ref<LiquiditySourceState[]>(
     LIQUIDITY_SOURCES.map((source) => ({
@@ -244,9 +232,16 @@ export const useTradeStore = defineStore('trade', () => {
     collateral: bigint,
     chainId?: number,
     liquiditySource?: LiquiditySourceId,
+    accountId?: string,
   ) {
+    if (!currentAccountId.value && !accountId) {
+      console.warn('openPosition: accountId is required but not provided')
+      return
+    }
+
     const position: Position = {
       id: `pos-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      accountId: accountId ?? currentAccountId.value!,
       market,
       side,
       size,
@@ -258,8 +253,8 @@ export const useTradeStore = defineStore('trade', () => {
       chainId: chainId ?? 56, // Default to BNB Chain (56)
       liquiditySource: liquiditySource ?? getLiquiditySourceFromOracle(selectedOracle.value),
     }
-    positions.value.push(position)
-
+    const allPositions = [...positionsStorage.data.value, position]
+    positionsStorage.updatePositions(allPositions)
     accountBalance.value -= collateral
   }
 
@@ -282,7 +277,8 @@ export const useTradeStore = defineStore('trade', () => {
   }
 
   function closePosition(positionId: string) {
-    const position = positions.value.find((p) => p.id === positionId)
+    const allPositions = positionsStorage.data.value
+    const position = allPositions.find((p) => p.id === positionId)
     if (!position) return
 
     const currentPrice = marketPrices.value[position.market]?.price || position.entryPrice
@@ -292,6 +288,7 @@ export const useTradeStore = defineStore('trade', () => {
 
     const historyEntry: TradeHistory = {
       id: position.id,
+      accountId: position.accountId,
       market: position.market,
       side: position.side,
       size: position.size,
@@ -303,11 +300,13 @@ export const useTradeStore = defineStore('trade', () => {
       chainId: position.chainId,
       liquiditySource: position.liquiditySource,
     }
-    tradeHistory.value.unshift(historyEntry)
+    const allTradeHistory = [historyEntry, ...tradeHistoryStorage.data.value]
+    tradeHistoryStorage.updateTradeHistory(allTradeHistory)
 
     accountBalance.value += position.collateral + pnl
 
-    positions.value = positions.value.filter((p) => p.id !== positionId)
+    const updatedPositions = allPositions.filter((p) => p.id !== positionId)
+    positionsStorage.updatePositions(updatedPositions)
   }
 
   function placeOrder(
@@ -318,9 +317,16 @@ export const useTradeStore = defineStore('trade', () => {
     orderType: 'limit' | 'stop',
     chainId?: number,
     liquiditySource?: LiquiditySourceId,
+    accountId?: string,
   ) {
+    if (!currentAccountId.value && !accountId) {
+      console.warn('placeOrder: accountId is required but not provided')
+      return
+    }
+
     const order: Order = {
       id: `ord-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      accountId: accountId ?? currentAccountId.value!,
       market,
       side,
       size,
@@ -330,11 +336,13 @@ export const useTradeStore = defineStore('trade', () => {
       chainId: chainId ?? 56, // Default to BNB Chain (56)
       liquiditySource: liquiditySource ?? getLiquiditySourceFromOracle(selectedOracle.value),
     }
-    orders.value.push(order)
+    const allOrders = [...ordersStorage.data.value, order]
+    ordersStorage.updateOrders(allOrders)
   }
 
   function cancelOrder(orderId: string) {
-    orders.value = orders.value.filter((o) => o.id !== orderId)
+    const allOrders = ordersStorage.data.value.filter((o) => o.id !== orderId)
+    ordersStorage.updateOrders(allOrders)
   }
 
   function calculateLiquidationPrice(entryPrice: bigint, leverage: number, side: 'long' | 'short'): bigint {
@@ -406,6 +414,7 @@ export const useTradeStore = defineStore('trade', () => {
     orders,
     tradeHistory,
     accountBalance,
+    currentAccountId,
     marginSettings,
 
     currentMarketPrice,
