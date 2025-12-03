@@ -56,7 +56,7 @@ watch(containerDom, (newVal) => {
 
 const { isConnected, address } = useConnection()
 
-const { data: taskStatus, updateTaskStatus } = useUserQuestTaskStatusStorage(address)
+const { data: taskStatus, updateTaskStatus, clear: clearTaskStatus } = useUserQuestTaskStatusStorage(address)
 const { addDiscountStatus } = useUserQuestDiscountStatusStorage(address)
 
 const tasks = ref<QuestTask[]>([
@@ -124,6 +124,17 @@ function setAllTasksCompleted() {
   })
 }
 
+function resetAllTasksCompleted() {
+  if (!isConnected.value || !allTasksIsCompleted.value) {
+    return
+  }
+  tasks.value = tasks.value.map((task) => ({ ...task, status: 'pending' }))
+  tasks.value.forEach((task) => {
+    updateTaskStatus(task.id, true)
+  })
+  clearTaskStatus()
+}
+
 function initialTaskStatus() {
   const v = tasks.value.map((task) => {
     const completed = taskStatus.value ? taskStatus.value[task.id] : false
@@ -158,7 +169,9 @@ watch(
     <header class="flex flex-col gap-2">
       <h1 class="text-2xl font-semibold leading-8">Hero&apos;s Rebirth - Get Evaluation Opportunities</h1>
       <p class="text-sm leading-5 text-[var(--hp-text-color)]">
-        Complete the following tasks to get a free evaluation <span @click="setAllTasksCompleted">opportunity</span>.
+        Complete the following tasks to get a free
+        <span @click="resetAllTasksCompleted">evaluation</span>
+        <span @click="setAllTasksCompleted"> opportunity</span>.
       </p>
     </header>
 
