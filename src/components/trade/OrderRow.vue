@@ -70,7 +70,7 @@
     </td>
     
     <!-- Actions Column -->
-    <td class="px-4 py-6 text-center">
+    <td class="px-4 py-6 flex justify-center">
       <button
         @click="cancelOrder(order.id)"
         class="flex items-center justify-center gap-1 bg-[#272727] px-4 py-2 transition hover:bg-[#333333]"

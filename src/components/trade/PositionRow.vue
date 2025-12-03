@@ -70,7 +70,7 @@
     </td>
     
     <!-- Leverage Column -->
-    <td class="px-4 py-6 text-center">
+    <td class="px-4 py-6 flex justify-center">
       <div class="text-[13px] leading-[18px] text-white font-normal">
         {{ position.leverage }}x
       </div>
@@ -107,7 +107,7 @@
     </td>
     
     <!-- Actions Column -->
-    <td class="px-4 py-6 text-center">
+    <td class="px-4 py-6 flex justify-center">
       <button
         @click="closePosition(position.id)"
         class="flex items-center justify-center gap-1 bg-[#272727] px-4 py-2 transition hover:bg-[#333333]"
