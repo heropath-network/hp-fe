@@ -670,9 +670,9 @@ const availableLiquidity = computed(() => {
 const isFormValid = computed(() => {
   const hasSize = parseFloat(size.value) > 0
   const hasPrice = orderType.value === 'market' || parseFloat(price.value) > 0
-  const sufficientBalance = calculatedCollateral.value <= accountBalance.value
-  
-  return hasSize && hasPrice && sufficientBalance
+  // const sufficientBalance = calculatedCollateral.value <= accountBalance.value
+
+  return hasSize && hasPrice 
 })
 
 const isActionDisabled = computed(() => !isFormValid.value || signing.value || !isConnected.value)
@@ -680,7 +680,18 @@ const submitButtonLabel = computed(() => {
   if (signing.value) return 'Waiting for signature'
   if (!isConnected.value) return 'Connect wallet'
   if (!isFormValid.value) return 'Enter an amount'
-  return `${tradeSide.value === 'long' ? 'Buy' : 'Sell'} ${selectedMarket.value.split('/')[0]}`
+  if (tradeSide.value === 'long' && leverage.value > 1) {
+    return `Long ${selectedMarket.value.split('/')[0]}`
+  }
+  if (tradeSide.value === 'short' && leverage.value > 1) {
+    return `Short ${selectedMarket.value.split('/')[0]}`
+  }
+  if (tradeSide.value === 'long' && leverage.value === 1) {
+    return `Buy ${selectedMarket.value.split('/')[0]}`
+  }
+  if (tradeSide.value === 'short' && leverage.value === 1) {
+    return `Sell ${selectedMarket.value.split('/')[0]}`
+  }
 })
 
 function getSignaturePrices() {
