@@ -3,7 +3,7 @@ import { EvaluationStep1Config, EvaluationStep2Config } from './evaluation'
 export interface UserEvaluation {
   accountId: string
   evaluationConfig: EvaluationStep1Config | EvaluationStep2Config
-  accountType: 'funded' | 'evaluation'
+  accountType: 'funded' | 'evaluation' | 'trading'
   accountStatus: 'active' | 'inactive'
   displayStatus: {
     showDrawdown: boolean

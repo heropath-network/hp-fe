@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useConnection } from '@wagmi/vue'
-import { useRouter } from 'vue-router'
 import BaseIcon from '@/components/BaseIcon.vue'
 import { generateUUID } from '@/utils/common'
 import { QuestTaskId } from '@/types/heroPath'
@@ -9,9 +8,7 @@ import XIcon from '@/assets/icons/quest/x.svg'
 import TradePerpIcon from '@/assets/icons/quest/tradePerp.svg'
 import TradeMemeIcon from '@/assets/icons/quest/tradeMeme.svg'
 import SwapIcon from '@/assets/icons/quest/swap.svg'
-import TradingLogoIcon from '@/assets/icons/quest/tradingLogo.svg'
 import { useUserQuestTaskStatusStorage, useUserQuestDiscountStatusStorage } from '@/storages/heroPath'
-import { ROUTE_NAMES } from '@/router'
 
 type QuestTask = {
   id: QuestTaskId
@@ -20,39 +17,6 @@ type QuestTask = {
   icon: string
   status: 'pending' | 'completed'
 }
-
-const router = useRouter()
-
-// Responsive container width handling
-const containerDom = ref<HTMLElement | null>(null)
-const containerWidth = ref(0)
-
-function updateContainerWidth() {
-  if (containerDom.value) {
-    containerWidth.value = containerDom.value.clientWidth
-  }
-}
-
-watch(
-  containerDom,
-  (newVal, _, onCleanup) => {
-    if (newVal) {
-      updateContainerWidth()
-      const handler = () => updateContainerWidth()
-      window.addEventListener('resize', handler)
-      onCleanup(() => {
-        window.removeEventListener('resize', handler)
-      })
-    }
-  },
-  { immediate: true },
-)
-watch(containerDom, (newVal) => {
-  if (newVal) {
-    containerWidth.value = newVal.clientWidth
-  }
-})
-// End of responsive container width handling
 
 const { isConnected, address } = useConnection()
 
@@ -225,29 +189,4 @@ watch(
       </article>
     </div>
   </section>
-
-  <div
-    class="fixed bottom-4 ml-[24px] absolute-translate-x-1/2"
-    :style="{ width: `${containerWidth - 48}px` }"
-    role="presentation"
-  >
-    <div
-      class="flex items-center justify-between relative bg-[var(--hp-bg-normal)] px-6 py-5 shadow-lg shadow-black/40"
-    >
-      <img :src="TradingLogoIcon" alt="" class="w-[96px] h-[96px] absolute left-6 top-[-20px] z-[1]" />
-      <p class="text-xl font-semibold leading-7 pl-[12%]">A Free Evaluation Opportunity</p>
-      <button
-        type="button"
-        class="flex items-center gap-2 bg-[var(--hp-primary-green)] px-6 py-[14px] text-base font-medium text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)]"
-        @click="
-          () => {
-            router.push({ name: ROUTE_NAMES.Trade })
-          }
-        "
-      >
-        Go to Training
-        <BaseIcon name="arrow" size="18" class="rotate-[270deg] text-[var(--hp-black-color)]" />
-      </button>
-    </div>
-  </div>
 </template>
