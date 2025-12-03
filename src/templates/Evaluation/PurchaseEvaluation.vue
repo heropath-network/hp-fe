@@ -24,10 +24,10 @@ const requireSymbolIcon = (symbol: string) => {
 
 const { prices: apiPrices } = usePaymentTokenPrices()
 
-const stepTabs = [
-  { label: '1 Step', value: EvaluationSteps.Step1 },
-  { label: '2 Step', value: EvaluationSteps.Step2 },
-]
+// const stepTabs = [
+//   { label: '1 Step', value: EvaluationSteps.Step1 },
+//   // { label: '2 Step', value: EvaluationSteps.Step2 },
+// ]
 
 const planTabs = [
   { label: 'Classic Plan', value: EvaluationPlan.Classic },
@@ -254,7 +254,7 @@ async function handlePurchase() {
       <div class="space-y-6 bg-[var(--hp-bg-normal)] p-6">
         <div class="space-y-4">
           <p class="text-lg font-semibold">Evaluation Type</p>
-          <div class="flex flex-wrap gap-3">
+          <!-- <div class="flex flex-wrap gap-3">
             <button
               v-for="tab in stepTabs"
               :key="tab.value"
@@ -269,7 +269,7 @@ async function handlePurchase() {
             >
               {{ tab.label }}
             </button>
-          </div>
+          </div> -->
           <div v-if="activePlanList.length" class="flex flex-wrap gap-3">
             <button
               v-for="tab in activePlanList"
