@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useConnection } from '@wagmi/vue'
+import { useRouter } from 'vue-router'
 import BaseIcon from '@/components/BaseIcon.vue'
 import { generateUUID } from '@/utils/common'
 import { QuestTaskId } from '@/types/heroPath'
@@ -8,7 +9,10 @@ import XIcon from '@/assets/icons/quest/x.svg'
 import TradePerpIcon from '@/assets/icons/quest/tradePerp.svg'
 import TradeMemeIcon from '@/assets/icons/quest/tradeMeme.svg'
 import SwapIcon from '@/assets/icons/quest/swap.svg'
+import TradingLogoIcon from '@/assets/icons/quest/tradingLogo.svg'
 import { useUserQuestTaskStatusStorage, useUserQuestDiscountStatusStorage } from '@/storages/heroPath'
+import { ROUTE_NAMES } from '@/router'
+import { template } from 'lodash-es'
 
 type QuestTask = {
   id: QuestTaskId
@@ -17,6 +21,39 @@ type QuestTask = {
   icon: string
   status: 'pending' | 'completed'
 }
+
+const router = useRouter()
+
+// Responsive container width handling
+const containerDom = ref<HTMLElement | null>(null)
+const containerWidth = ref(0)
+
+function updateContainerWidth() {
+  if (containerDom.value) {
+    containerWidth.value = containerDom.value.clientWidth
+  }
+}
+
+watch(
+  containerDom,
+  (newVal, _, onCleanup) => {
+    if (newVal) {
+      updateContainerWidth()
+      const handler = () => updateContainerWidth()
+      window.addEventListener('resize', handler)
+      onCleanup(() => {
+        window.removeEventListener('resize', handler)
+      })
+    }
+  },
+  { immediate: true },
+)
+watch(containerDom, (newVal) => {
+  if (newVal) {
+    containerWidth.value = newVal.clientWidth
+  }
+})
+// End of responsive container width handling
 
 const { isConnected, address } = useConnection()
 
@@ -126,10 +163,7 @@ watch(
 </script>
 
 <template>
-  <section
-    ref="containerDom"
-    class="mt-4 flex flex-col gap-6 pb-28 text-[var(--hp-white-color)]"
-  >
+  <section ref="containerDom" class="mt-4 flex flex-col gap-6 pb-28 text-[var(--hp-white-color)]">
     <header class="flex flex-col gap-2">
       <h1 class="text-2xl font-semibold leading-8">Hero&apos;s Rebirth - Get Evaluation Opportunities</h1>
       <p class="text-sm leading-5 text-[var(--hp-text-color)]">
@@ -189,4 +223,30 @@ watch(
       </article>
     </div>
   </section>
+
+  <div class="fixed bottom-4 absolute-translate-x-1/2" :style="{ width: `${containerWidth}px` }" role="presentation">
+    <div
+      class="flex items-center justify-between relative bg-[var(--hp-bg-normal)] h-[100px] px-6 py-5 shadow-lg shadow-black/40"
+    >
+      <img :src="TradingLogoIcon" alt="" class="w-[96px] h-[96px] absolute left-6 top-[-20px] z-[1]" />
+      <p class="text-xl font-semibold leading-7 pl-[12%]">A Free Evaluation Opportunity</p>
+      <template v-if="allTasksIsCompleted">
+        <button
+          type="button"
+          class="flex items-center gap-2 bg-[var(--hp-primary-green)] px-6 py-[14px] text-base font-medium text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)]"
+          @click="
+            () => {
+              router.push({ name: ROUTE_NAMES.Evaluation })
+            }
+          "
+        >
+          Discounted Evaluation
+          <BaseIcon name="arrow" size="18" class="rotate-[270deg] text-[var(--hp-black-color)]" />
+        </button>
+      </template>
+      <template v-else>
+        <span class="font-[600] leading-6 text-[18px] text-[var(--hp-text-color)]"> Tasks Incomplete </span>
+      </template>
+    </div>
+  </div>
 </template>
