@@ -109,12 +109,12 @@ function selectToken(token: (typeof paymentTokens)[number]) {
   showTokenDropdown.value = false
 }
 
-function toggleStep(step: EvaluationSteps) {
-  activeStep.value = step
-  if (step === EvaluationSteps.Step2) {
-    activePlan.value = EvaluationPlan.Classic
-  }
-}
+// function toggleStep(step: EvaluationSteps) {
+//   activeStep.value = step
+//   if (step === EvaluationSteps.Step2) {
+//     activePlan.value = EvaluationPlan.Classic
+//   }
+// }
 
 function initFromQuery() {
   const { step, plan, level } = route.query
