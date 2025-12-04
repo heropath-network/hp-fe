@@ -10,7 +10,7 @@
             :class="[
               'flex-1 px-0 py-2 text-sm font-medium transition w-[83px]',
               tradeSide === 'long'
-                ? 'bg-green-success text-gray-1000'
+                ? 'bg-green-success text-gray-1000 hover:bg-green-hover'
                 : 'text-gray-400'
             ]"
           >
@@ -21,7 +21,7 @@
             :class="[
               'flex-1 px-0 py-2 text-sm font-medium transition w-[83px]',
               tradeSide === 'short'
-                ? 'bg-red-error text-gray-1000'
+                ? 'bg-red-error text-gray-1000 hover:bg-red-hover'
                 : 'text-gray-400'
             ]"
           >
@@ -273,7 +273,7 @@
         :disabled="isActionDisabled"
         :class="[
           'w-full py-[14px] text-[14px] font-medium text-center transition flex items-center justify-center',
-          tradeSide === 'long' ? 'bg-green-success text-gray-1000' : 'bg-red-error text-gray-1000',
+          tradeSide === 'long' ? 'bg-green-success text-gray-1000 hover:bg-green-hover' : 'bg-red-error text-gray-1000 hover:bg-red-hover',
           isActionDisabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100'
         ]"
       >
