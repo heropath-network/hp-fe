@@ -163,7 +163,11 @@ function formatTimeAgo(timestamp: string): string {
                 </span>
               </div>
 
-              <h3 class="text-lg font-semibold leading-7 min-h-[48px]">{{ card.title }}</h3>
+              <h3
+                class="text-lg font-semibold leading-7 min-h-[48px] hover:text-[var(--hp-primary-green)] cursor-pointer"
+              >
+                {{ card.title }}
+              </h3>
             </div>
 
             <div class="flex items-center gap-2 text-sm leading-5 text-[var(--hp-text-color)]">
@@ -198,7 +202,11 @@ function formatTimeAgo(timestamp: string): string {
                 </span>
               </div>
 
-              <h3 class="text-lg font-semibold leading-7 min-h-[48px]">{{ card.title }}</h3>
+              <h3
+                class="text-lg font-semibold leading-7 min-h-[48px] hover:text-[var(--hp-primary-green)] cursor-pointer"
+              >
+                {{ card.title }}
+              </h3>
             </div>
 
             <div class="flex items-center gap-2 text-sm leading-5 text-[var(--hp-text-color)]">
