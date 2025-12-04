@@ -315,7 +315,7 @@
           <!-- Max. Position Slippage with edit icon -->
           <div v-else-if="(item as TradeDetailItem).key === 'maxSlippage'" class="flex items-center gap-1">
             <span class="text-[13px] leading-[18px] text-white text-right">{{ item.value }}</span>
-            <i class="iconfont icon-edit text-[#9B9B9B]"></i>
+            <img :src="editIcon" alt="Edit" class="w-4 h-4" />
           </div>
           <!-- Regular value -->
           <span v-else class="text-[13px] leading-[18px] text-white text-right">{{ item.value }}</span>
@@ -475,6 +475,7 @@ import { useNotification } from '@/composables/useNotification'
 import SourceLiquidityLabel from '@/components/common/SourceLiquidityLabel.vue'
 import Tooltip from '@/components/common/Tooltip.vue'
 import { LoadingIcon } from '@/components'
+import editIcon from '@/assets/icons/edit.svg'
 import type { LiquiditySourceId } from '@/constants/liquiditySources'
 import type { Position as PositionType, Order as OrderType } from '@/storages/trading'
 
