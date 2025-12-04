@@ -40,7 +40,7 @@ function generateRows(frame: string, count = 20): TraderRow[] {
 
     return {
       address: randomAddress(),
-      volume: randomNumber(3_000_00, 10_000_000) * volumeMultiplier,
+      volume: randomNumber(5000, 1000000) * volumeMultiplier,
       leverage: randomNumber(1, 5),
       win: wins,
       loss: losses,

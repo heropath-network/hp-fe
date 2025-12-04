@@ -70,7 +70,7 @@ function generatePositions(count = 20): PositionRow[] {
     const source = liquiditySources[Math.floor(Math.random() * liquiditySources.length)]
     const isLong = Math.random() > 0.45
     const leverage = randomNumber(1, 5)
-    const size = randomNumber(750_000, 4_200_000)
+    const size = randomNumber(2000, 200000)
     const entryPrice = randomEntryPrice(market)
     const pnl = randomNumber(0, 1300) * (Math.random() > 0.52 ? 1 : -1)
 

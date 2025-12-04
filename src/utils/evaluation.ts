@@ -1,13 +1,13 @@
-import { TradeHistory, Position } from '@/types/trading'
+import { TradeHistory, Position } from '@/storages/trading'
 import * as _ from 'lodash-es'
 
 export function getAccountHistoryPnl(history: TradeHistory[]): bigint {
-  return history.reduce((acc, trade) => acc + (!trade.isOpen ? trade.pnl : BigInt(0)), BigInt(0))
+  return history.reduce((acc, trade) => acc + (!!trade.closeTimestamp ? trade.pnl : BigInt(0)), BigInt(0))
 }
 
 export function getAccountTotalVolume(history: TradeHistory[]): bigint {
   return history.reduce(
-    (acc, trade) => acc + (trade.isOpen ? trade.entryPrice * trade.size : trade.exitPrice * trade.size),
+    (acc, trade) => acc + (!!trade.closeTimestamp ? trade.exitPrice * trade.size : trade.entryPrice * trade.size),
     BigInt(0),
   )
 }
@@ -18,13 +18,13 @@ export function countTradesWinRate(history: TradeHistory[]): {
   winCount: number
   winRate: number
 }[] {
-  const newHistory = history.filter((trade) => !trade.isOpen)
+  const newHistory = history.filter((trade) => !!trade.closeTimestamp)
 
   const grouped = _.groupBy(newHistory, (trade) => trade.market)
 
   const result = Object.entries(grouped).map(([market, trades]) => {
     const tradeCount = trades.length
-    const winCount = trades.filter((trade) => !trade.isOpen && trade.pnl > BigInt(0)).length
+    const winCount = trades.filter((trade) => !!trade.closeTimestamp && trade.pnl > BigInt(0)).length
     const winRate = tradeCount > 0 ? (winCount / tradeCount) * 100 : 0
     return {
       market,
