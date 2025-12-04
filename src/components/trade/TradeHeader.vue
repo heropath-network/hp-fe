@@ -5,13 +5,18 @@
     <!-- Left: Logo and Navigation -->
     <div class="flex items-center gap-5">
       <!-- Logo -->
-      <div class="flex items-center h-[21px]">
-        <span class="text-white font-semibold text-lg leading-[21px]">Hero PATH</span>
+      <div class="flex items-center">
+        <button
+          @click="router.push({ name: ROUTE_NAMES.Dashboard })"
+          class="cursor-pointer hover:opacity-80 transition-opacity"
+        >
+          <img src="@/assets/img/HeroPath.svg" alt="Hero PATH" class="h-[32px] w-auto" />
+        </button>
       </div>
       <!-- Navigation -->
       <div class="flex items-center">
         <button
-          class="flex items-center justify-center h-[32px] px-4 py-3 text-[14px] font-semibold leading-[20px] text-white"
+          class="flex items-center justify-center h-[32px] px-4 py-[6px] text-[14px] font-semibold leading-[20px] text-white"
         >
           Evaluation Mode
         </button>
