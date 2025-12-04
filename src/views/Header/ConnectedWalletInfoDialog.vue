@@ -53,7 +53,7 @@ tryOnMounted(() => {
           <span class="font-[500] text-[var(--hp-text-color)] text-[14px] leading-[20px]">{{ connector?.name }}</span>
           <div class="flex items-center">
             <div
-              class="bg-[var(--hp-white-color)] text-[var(--hp-black-color)] h-[24px] px-2 py-1 flex items-center font-[500] cursor-pointer"
+              class="bg-[transparent] text-[var(--hp-primary-green)] border-[1px] border-[var(--hp-primary-green)] text-[12px] h-[24px] px-2 py-1 flex items-center font-[500] cursor-pointer hover:text-[var(--hp-black-color)] hover:bg-[var(--hp-primary-green)]"
               @click="
                 () => {
                   onCloseDialog()
@@ -64,7 +64,7 @@ tryOnMounted(() => {
               Change
             </div>
             <div
-              class="bg-[var(--hp-white-color)] text-[var(--hp-black-color)] h-[24px] px-2 py-1 ml-3 flex items-center font-[500] cursor-pointer"
+              class="bg-[transparent] ml-[12px] text-[var(--hp-primary-green)] border-[1px] border-[var(--hp-primary-green)] text-[12px] h-[24px] px-2 py-1 flex items-center font-[500] cursor-pointer hover:text-[var(--hp-black-color)] hover:bg-[var(--hp-primary-green)]"
               @click="
                 () => {
                   disconnect()
