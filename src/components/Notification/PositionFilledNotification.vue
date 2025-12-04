@@ -103,7 +103,7 @@ interface Props {
   orderType: 'market' | 'limit' | 'stop'
   liquiditySource: LiquiditySourceId
   marginMode: 'isolated' | 'cross'
-  actionType?: 'open' | 'close' | 'place'
+  actionType?: 'open' | 'close' | 'place' | 'cancel'
   fillPromise?: Promise<any>
 }
 
@@ -169,6 +169,9 @@ const tokenIconSrc = computed(() => {
 const titleLabel = computed(() => {
   if (props.actionType === 'close') {
     return 'Close Position'
+  }
+  if (props.actionType === 'cancel') {
+    return 'Cancel Order'
   }
   return props.position ? 'Open Position' : 'Place Order'
 })
