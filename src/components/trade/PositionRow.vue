@@ -9,28 +9,20 @@
             {{ position.market }}
           </div>
           <div class="flex items-center gap-2">
-            <div class="text-[13px] leading-[18px] text-[#9b9b9b] font-normal">
-              {{ getTimeframe() }}
-            </div>
+            <span
+              :class="[
+                'inline-block text-[13px]',
+                position.side === 'long' ? 'text-green-success' : 'text-red-error'
+              ]"
+            >
+              {{ position.side.charAt(0).toUpperCase() + position.side.slice(1) }}  {{ position.leverage }}x
+            </span> 
             <ChainLabel :chain-id="position.chainId" :liquidity-source="position.liquiditySource" />
           </div>
         </div>
       </div>
     </td>
     
-    <!-- Side Column -->
-    <td class="px-4 py-6">
-      <span
-        :class="[
-          'inline-block px-2 py-0.5 text-xs font-semibold',
-          position.side === 'long'
-            ? 'bg-green-success/20 text-green-success'
-            : 'bg-red-error/20 text-red-error'
-        ]"
-      >
-        {{ position.side.toUpperCase() }}
-      </span>
-    </td>
     
     <!-- Size Column -->
     <td class="px-4 py-6 text-right">
@@ -41,6 +33,14 @@
         <div class="text-[13px] leading-[18px] text-[#9b9b9b] font-normal whitespace-nowrap">
           {{ formatNumber(position.size, 4) }}
         </div>
+      </div>
+    </td>
+
+
+    <!-- Collateral Column -->
+    <td class="px-4 py-6 text-right">
+      <div class="text-[13px] leading-[18px] text-white font-normal whitespace-nowrap">
+        {{ formatCurrency(position.collateral) }}
       </div>
     </td>
     
@@ -69,19 +69,7 @@
       </div>
     </td>
     
-    <!-- Leverage Column -->
-    <td class="px-4 py-6 flex justify-center">
-      <div class="text-[13px] leading-[18px] text-white font-normal">
-        {{ position.leverage }}x
-      </div>
-    </td>
     
-    <!-- Collateral Column -->
-    <td class="px-4 py-6 text-right">
-      <div class="text-[13px] leading-[18px] text-white font-normal whitespace-nowrap">
-        {{ formatCurrency(position.collateral) }}
-      </div>
-    </td>
     
     <!-- PnL Column -->
     <td class="px-4 py-6 text-right">
@@ -112,14 +100,14 @@
         @click="closePosition(position.id)"
         :disabled="signing"
         :class="[
-          'flex items-center justify-center gap-1 bg-[#272727] px-4 py-2 transition',
+          'flex items-center justify-center gap-1 bg-[#272727] px-[17px] py-2 transition',
           signing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#333333]'
         ]"
       >
         <!-- <svg class="w-4 h-4 text-[#ff4e59]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg> -->
-        <span class="text-[12px] leading-[16px] text-[#ff4e59] font-medium text-center whitespace-nowrap">
+        <span class="text-[12px] leading-[16px] text-white font-medium text-center whitespace-nowrap">
             {{ signing ? 'Signing...' : 'Close' }}
         </span>
         <LoadingIcon v-if="signing" class="ml-1" :is-black="false" />
