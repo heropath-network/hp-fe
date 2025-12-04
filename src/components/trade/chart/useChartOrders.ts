@@ -1,6 +1,7 @@
 import { Ref, computed, ref, watch, onUnmounted } from 'vue'
 import { watchDebounced } from '@vueuse/core'
 import { useTradeStore } from '@/stores/tradeStore'
+import { CHART_SHOW_ORDER_STORAGE } from '@/storages/chart'
 
 interface OrderInfo {
   id: string
@@ -30,22 +31,18 @@ const labelStyle = {
  * Composition function to manage order lines on TradingView chart
  * Similar to mux-fe/src/template/Trade/PriceChart/chartLabels.ts
  */
-export function useChartOrders(
-  symbol: Ref<string | null | undefined>,
-  widget: Ref<any>
-) {
+export function useChartOrders(symbol: Ref<string | null | undefined>, widget: Ref<any>) {
   const tradeStore = useTradeStore()
   const chartViewOrders: Ref<Map<string, LineStore>> = ref(new Map())
 
   // Get orders for the current market
   const orders = computed<{ [id: string]: OrderInfo }>(() => {
-    if (!symbol.value) {
+    // Don't show orders if toggle is off
+    if (!CHART_SHOW_ORDER_STORAGE.value || !symbol.value) {
       return {}
     }
 
-    const marketOrders = tradeStore.orders.filter(
-      (order) => order.market === symbol.value
-    )
+    const marketOrders = tradeStore.orders.filter((order) => order.market === symbol.value)
 
     const result: { [id: string]: OrderInfo } = {}
     marketOrders.forEach((order) => {
@@ -77,10 +74,10 @@ export function useChartOrders(
     const isLong = order.isLong
     const isOpen = order.isOpen
     const labelText = getLabelText(order.isOpen, order.orderType, isLong)
-    
+
     // Convert BigInt trigger price to number (18 decimals)
     const price = Number(order.triggerPrice) / 1e18
-    
+
     // Convert BigInt size to number and format for display (18 decimals)
     const sizeNum = Number(order.size) / 1e18
     const size = sizeNum.toFixed(4)
@@ -133,7 +130,7 @@ export function useChartOrders(
     const needUpdateOrders: { [id: string]: OrderInfo } = {}
 
     // Filter delete - orders that no longer exist
-    chartViewOrders.value.forEach((lineStore, id) => {
+    chartViewOrders.value.forEach((_lineStore, id) => {
       const v = orders.value[id]
       if (!v) {
         needDeleteIds.push(id)
@@ -153,10 +150,7 @@ export function useChartOrders(
     chartViewOrders.value.forEach((lineStore, id) => {
       const newData = orders.value[id]
       const oldData = lineStore.order
-      if (
-        newData &&
-        (newData.size !== oldData.size || newData.triggerPrice !== oldData.triggerPrice)
-      ) {
+      if (newData && (newData.size !== oldData.size || newData.triggerPrice !== oldData.triggerPrice)) {
         needUpdateOrders[id] = newData
       }
     })
@@ -198,13 +192,18 @@ export function useChartOrders(
 
   // Watch for order and widget changes with debounce
   const stopWatcher = watchDebounced(
-    [orders, widget],
+    [orders, widget, CHART_SHOW_ORDER_STORAGE],
     () => {
       if (widget.value?.isTvWidgetChartReady) {
-        updateOrdersLine()
+        // If toggle is off, clear all order lines
+        if (!CHART_SHOW_ORDER_STORAGE.value) {
+          clearOrdersLine()
+        } else {
+          updateOrdersLine()
+        }
       }
     },
-    { debounce: 500 }
+    { debounce: 500 },
   )
 
   function clearOrdersLine() {

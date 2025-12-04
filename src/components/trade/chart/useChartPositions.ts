@@ -1,6 +1,7 @@
 import { Ref, computed, ref, watch, onUnmounted } from 'vue'
 import { watchDebounced } from '@vueuse/core'
 import { useTradeStore } from '@/stores/tradeStore'
+import { CHART_SHOW_POSITION_STORAGE } from '@/storages/chart'
 
 interface PositionInfo {
   id: string
@@ -28,22 +29,18 @@ const labelStyle = {
  * Composition function to manage position lines on TradingView chart
  * Similar to mux-fe/src/template/Trade/PriceChart/chartLabels.ts
  */
-export function useChartPositions(
-  symbol: Ref<string | null | undefined>,
-  widget: Ref<any>
-) {
+export function useChartPositions(symbol: Ref<string | null | undefined>, widget: Ref<any>) {
   const tradeStore = useTradeStore()
   const chartViewPositions: Ref<Map<string, LineStore>> = ref(new Map())
 
   // Get positions for the current market
   const positions = computed<{ [id: string]: PositionInfo }>(() => {
-    if (!symbol.value) {
+    // Don't show positions if toggle is off
+    if (!CHART_SHOW_POSITION_STORAGE.value || !symbol.value) {
       return {}
     }
 
-    const marketPositions = tradeStore.positions.filter(
-      (pos) => pos.market === symbol.value && pos.size > BigInt(0)
-    )
+    const marketPositions = tradeStore.positions.filter((pos) => pos.market === symbol.value && pos.size > BigInt(0))
 
     const result: { [id: string]: PositionInfo } = {}
     marketPositions.forEach((pos) => {
@@ -68,7 +65,7 @@ export function useChartPositions(
     const price = Number(info.entryPrice) / 1e18
     const color = isLong ? labelStyle.longColor : labelStyle.shortColor
     const lineColor = isLong ? lineStyle.longColor : lineStyle.shortColor
-    
+
     // Convert BigInt size to number and format for display (18 decimals)
     const sizeNum = Number(info.size) / 1e18
     const size = sizeNum.toFixed(4)
@@ -113,7 +110,7 @@ export function useChartPositions(
     const needUpdatePositions: { [id: string]: PositionInfo } = {}
 
     // Filter delete - positions that no longer exist
-    chartViewPositions.value.forEach((lineStore, id) => {
+    chartViewPositions.value.forEach((_lineStore, id) => {
       const v = positions.value[id]
       if (!v) {
         needDeleteIds.push(id)
@@ -133,10 +130,7 @@ export function useChartPositions(
     chartViewPositions.value.forEach((lineStore, id) => {
       const newData = positions.value[id]
       const oldData = lineStore.info
-      if (
-        newData &&
-        (newData.size !== oldData.size || newData.entryPrice !== oldData.entryPrice)
-      ) {
+      if (newData && (newData.size !== oldData.size || newData.entryPrice !== oldData.entryPrice)) {
         needUpdatePositions[id] = newData
       }
     })
@@ -178,13 +172,18 @@ export function useChartPositions(
 
   // Watch for position and widget changes with debounce
   const stopWatcher = watchDebounced(
-    [positions, widget],
+    [positions, widget, CHART_SHOW_POSITION_STORAGE],
     () => {
       if (widget.value?.isTvWidgetChartReady) {
-        updatePositionsLine()
+        // If toggle is off, clear all position lines
+        if (!CHART_SHOW_POSITION_STORAGE.value) {
+          clearPositionsLine()
+        } else {
+          updatePositionsLine()
+        }
       }
     },
-    { debounce: 500 }
+    { debounce: 500 },
   )
 
   function clearPositionsLine() {

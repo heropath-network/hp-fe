@@ -28,16 +28,28 @@
 
       <!-- Right side actions -->
       <div class="ml-auto flex items-center gap-3">
-        <template v-if="selectedTab === 'positions' && positions.length > 0">
+        <template v-if="selectedTab === 'positions'">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-gray-400">Label Positions</span>
+            <Switch :enabled="chartShowPositions" @update:enabled="chartShowPositions = $event" />
+          </div>
+          <div v-if="positions.length > 0" class="h-4 w-px bg-gray-800"></div>
           <button
+            v-if="positions.length > 0"
             @click="closeAllPositions"
             class="bg-red-error px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-error/90"
           >
             Close All
           </button>
         </template>
-        <template v-if="selectedTab === 'orders' && orders.length > 0">
+        <template v-if="selectedTab === 'orders'">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-gray-400">Label Orders</span>
+            <Switch :enabled="chartShowOrders" @update:enabled="chartShowOrders = $event" />
+          </div>
+          <div v-if="orders.length > 0" class="h-4 w-px bg-gray-800"></div>
           <button
+            v-if="orders.length > 0"
             @click="cancelAllOrders"
             class="bg-gray-700 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-gray-600"
           >
@@ -74,10 +86,15 @@ import PositionsTable from './PositionsTable.vue'
 import OrdersTable from './OrdersTable.vue'
 import HistoryTable from './HistoryTable.vue'
 import { fromBigInt } from '@/utils/bigint'
+import Switch from '@/components/Switch.vue'
+import { CHART_SHOW_POSITION_STORAGE, CHART_SHOW_ORDER_STORAGE } from '@/storages/chart'
 
 const tradeStore = useTradeStore()
 
 const selectedTab = ref<'positions' | 'orders' | 'history'>('positions')
+
+const chartShowPositions = CHART_SHOW_POSITION_STORAGE
+const chartShowOrders = CHART_SHOW_ORDER_STORAGE
 
 const tabs = [
   { key: 'positions' as const, label: 'Positions' },
