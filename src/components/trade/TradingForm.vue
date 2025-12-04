@@ -876,18 +876,7 @@ async function handleTrade() {
         timestamp: Date.now(),
       }
       
-      // This automatically saves to LocalStorage via useUserPositionsStorage
-      tradeStore.openPosition(
-        positionData.market,
-        positionData.side,
-        positionData.size,
-        positionData.entryPrice,
-        positionData.leverage,
-        positionData.collateral,
-        positionData.chainId,
-        positionData.liquiditySource,
-        positionData.accountId
-      )
+      
 
       // Create position object for notification
       // We construct it manually since the store function doesn't return the created position
@@ -927,6 +916,19 @@ async function handleTrade() {
           fillPromise: new Promise<void>((resolve) => {
             setTimeout(() => {
               resolve()
+
+              // This automatically saves to LocalStorage via useUserPositionsStorage
+              tradeStore.openPosition(
+                positionData.market,
+                positionData.side,
+                positionData.size,
+                positionData.entryPrice,
+                positionData.leverage,
+                positionData.collateral,
+                positionData.chainId,
+                positionData.liquiditySource,
+                positionData.accountId
+              )
             }, DURATION_SUCCESS_NOTIFICATION)
           }),
           onClose: () => {
@@ -955,17 +957,7 @@ async function handleTrade() {
         timestamp: Date.now(),
       }
       
-      // This automatically saves to LocalStorage via useUserOrdersStorage
-      tradeStore.placeOrder(
-        orderData.market,
-        orderData.side,
-        orderData.size,
-        orderData.triggerPrice,
-        orderData.orderType,
-        orderData.chainId,
-        orderData.liquiditySource,
-        orderData.accountId
-      )
+      
 
       // Create order object for notification
       // We construct it manually since the store function doesn't return the created order
@@ -996,6 +988,18 @@ async function handleTrade() {
           fillPromise: new Promise<void>((resolve) => {
             setTimeout(() => {
               resolve()
+
+              // This automatically saves to LocalStorage via useUserOrdersStorage
+              tradeStore.placeOrder(
+                orderData.market,
+                orderData.side,
+                orderData.size,
+                orderData.triggerPrice,
+                orderData.orderType,
+                orderData.chainId,
+                orderData.liquiditySource,
+                orderData.accountId
+              )
             }, DURATION_SUCCESS_NOTIFICATION)
           }),
           onClose: () => {
