@@ -110,33 +110,49 @@
     <td class="px-4 py-6 flex justify-center">
       <button
         @click="closePosition(position.id)"
-        class="flex items-center justify-center gap-1 bg-[#272727] px-4 py-2 transition hover:bg-[#333333]"
+        :disabled="signing"
+        :class="[
+          'flex items-center justify-center gap-1 bg-[#272727] px-4 py-2 transition',
+          signing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#333333]'
+        ]"
       >
         <!-- <svg class="w-4 h-4 text-[#ff4e59]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg> -->
         <span class="text-[12px] leading-[16px] text-[#ff4e59] font-medium text-center whitespace-nowrap">
-            Close
+            {{ signing ? 'Signing...' : 'Close' }}
         </span>
+        <LoadingIcon v-if="signing" class="ml-1" :is-black="false" />
       </button>
     </td>
   </tr>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useTradeStore } from '@/stores/tradeStore'
 import { formatNumber, formatCurrency, fromBigInt } from '@/utils/bigint'
-import { calculatePositionPnL } from '@/utils/pnl'
-import type { Position } from '@/storages/trading'
+import { calculatePositionPnL, calculateTradeHistoryPnL } from '@/utils/pnl'
+import type { Position, TradeHistory } from '@/storages/trading'
 import MarketIcon from '@/components/common/MarketIcon.vue'
 import ChainLabel from '@/components/common/ChainLabel.vue'
+import { useConnection, useSignTypedData, useChainId } from '@wagmi/vue'
+import { useEvaluationAccount } from '@/composables/useEvaluationAccount'
+import { useNotification } from '@/composables/useNotification'
+import PositionFilledNotification from '@/components/Notification/PositionFilledNotification.vue'
+import { LoadingIcon } from '@/components'
 
 const props = defineProps<{
   position: Position
 }>()
 
 const tradeStore = useTradeStore()
+const { address, isConnected } = useConnection()
+const { signTypedDataAsync } = useSignTypedData()
+const chainId = useChainId()
+const { selectedEvaluationId } = useEvaluationAccount()
+const notification = useNotification()
+const signing = ref(false)
 
 function getMarkPrice(market: string): string {
   const price = tradeStore.marketPrices[market]?.price
@@ -198,13 +214,158 @@ function getTimeframe(): string {
 }
 
 /**
- * Closes a position and removes it from storage
+ * Requests signature for closing a position
+ */
+async function requestClosePositionSignature() {
+  if (!address.value) {
+    throw new Error('Wallet not connected')
+  }
+
+  const currentPrice = tradeStore.marketPrices[props.position.market]?.price || props.position.entryPrice
+  const exitPrice = fromBigInt(currentPrice, 2)
+  const baseAsset = props.position.market.split('/')[0] || ''
+  const sizeFormatted = fromBigInt(props.position.size, 4)
+  
+  const messageLines = [
+    'Trade Confirmation',
+    'Action: Close Position',
+    `Account: ${selectedEvaluationId.value ?? 'N/A'}`,
+    `Market: ${props.position.market}`,
+    `Side: ${props.position.side}`,
+    `Size: ${sizeFormatted} ${baseAsset}`,
+    `Entry Price: $${fromBigInt(props.position.entryPrice, 2)}`,
+    `Exit Price: $${exitPrice}`,
+    `Leverage: ${props.position.leverage}x`,
+  ]
+
+  const contents = `${messageLines.join('\n')}\n\n.`
+
+  await signTypedDataAsync({
+    types: {
+      Person: [{ name: 'wallet', type: 'address' }],
+      Trade: [
+        { name: 'account', type: 'Person' },
+        { name: 'action', type: 'string' },
+        { name: 'market', type: 'string' },
+        { name: 'side', type: 'string' },
+        { name: 'orderType', type: 'string' },
+        { name: 'size', type: 'string' },
+        { name: 'price', type: 'string' },
+        { name: 'triggerPrice', type: 'string' },
+        { name: 'leverage', type: 'uint256' },
+        { name: 'contents', type: 'string' },
+      ],
+    },
+    primaryType: 'Trade',
+    message: {
+      account: {
+        wallet: address.value,
+      },
+      action: 'Close Position',
+      market: props.position.market,
+      side: props.position.side,
+      orderType: 'market',
+      size: sizeFormatted,
+      price: exitPrice,
+      triggerPrice: 'market',
+      leverage: props.position.leverage,
+      contents,
+    },
+  } as any)
+}
+
+/**
+ * Closes a position with signing and notification
  * This calculates PnL and updates account balance, then removes from LocalStorage
  */
-function closePosition(positionId: string) {
-  if (confirm('Are you sure you want to close this position?')) {
-    // closePosition automatically updates storage via tradeStore
+async function closePosition(positionId: string) {
+  if (!isConnected.value || !address.value) {
+    alert('Please connect your wallet first')
+    return
+  }
+
+  signing.value = true
+
+  try {
+    await requestClosePositionSignature()
+    
+    const DURATION_SUCCESS_NOTIFICATION = 3000
+    const DURATION_CLOSE_NOTIFICATION = DURATION_SUCCESS_NOTIFICATION + 2000
+
+    // Get position data before closing
+    const position = tradeStore.positions.find((p) => p.id === positionId)
+    if (!position) {
+      throw new Error('Position not found')
+    }
+
+    const currentPrice = tradeStore.marketPrices[position.market]?.price || position.entryPrice
+    const currentLiquiditySource = tradeStore.getLiquiditySourceFromOracle(tradeStore.selectedOracle)
+    const marginSetting = tradeStore.getMarginSetting(position.market)
+    const marginMode = marginSetting.mode
+
+    // Calculate PnL before closing (same calculation as in closePosition)
+    const pnlBreakdown = calculateTradeHistoryPnL(
+      position.entryPrice,
+      currentPrice,
+      position.side,
+      position.size,
+      position.leverage,
+      position.collateral,
+      position.timestamp,
+      Date.now(),
+      true, // Include fees
+    )
+
+    // Create trade history object for notification (matching what closePosition creates)
+    const tradeHistory: TradeHistory = {
+      id: position.id,
+      accountId: position.accountId,
+      market: position.market,
+      side: position.side,
+      size: position.size,
+      entryPrice: position.entryPrice,
+      exitPrice: currentPrice,
+      pnl: pnlBreakdown.netPnl,
+      collateral: position.collateral,
+      leverage: position.leverage,
+      timestamp: position.timestamp,
+      closeTimestamp: Date.now(),
+      chainId: position.chainId,
+      liquiditySource: position.liquiditySource,
+    }
+
+    // Close the position (this updates storage)
     tradeStore.closePosition(positionId)
+
+    // Show notification
+    const notificationInstance = notification.create({
+      content: PositionFilledNotification,
+      props: {
+        position: null,
+        order: null,
+        tradeHistory: tradeHistory,
+        market: position.market,
+        side: position.side,
+        orderType: 'market',
+        liquiditySource: currentLiquiditySource,
+        marginMode: marginMode,
+        actionType: 'close',
+        fillPromise: new Promise<void>((resolve) => {
+          setTimeout(() => {
+            resolve()
+          }, DURATION_SUCCESS_NOTIFICATION)
+        }),
+        onClose: () => {
+          notificationInstance.destroy()
+        },
+      },
+      duration: DURATION_CLOSE_NOTIFICATION,
+    })
+  } catch (error) {
+    console.error('Close position signing failed:', error)
+    // Don't close the position if signing failed
+  } finally {
+    signing.value = false
   }
 }
 </script>

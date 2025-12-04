@@ -92,22 +92,26 @@
 import { computed, ref, onMounted } from 'vue'
 import { formatNumber } from '@/utils/bigint'
 import { LIQUIDITY_SOURCES, type LiquiditySourceId } from '@/constants/liquiditySources'
-import type { Position, Order } from '@/storages/trading'
+import type { Position, Order, TradeHistory } from '@/storages/trading'
 
 interface Props {
   position?: Position | null
   order?: Order | null
+  tradeHistory?: TradeHistory | null
   market: string
   side: 'long' | 'short'
   orderType: 'market' | 'limit' | 'stop'
   liquiditySource: LiquiditySourceId
   marginMode: 'isolated' | 'cross'
+  actionType?: 'open' | 'close' | 'place'
   fillPromise?: Promise<any>
 }
 
 const props = withDefaults(defineProps<Props>(), {
   position: null,
   order: null,
+  tradeHistory: null,
+  actionType: 'open',
   fillPromise: undefined,
 })
 
@@ -150,10 +154,6 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-function handleClose() {
-  emit('close')
-}
-
 // Get token symbol from market (e.g., "ETH/USD" -> "ETH")
 const tokenSymbol = computed(() => {
   return props.market.split('/')[0] || 'ETH'
@@ -167,6 +167,9 @@ const tokenIconSrc = computed(() => {
 
 // Title label
 const titleLabel = computed(() => {
+  if (props.actionType === 'close') {
+    return 'Close Position'
+  }
   return props.position ? 'Open Position' : 'Place Order'
 })
 
@@ -213,6 +216,10 @@ const marginModeLabel = computed(() => {
 
 // Formatted price
 const formattedPrice = computed(() => {
+  if (props.tradeHistory && props.actionType === 'close') {
+    // For closed positions, show exit price
+    return formatNumber(props.tradeHistory.exitPrice, 2)
+  }
   if (props.position) {
     return formatNumber(props.position.entryPrice, 2)
   }
@@ -224,6 +231,12 @@ const formattedPrice = computed(() => {
 
 // Formatted size
 const formattedSize = computed(() => {
+  if (props.tradeHistory && props.actionType === 'close') {
+    // For closed positions, calculate USD value using exit price
+    const sizeUsdBigInt = (props.tradeHistory.size * props.tradeHistory.exitPrice) / BigInt(10 ** 18)
+    const sizeUsd = formatNumber(sizeUsdBigInt, 2)
+    return `${formatNumber(props.tradeHistory.size, 4)} ${tokenSymbol.value} ($${sizeUsd})`
+  }
   if (props.position) {
     // Calculate USD value: size * entryPrice (both in 18 decimals, result needs to be divided by 10^18)
     const sizeUsdBigInt = (props.position.size * props.position.entryPrice) / BigInt(10 ** 18)
