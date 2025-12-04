@@ -1,21 +1,22 @@
-import { computed, ref, watch } from 'vue'
+import { computed, watch } from 'vue'
 import { useConnection } from '@wagmi/vue'
-import { useUserEvaluationsStorage } from '@/storages/heroPath'
+import { useUserEvaluationsStorage, useSelectedEvaluationAccountStorage } from '@/storages/heroPath'
 
 /**
  * Composable for managing evaluation account selection and balance calculations
  * Used in both Dashboard and TradeHeader to maintain consistent logic
+ * The selected account is stored globally and persists across the app
  */
 export function useEvaluationAccount() {
   const { address } = useConnection()
   const { data: evaluations } = useUserEvaluationsStorage(address)
+  const { data: selectedEvaluationId, setSelectedAccount } = useSelectedEvaluationAccountStorage(address)
 
   const evaluationList = computed(() => {
     return evaluations.value || []
   })
 
   // Get selected evaluation
-  const selectedEvaluationId = ref<string | null>(null)
   const selectedEvaluation = computed(
     () => evaluationList.value.find((evaluation) => evaluation.accountId === selectedEvaluationId.value) || null,
   )
@@ -55,18 +56,18 @@ export function useEvaluationAccount() {
     evaluationList,
     (list) => {
       if (!list.length) {
-        selectedEvaluationId.value = null
+        setSelectedAccount(null)
         return
       }
       if (!selectedEvaluationId.value || !list.some((item) => item.accountId === selectedEvaluationId.value)) {
-        selectedEvaluationId.value = list[0].accountId
+        setSelectedAccount(list[0].accountId)
       }
     },
     { immediate: true },
   )
 
   function selectEvaluation(id: string) {
-    selectedEvaluationId.value = id
+    setSelectedAccount(id)
   }
 
   return {
@@ -81,4 +82,3 @@ export function useEvaluationAccount() {
     selectEvaluation,
   }
 }
-

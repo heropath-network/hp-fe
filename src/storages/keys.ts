@@ -7,6 +7,7 @@ const UserTradeHistory = 'user:trade:history:{addr}'
 const AccountShowInLeaderboardKey = 'heroPath:accountShowInLeaderboard:{addr}'
 const UserQuestTaskStatusKey = 'user:questTaskStatus:{addr}'
 const UserQuestDiscountStatusKey = 'user:questDiscount:status:{addr}:{task}'
+const SelectedEvaluationAccountKey = 'heroPath:selectedEvaluationAccount:{addr}'
 
 export {
   UserTradeHistory,
@@ -18,4 +19,5 @@ export {
   UserPositionsKey,
   UserOrdersKey,
   AccountShowInLeaderboardKey,
+  SelectedEvaluationAccountKey,
 }

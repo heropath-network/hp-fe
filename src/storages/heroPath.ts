@@ -7,6 +7,7 @@ import {
   UserWithdrawalHistoryKey,
   UserQuestDiscountStatusKey,
   UserQuestTaskStatusKey,
+  SelectedEvaluationAccountKey,
 } from './keys'
 import { EMPTY_ADDRESS } from '@/constants'
 import { UserEvaluation, UserPayouts, UserWithdrawalHistory, QuestDiscount, QuestTaskId } from '@/types/heroPath'
@@ -191,5 +192,27 @@ export function useUserQuestDiscountStatusStorage(address: Ref<string | undefine
     clear,
     addDiscountStatus,
     updateDiscountStatus,
+  }
+}
+
+export function useSelectedEvaluationAccountStorage(address: Ref<string | undefined>) {
+  const key = computed(() => {
+    return SelectedEvaluationAccountKey.replace('{addr}', address.value ?? EMPTY_ADDRESS)
+  })
+
+  const storage = useLocalStorage<string | null>(key, null)
+
+  function setSelectedAccount(accountId: string | null) {
+    storage.value = accountId
+  }
+
+  function clear() {
+    storage.value = null
+  }
+
+  return {
+    data: storage,
+    setSelectedAccount,
+    clear,
   }
 }
