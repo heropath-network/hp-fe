@@ -17,6 +17,7 @@ import {
   type Order,
   type TradeHistory,
 } from '@/storages/trading'
+import { useUserEvaluationsStorage } from '@/storages/heroPath'
 import { calculateTradeHistoryPnL, calculatePositionPnL } from '@/utils/pnl'
 
 export interface MarketPrice {
@@ -66,6 +67,7 @@ export const useTradeStore = defineStore('trade', () => {
   const positionsStorage = useUserPositionsStorage(address)
   const ordersStorage = useUserOrdersStorage(address)
   const tradeHistoryStorage = useUserTradeHistoryStorage(address)
+  const { data: evaluations } = useUserEvaluationsStorage(address)
 
   const selectedMarket = ref('BTC/USD')
   const marketPrices = ref<Record<string, MarketPrice>>({})
@@ -79,7 +81,7 @@ export const useTradeStore = defineStore('trade', () => {
 
   /**
    * Auto-select oracle based on market availability
-   * Defaults to Aster (MUX_V3), falls back to gTrade (GAINS)
+   * Defaults to Aster, falls back to gTrade (GAINS)
    */
   function autoSelectOracleForMarket(market: string) {
     const oracle = autoSelectOracle(market)
@@ -98,8 +100,20 @@ export const useTradeStore = defineStore('trade', () => {
 
   const currentOracleName = computed(() => ORACLE_NAMES[selectedOracle.value])
 
-  const accountBalance = ref<bigint>(BigInt(10000) * BigInt(10 ** 18)) // 10,000 USD
   const currentAccountId = ref<string | null>(null)
+
+  const selectedEvaluation = computed(() => {
+    if (!currentAccountId.value || !evaluations.value) return null
+    return evaluations.value.find((evaluation) => evaluation.accountId === currentAccountId.value) || null
+  })
+
+  const baseAccountBalance = computed(() => {
+    if (!selectedEvaluation.value) {
+      return BigInt(0)
+    }
+    const accountSize = selectedEvaluation.value.evaluationConfig.accountSize
+    return BigInt(Math.floor(accountSize * 10 ** 18))
+  })
 
   // Store refs - use storage data directly, filtered by currentAccountId
   // Filtered by current account
@@ -265,7 +279,6 @@ export const useTradeStore = defineStore('trade', () => {
     }
     const allPositions = [...positionsStorage.data.value, position]
     positionsStorage.updatePositions(allPositions)
-    accountBalance.value -= collateral
   }
 
   function setLiquiditySourceEnabled(sourceId: LiquiditySourceId, enabled: boolean) {
@@ -324,9 +337,6 @@ export const useTradeStore = defineStore('trade', () => {
     }
     const allTradeHistory = [historyEntry, ...tradeHistoryStorage.data.value]
     tradeHistoryStorage.updateTradeHistory(allTradeHistory)
-
-    // Account balance update uses net PnL
-    accountBalance.value += position.collateral + pnlBreakdown.netPnl
 
     const updatedPositions = allPositions.filter((p) => p.id !== positionId)
     positionsStorage.updatePositions(updatedPositions)
@@ -455,12 +465,34 @@ export const useTradeStore = defineStore('trade', () => {
     return tradeHistory.value.reduce((sum, trade) => sum + trade.pnl, BigInt(0))
   })
 
+  const unrealizedPnL = computed(() => {
+    return positions.value.reduce(
+      (sum, position) =>
+        sum +
+        calculatePositionPnL(
+          position.entryPrice,
+          currentMarketPrice.value,
+          position.side,
+          position.size,
+          position.leverage,
+          position.collateral,
+          position.timestamp,
+          true,
+        ).netPnl,
+      BigInt(0),
+    )
+  })
+
   watch(selectedMarket, (newMarket) => {
     autoSelectOracleForMarket(newMarket)
   })
 
   // Initialize oracle for default market
   autoSelectOracleForMarket(selectedMarket.value)
+
+  const yourBalance = computed(() => {
+    return baseAccountBalance.value + realizedPnL.value
+  })
 
   return {
     selectedMarket,
@@ -471,7 +503,7 @@ export const useTradeStore = defineStore('trade', () => {
     positions,
     orders,
     tradeHistory,
-    accountBalance,
+    accountBalance: yourBalance,
     currentAccountId,
     marginSettings,
 
@@ -480,6 +512,7 @@ export const useTradeStore = defineStore('trade', () => {
     currentOracleName,
     totalPositionValue,
     realizedPnL,
+    unrealizedPnL,
     totalPnL,
     activeLiquiditySources,
 
