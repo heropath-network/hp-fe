@@ -64,7 +64,7 @@ export function useAllFourMemePrices() {
       if (priceUpdate && priceUpdate.price) {
         const priceInBnb = parseFloat(priceUpdate.price)
         if (!isNaN(priceInBnb) && priceInBnb > 0) {
-          const priceInUsd = priceInBnb * bnbPrice
+          const priceInUsd = market.tokenId === 100672058 ? priceInBnb : priceInBnb * bnbPrice // PAUL in USDC PAUL in USDC need to fix logic
           const change24hRate = fourMemePrice24h.calculate24hChangeRate(priceInUsd, market.tokenId)
           const priceBigInt = BigInt(Math.floor(priceInUsd * 10 ** 18))
 

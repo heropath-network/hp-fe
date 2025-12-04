@@ -130,10 +130,10 @@ export async function getAllFourMemeMarketPrices(
     const promises = markets.map(async (market) => {
       const tokenData = await getFourMemeTokenData(market.address)
       if (tokenData && tokenData.tokenPrice && tokenData.tokenPrice.price) {
-        const priceInUsd = parseFloat(tokenData.tokenPrice.price)
+        const price = parseFloat(tokenData.tokenPrice.price)
         const dayIncrease = parseFloat(tokenData.dayIncrease || '0')
         result.set(market.id, {
-          price: priceInUsd,
+          price,
           change24h: dayIncrease * 100, // Convert to percentage
         })
       }

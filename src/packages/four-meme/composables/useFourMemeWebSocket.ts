@@ -272,7 +272,7 @@ export function useFourMemeWebSocketPrice(market: Ref<FourMemeMarket | null | un
     if (update && bnbPrice && bnbPrice > 0) {
       const priceInBnb = parseFloat(update.price)
       if (!isNaN(priceInBnb) && priceInBnb > 0) {
-        const priceInUsd = priceInBnb * bnbPrice
+        const priceInUsd = m.tokenId === 100672058 ? priceInBnb : priceInBnb * bnbPrice // PAUL in USDC PAUL in USDC need to fix logic
         currentPrice.value = priceInUsd
         priceUpdate.value = {
           ...update,
