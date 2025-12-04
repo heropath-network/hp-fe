@@ -12,7 +12,9 @@
             <div class="flex items-center gap-1">
               <span class="text-base font-semibold leading-[24px] text-white">{{ selectedMarket }}</span>
             </div>
-            <span class="text-xs mt-[2px] leading-[16px] text-gray-400">Up to {{ maxLeverage }}X</span>
+            <span class="text-xs mt-[2px] leading-[16px] text-gray-400">
+              {{ isMemeMarket ? 'Meme Spot' : `Up to ${maxLeverage}X` }}
+            </span>
           </div>
         </div>
         <svg class="ml-3 h-4 w-4 flex-shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,15 +214,16 @@ import MarketIcon from '@/components/common/MarketIcon.vue'
 import Tooltip from '@/components/common/Tooltip.vue'
 import SourceLiquidityLabel from '@/components/common/SourceLiquidityLabel.vue'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
-import { getAvailableOraclesForMarket } from '@/utils/oracleMatching'
-import { ProjectId, ORACLE_NAMES } from '@/constants'
+import { getAvailableOraclesForMarket, isMarketAvailableInFourMeme } from '@/utils/oracleMatching'
+import { ORACLE_NAMES } from '@/constants'
 
 const tradeStore = useTradeStore()
 const marketStatus = useMarketStatus()
 
 const selectedMarket = computed(() => tradeStore.selectedMarket)
 const isMarketClosed = computed(() => marketStatus.checkMarketClosed(selectedMarket.value))
-const maxLeverage = computed(() => '100') // Default leverage, can be made dynamic
+const maxLeverage = computed(() => '5') // Default leverage, can be made dynamic
+const isMemeMarket = computed(() => isMarketAvailableInFourMeme(selectedMarket.value))
 
 const oracleSources = computed(() => tradeStore.oracleSources)
 const selectedOracleName = computed(() => tradeStore.currentOracleName)
