@@ -7,12 +7,12 @@
 
         <TradeStatistics @open-market-select="showMarketSelect = true" />
 
-        <div class="flex-1 overflow-hidden">
+        <div class="flex-1 overflow-hidden min-h-[50vh]">
           <PriceChart />
         </div>
 
         <!-- Positions and Orders -->
-        <div class="h-[40%] border-t border-gray-800">
+        <div class="flex-1 border-t border-gray-800 max-h-[calc(100vh-300px)]">
           <PositionsAndOrders />
         </div>
       </div>
