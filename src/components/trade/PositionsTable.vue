@@ -5,14 +5,12 @@
         <thead class="border-b border-gray-800">
           <tr class="text-xs text-gray-400">
             <th class="px-4 py-3 text-left font-medium">Market</th>
-            <th class="px-4 py-3 text-left font-medium">Side</th>
             <th class="px-4 py-3 text-right font-medium">Size</th>
+            <th class="px-4 py-3 text-right font-medium">Net Value</th>
             <th class="px-4 py-3 text-right font-medium">Entry Price</th>
-            <th class="px-4 py-3 text-right font-medium">Mark Price</th>
+            <th class="px-4 py-3 text-right font-medium">Index Price</th>
             <th class="px-4 py-3 text-right font-medium">Liq. Price</th>
-            <th class="px-4 py-3 text-center font-medium">Leverage</th>
-            <th class="px-4 py-3 text-right font-medium">Collateral</th>
-            <th class="px-4 py-3 text-right font-medium">PnL</th>
+            <th class="px-4 py-3 text-right font-medium">PNL & ROE</th>
             <th class="px-4 py-3 text-center font-medium">Actions</th>
           </tr>
         </thead>
