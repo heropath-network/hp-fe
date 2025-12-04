@@ -1,7 +1,7 @@
 import { useLocalStorage } from '@vueuse/core'
 
 const FAVORITES_STORAGE_KEY = 'market-favorites'
-const DEFAULT_FAVORITES: string[] = ['BTC/USD','BNB/USD',  'GG']
+const DEFAULT_FAVORITES: string[] = ['BTC/USD', 'BNB/USD', 'GG', 'PALU']
 
 export const favoritesStorage = useLocalStorage<string[]>(FAVORITES_STORAGE_KEY, DEFAULT_FAVORITES)
 
