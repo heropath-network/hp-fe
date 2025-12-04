@@ -69,11 +69,11 @@
                 ></div>
                 <!-- Slider markers -->
                 <div class="absolute inset-0 flex justify-between items-center pointer-events-none">
-                  <div class="w-[3px] h-[3px] rounded-full bg-[#9b9b9b]" :class="localLeverage > 1 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"></div>
+                  <div class="ml-[2px] w-[3px] h-[3px] rounded-full bg-[#9b9b9b]" :class="localLeverage > 1 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"></div>
                   <div class="w-[3px] h-[3px] rounded-full bg-[#9b9b9b]" :class="localLeverage > 2 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"></div>
                   <div class="w-[3px] h-[3px] rounded-full bg-[#9b9b9b]" :class="localLeverage > 3 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"></div>
                   <div class="w-[3px] h-[3px] rounded-full bg-[#9b9b9b]" :class="localLeverage > 4 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"></div>
-                  <div class="w-[3px] h-[3px] rounded-full bg-[#9b9b9b]" :class="localLeverage > 5 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"></div>
+                  <div class="mr-[2px] w-[3px] h-[3px] rounded-full bg-[#9b9b9b]" :class="localLeverage > 5 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"></div>
                 </div>
               </div>
             </div>
