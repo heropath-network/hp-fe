@@ -315,6 +315,7 @@
           <!-- Max. Position Slippage with edit icon -->
           <div v-else-if="(item as TradeDetailItem).key === 'maxSlippage'" class="flex items-center gap-1">
             <span class="text-[13px] leading-[18px] text-white text-right">{{ item.value }}</span>
+            <i class="iconfont icon-edit text-[#9B9B9B]"></i>
           </div>
           <!-- Regular value -->
           <span v-else class="text-[13px] leading-[18px] text-white text-right">{{ item.value }}</span>
@@ -378,21 +379,6 @@
             </span>
           </div>
 
-         
-          <div class="flex items-start justify-between">
-            <div class="flex items-center gap-1">
-              <div class="flex flex-col">
-                <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Margin Usage</span>
-                <div class="h-px w-full bg-[#272727] mt-0.5"></div>
-              </div>
-              
-            </div>
-            <div class="flex flex-col items-end">
-              <span class="text-[13px] leading-[18px] text-white">{{ formatCurrency(marginUsageAmount) }}</span>
-              <div class="h-px w-[51px] bg-[#272727] mt-0.5"></div>
-            </div>
-          </div>
-
           <!-- Margin Usage Percentage -->
           <div class="flex items-start justify-between">
             <div class="flex flex-col">
@@ -415,7 +401,7 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1 cursor-pointer" @click="showCrossBreakdown = !showCrossBreakdown">
               <div class="flex flex-col">
-                <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Cross Margin Ratio</span>
+                <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Margin Ratio</span>
                 <div class="h-px w-full bg-[#272727] mt-0.5"></div>
               </div>
               <svg 
