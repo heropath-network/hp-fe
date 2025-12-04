@@ -5,6 +5,7 @@ import { computed } from 'vue'
 import GlobalMount from './GlobalMount.vue'
 import Header from '@/views/Header/Header.vue'
 import Menu from '@/views/Menu.vue'
+import NotificationContainer from '@/components/Notification/NotificationContainer.vue'
 
 const route = useRoute()
 const showMenu = computed(() => !route.meta?.hideMenu)
@@ -30,4 +31,5 @@ const isTradePage = computed(() => route.path === "/trade");
     </div>
   </div>
   <GlobalMount />
+  <NotificationContainer />
 </template>
