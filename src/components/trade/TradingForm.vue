@@ -362,7 +362,7 @@
               <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Your Balance</span>
               <div class="h-px w-full bg-[#272727] mt-0.5"></div>
             </div>
-            <span class="text-[13px] leading-[18px] text-white">{{ formatCurrency(accountBalance) }}</span>
+            <span class="text-[13px] leading-[18px] text-white">{{ formatCurrency(yourBalance) }}</span>
           </div>
 
           <!-- Unrealized PnL (shown when Account Equity is expanded) -->
@@ -505,12 +505,17 @@ const { signTypedDataAsync } = useSignTypedData()
 const {
   selectedMarket,
   accountBalance,
+  realizedPnL,
   currentMarketPrice,
   liquiditySources,
   activeLiquiditySources,
   positions,
   totalPnL
 } = storeToRefs(tradeStore)
+
+const yourBalance = computed(() => {
+  return accountBalance.value + realizedPnL.value
+})
 
 const tradeSide = ref<'long' | 'short'>('long')
 const orderType = ref<'market' | 'limit' | 'stop'>('market')
@@ -1061,7 +1066,7 @@ const collateralLocked = computed(() => {
   return positions.value.reduce((sum, pos) => sum + pos.collateral, BigInt(0))
 })
 
-const accountValueUsd = computed(() => accountBalance.value + totalPnL.value)
+const accountValueUsd = computed(() => yourBalance.value + totalPnL.value)
 
 function leverageToBigInt(value: number): bigint {
   const normalized = Number.isFinite(value) ? Math.max(1, Math.floor(value)) : 1

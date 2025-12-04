@@ -425,11 +425,7 @@ export const useTradeStore = defineStore('trade', () => {
 
     // Update leverage and recalculate liquidation price for each active position
     const updatedPositions = activePositions.map((position) => {
-      const updatedLiquidationPrice = calculateLiquidationPrice(
-        position.entryPrice,
-        newLeverage,
-        position.side
-      )
+      const updatedLiquidationPrice = calculateLiquidationPrice(position.entryPrice, newLeverage, position.side)
 
       return {
         ...position,
@@ -455,6 +451,10 @@ export const useTradeStore = defineStore('trade', () => {
     )
   }
 
+  const realizedPnL = computed(() => {
+    return tradeHistory.value.reduce((sum, trade) => sum + trade.pnl, BigInt(0))
+  })
+
   watch(selectedMarket, (newMarket) => {
     autoSelectOracleForMarket(newMarket)
   })
@@ -479,6 +479,7 @@ export const useTradeStore = defineStore('trade', () => {
     oracleSources,
     currentOracleName,
     totalPositionValue,
+    realizedPnL,
     totalPnL,
     activeLiquiditySources,
 
