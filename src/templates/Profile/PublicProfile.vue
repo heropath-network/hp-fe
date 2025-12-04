@@ -9,6 +9,11 @@ import { ROUTE_NAMES } from '@/router'
 import { useUserEvaluationsStorage } from '@/storages/heroPath'
 import { formatDate, formatNumber, getAccountTypeLabel, getAccountStatusLabel } from '@/utils/common'
 import BaseIcon from '@/components/BaseIcon.vue'
+import { useUserTradeHistoryStorage } from '@/storages/trading'
+import { useUserPayoutsStorage } from '@/storages/heroPath'
+import { countTradesWinRate, getAccountHistoryPnl, getAccountTotalVolume } from '@/utils/evaluation'
+import { SHARE_OF_PROFIT } from '@/constants'
+import * as _ from 'lodash-es'
 
 const router = useRouter()
 
@@ -18,6 +23,29 @@ const { data: _userEvaluations } = useUserEvaluationsStorage(address)
 
 const userEvaluations = computed(() => {
   return _userEvaluations.value.filter((evaluation) => evaluation.displayStatus.showPublic)
+})
+
+const { data: userTradeHistory } = useUserTradeHistoryStorage(address)
+const { data: payoutsInfo } = useUserPayoutsStorage(address)
+
+const evaluationTradeHistory = computed(() => {
+  if (!userEvaluations.value || !userTradeHistory.value) {
+    return []
+  }
+  const accountIds = userEvaluations.value
+    .filter((evaluation) => evaluation.accountType === 'evaluation')
+    .map((evaluation) => evaluation.accountId)
+  return userTradeHistory.value.filter((trade) => accountIds.includes(trade.accountId))
+})
+
+const fundedTradeHistory = computed(() => {
+  if (!userEvaluations.value || !userTradeHistory.value) {
+    return []
+  }
+  const accountIds = userEvaluations.value
+    .filter((evaluation) => evaluation.accountType === 'funded')
+    .map((evaluation) => evaluation.accountId)
+  return userTradeHistory.value.filter((trade) => accountIds.includes(trade.accountId))
 })
 
 const accountFilters = [
@@ -46,25 +74,42 @@ const patternStyle = {
   backgroundPosition: '-20px -20px',
 }
 
-const lifetimeTradingVolume = computed(() => {
-  return 0
+const evaluationTradingVolume = computed(() => {
+  return Number(getAccountTotalVolume(evaluationTradeHistory.value))
 })
 
 const fundedTradingVolume = computed(() => {
-  return 0
+  return Number(getAccountTotalVolume(fundedTradeHistory.value))
 })
+
+const lifetimeTradingVolume = computed(() => {
+  return evaluationTradingVolume.value + fundedTradingVolume.value
+})
+
+const totalPnl = computed(() => {
+  return Number(getAccountHistoryPnl(fundedTradeHistory.value)) * SHARE_OF_PROFIT
+})
+
 const currentWithdrawableProfit = computed(() => {
-  return 0
+  return totalPnl.value - payoutsInfo.value.withdrawnAmount
 })
+
+const tradeWinRateInfo = computed(() => {
+  return countTradesWinRate([...evaluationTradeHistory.value, ...fundedTradeHistory.value])
+})
+
 const highestWinRateAsset = computed(() => {
-  return '--'
+  const v = _.maxBy(tradeWinRateInfo.value, (info) => info.winRate)?.market
+  return v ?? '--'
 })
 
 const tradingWinRate = computed(() => {
-  return '0'
+  const v = _.maxBy(tradeWinRateInfo.value, (info) => info.winRate)
+  return v ? v.winRate : 0
 })
+
 const lifetimeProfitWithdrawn = computed(() => {
-  return 0
+  return payoutsInfo.value.withdrawnAmount + currentWithdrawableProfit.value
 })
 </script>
 

@@ -7,7 +7,7 @@ import { useDayCountDown } from '@/use/useDayCountDown'
 import BaseIcon from '@/components/BaseIcon.vue'
 import router, { ROUTE_NAMES } from '@/router'
 import { useUserTradeHistoryStorage } from '@/storages/trading'
-import { getAccountHistoryPnl, getAccountTotalVolume } from '@/use/evaluation'
+import { getAccountHistoryPnl, getAccountTotalVolume } from '@/utils/evaluation'
 
 const { remainingText: dayCountDown } = useDayCountDown()
 
