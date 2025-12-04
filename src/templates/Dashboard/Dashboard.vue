@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useConnection } from '@wagmi/vue'
 import { ellipsisMiddle, formatNumber, getAccountTypeLabel } from '@/utils/common'
-import { useUserEvaluationsStorage } from '@/storages/heroPath'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useDayCountDown } from '@/use/useDayCountDown'
 import BaseIcon from '@/components/BaseIcon.vue'
 import router, { ROUTE_NAMES } from '@/router'
@@ -10,20 +9,22 @@ import { useUserTradeHistoryStorage, useUserPositionsStorage } from '@/storages/
 import { getAccountHistoryPnl, getAccountTotalVolume, getPositionsUnrealizedPnl } from '@/utils/evaluation'
 import { useAllTokenPrices } from '@/use/useTokenPrices'
 import { EvaluationGlobalConfigInfo } from '@/config/evaluation'
+import { useEvaluationAccount } from '@/composables/useEvaluationAccount'
 
 const { remainingText: dayCountDown } = useDayCountDown()
 
 const { address, isConnected } = useConnection()
-const { data: evaluations } = useUserEvaluationsStorage(address)
 const { data: allTradeHistory } = useUserTradeHistoryStorage(address)
 const { data: allPositions } = useUserPositionsStorage(address)
 
 const { prices: allTokenPrices } = useAllTokenPrices()
 
-const selectedEvaluationId = ref<string | null>(null)
-const selectedEvaluation = computed(
-  () => evaluations.value?.find((evaluation) => evaluation.accountId === selectedEvaluationId.value) || null,
-)
+const {
+  evaluationList,
+  selectedEvaluationId,
+  selectedEvaluation,
+  selectEvaluation,
+} = useEvaluationAccount()
 
 const accountTradeHistory = computed(() => {
   if (!selectedEvaluation.value) {
@@ -39,8 +40,8 @@ const accountPositions = computed(() => {
   return allPositions.value.filter((position) => position.accountId === selectedEvaluation.value!.accountId)
 })
 
-const evaluationList = computed(() => {
-  return evaluations.value.filter((item) => item.displayStatus.showDashboard)
+const dashboardEvaluationList = computed(() => {
+  return evaluationList.value.filter((item) => item.displayStatus.showDashboard)
 })
 
 const displayDate = computed(() => {
@@ -126,24 +127,10 @@ const maxDailyLossEquityLimit = computed(() => {
 
 const showEvaluationDropdown = ref(false)
 
-function selectEvaluation(id: string) {
-  selectedEvaluationId.value = id
+function handleSelectEvaluation(id: string) {
+  selectEvaluation(id)
   showEvaluationDropdown.value = false
 }
-
-watch(
-  evaluationList,
-  (list) => {
-    if (!list.length) {
-      selectedEvaluationId.value = null
-      return
-    }
-    if (!selectedEvaluationId.value || !list.some((item) => item.accountId === selectedEvaluationId.value)) {
-      selectedEvaluationId.value = list[0].accountId
-    }
-  },
-  { immediate: true },
-)
 </script>
 
 <template>
@@ -182,12 +169,12 @@ watch(
             v-if="showEvaluationDropdown"
             class="absolute right-0 top-[calc(100%+8px)] z-20 w-full min-w-[280px] overflow-hidden border border-[var(--hp-line-light-color)] bg-[var(--hp-bg-light)]"
           >
-            <template v-if="!evaluationList.length">
+            <template v-if="!dashboardEvaluationList.length">
               <div class="px-4 py-3 text-sm text-[var(--hp-white-color)]">No evaluation accounts</div>
             </template>
             <template v-else>
               <button
-                v-for="evaluation in evaluationList"
+                v-for="evaluation in dashboardEvaluationList"
                 :key="evaluation.accountId"
                 type="button"
                 class="flex w-full items-center cursor-pointer justify-between px-4 py-3 text-left transition bg-[var(--hp-line-normal-color)] hover:bg-[var(--hp-line-light-color)] group"
@@ -196,7 +183,7 @@ watch(
                     ? 'text-[var(--hp-primary-green)]'
                     : 'text-[var(--hp-white-color)]',
                 ]"
-                @click="selectEvaluation(evaluation.accountId)"
+                @click="handleSelectEvaluation(evaluation.accountId)"
               >
                 <div
                   class="text-base font-semibold text-[var(--hp-text-color)] group-hover:text-[var(--hp-white-color)]"
