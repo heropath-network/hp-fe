@@ -456,6 +456,24 @@
       @toggle="handleLiquiditySourceToggle"
     />
     <MarketSelect :show="showMarketSelect" @close="showMarketSelect = false" />
+    <ConfirmOrderDialog
+      :show="showConfirmDialog"
+      :trade-side="tradeSide"
+      :size="size"
+      :leverage="leverage"
+      :market="selectedMarket"
+      :index-price="indexPrice"
+      :market-price="marketPrice"
+      :price-impact="'0'"
+      :liquidation-price="liquidationPrice === '--' ? '--' : liquidationPrice.replace('$', '')"
+      :collateral="marginRequired.replace('$', '')"
+      :open-cost="openCost.replace('$', '')"
+      :max-r-o-e="maxROE.replace('%', '')"
+      :use-amount="marginRequired.replace('$', '')"
+      :position-size-u-s-d="positionSizeUSD"
+      @close="showConfirmDialog = false"
+      @confirm="handleConfirmOrder"
+    />
   </div>
 </template>
 
@@ -470,6 +488,7 @@ import { formatCurrency } from '@/utils/bigint'
 import MarginModeDialog from '@/components/trade/MarginModeDialog.vue'
 import LiquiditySourcesDialog from '@/components/trade/LiquiditySourcesDialog.vue'
 import MarketSelect from '@/components/trade/MarketSelect.vue'
+import ConfirmOrderDialog from '@/components/trade/ConfirmOrderDialog.vue'
 import PositionFilledNotification from '@/components/Notification/PositionFilledNotification.vue'
 import { useNotification } from '@/composables/useNotification'
 import SourceLiquidityLabel from '@/components/common/SourceLiquidityLabel.vue'
@@ -516,6 +535,7 @@ const stopLoss = ref('')
 const showAccountBreakdown = ref(false)
 const showCrossBreakdown = ref(false)
 const signing = ref(false)
+const showConfirmDialog = ref(false)
 
 const notification = useNotification()
 
@@ -570,6 +590,21 @@ const displayPrice = computed(() => {
     return fromBigInt(currentMarketPrice.value, 2)
   }
   return price.value || '0.00'
+})
+
+// Index price (oracle/reference price) - use current market price as base
+const indexPrice = computed(() => {
+  return fromBigInt(currentMarketPrice.value, 2)
+})
+
+// Market price (execution price) - can include spread, but for now use same as index
+// In a real system, this would be index price + spread for long, index price - spread for short
+const marketPrice = computed(() => {
+  const basePrice = parseFloat(indexPrice.value) || 0
+  // For now, use the same price. In production, you'd add spread here:
+  // const spread = basePrice * 0.0001 // 0.01% spread
+  // return tradeSide.value === 'long' ? basePrice + spread : basePrice - spread
+  return basePrice.toString()
 })
 
 function formatPrice(price: string): string {
@@ -846,6 +881,15 @@ watch(orderType, (newType, oldType) => {
  * - clearOrders(), removeOrder(id), removeOrdersByMarket(market), etc.
  */
 async function handleTrade() {
+  if (!isFormValid.value || !address.value) return
+
+  // Show confirmation dialog first
+  showConfirmDialog.value = true
+}
+
+async function handleConfirmOrder() {
+  showConfirmDialog.value = false
+
   if (!isFormValid.value || !address.value) return
 
   const sizeValue = toBigInt(size.value)
