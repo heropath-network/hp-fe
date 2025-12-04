@@ -408,6 +408,41 @@ export const useTradeStore = defineStore('trade', () => {
       ...marginSettings.value,
       [market]: safeSetting,
     }
+
+    // When cross leverage is set, update all active positions with this leverage
+    if (safeSetting.mode === 'cross' && safeSetting.leverage !== undefined) {
+      updateAllActivePositionsLeverage(safeSetting.leverage)
+    }
+  }
+
+  function updateAllActivePositionsLeverage(newLeverage: number) {
+    if (!currentAccountId.value) return
+
+    const allPositions = positionsStorage.data.value
+    const activePositions = allPositions.filter((p) => p.accountId === currentAccountId.value)
+
+    if (activePositions.length === 0) return
+
+    // Update leverage and recalculate liquidation price for each active position
+    const updatedPositions = activePositions.map((position) => {
+      const updatedLiquidationPrice = calculateLiquidationPrice(
+        position.entryPrice,
+        newLeverage,
+        position.side
+      )
+
+      return {
+        ...position,
+        leverage: newLeverage,
+        liquidationPrice: updatedLiquidationPrice,
+      }
+    })
+
+    // Merge updated positions with positions from other accounts
+    const otherAccountPositions = allPositions.filter((p) => p.accountId !== currentAccountId.value)
+    const allUpdatedPositions = [...otherAccountPositions, ...updatedPositions]
+
+    positionsStorage.updatePositions(allUpdatedPositions)
   }
 
   if (typeof window !== 'undefined') {
