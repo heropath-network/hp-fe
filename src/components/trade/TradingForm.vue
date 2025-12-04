@@ -484,10 +484,13 @@ import { formatCurrency } from '@/utils/bigint'
 import MarginModeDialog from '@/components/trade/MarginModeDialog.vue'
 import LiquiditySourcesDialog from '@/components/trade/LiquiditySourcesDialog.vue'
 import MarketSelect from '@/components/trade/MarketSelect.vue'
+import PositionFilledNotification from '@/components/Notification/PositionFilledNotification.vue'
+import { useNotification } from '@/composables/useNotification'
 import SourceLiquidityLabel from '@/components/common/SourceLiquidityLabel.vue'
 import Tooltip from '@/components/common/Tooltip.vue'
 import { LoadingIcon } from '@/components'
 import type { LiquiditySourceId } from '@/constants/liquiditySources'
+import type { Position as PositionType, Order as OrderType } from '@/storages/trading'
 
 interface TradeDetailItem {
   key: string
@@ -527,6 +530,8 @@ const stopLoss = ref('')
 const showAccountBreakdown = ref(false)
 const showCrossBreakdown = ref(false)
 const signing = ref(false)
+
+const notification = useNotification()
 
 const marginSetting = computed(() => tradeStore.getMarginSetting(selectedMarket.value))
 const activeLiquiditySourcesCount = computed(() => activeLiquiditySources.value.length)
@@ -867,18 +872,74 @@ async function handleTrade() {
     if (orderType.value === 'market') {
       const currentLiquiditySource = tradeStore.getLiquiditySourceFromOracle(tradeStore.selectedOracle)
       
+      // Store position data before creating it for the popup
+      const positionData = {
+        market: selectedMarket.value,
+        side: tradeSide.value,
+        size: sizeValue,
+        entryPrice: currentMarketPrice.value,
+        leverage: leverage.value,
+        collateral: collateralValue,
+        chainId: chainId.value,
+        liquiditySource: currentLiquiditySource,
+        accountId: selectedEvaluationId.value ?? tradeStore.currentAccountId ?? '',
+        timestamp: Date.now(),
+      }
+      
       // This automatically saves to LocalStorage via useUserPositionsStorage
       tradeStore.openPosition(
-        selectedMarket.value,
-        tradeSide.value,
-        sizeValue,
-        currentMarketPrice.value,
-        leverage.value,
-        collateralValue,
-        chainId.value,
-        currentLiquiditySource,
-        selectedEvaluationId.value ?? undefined
+        positionData.market,
+        positionData.side,
+        positionData.size,
+        positionData.entryPrice,
+        positionData.leverage,
+        positionData.collateral,
+        positionData.chainId,
+        positionData.liquiditySource,
+        positionData.accountId
       )
+
+      // Create position object for notification
+      // We construct it manually since the store function doesn't return the created position
+      // Calculate liquidation price: entry * (1 - 1/leverage) for long, entry * (1 + 1/leverage) for short
+      const leverageBig = BigInt(positionData.leverage)
+      const adjustmentFactor = positionData.entryPrice / leverageBig
+      const liquidationPrice = positionData.side === 'long'
+        ? positionData.entryPrice - adjustmentFactor
+        : positionData.entryPrice + adjustmentFactor
+      
+      const newPosition: PositionType = {
+        id: `pos-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        accountId: positionData.accountId,
+        market: positionData.market,
+        side: positionData.side,
+        size: positionData.size,
+        entryPrice: positionData.entryPrice,
+        leverage: positionData.leverage,
+        collateral: positionData.collateral,
+        liquidationPrice: liquidationPrice,
+        timestamp: positionData.timestamp,
+        chainId: positionData.chainId,
+        liquiditySource: positionData.liquiditySource,
+      }
+      
+      // Show notification
+      const notificationInstance = notification.create({
+        content: PositionFilledNotification,
+        props: {
+          position: newPosition,
+          order: null,
+          market: selectedMarket.value,
+          side: tradeSide.value,
+          orderType: 'market',
+          liquiditySource: currentLiquiditySource,
+          marginMode: currentMarginModeType.value,
+          onClose: () => {
+            notificationInstance.destroy()
+          },
+        },
+        duration: 0, // Don't auto-close
+      })
 
       size.value = ''
       sizePercentage.value = 0
@@ -886,17 +947,63 @@ async function handleTrade() {
       const triggerPrice = toBigInt(price.value)
       const currentLiquiditySource = tradeStore.getLiquiditySourceFromOracle(tradeStore.selectedOracle)
       
+      // Store order data before creating it for the popup
+      const orderData = {
+        market: selectedMarket.value,
+        side: tradeSide.value,
+        size: sizeValue,
+        triggerPrice: triggerPrice,
+        orderType: orderType.value as 'limit' | 'stop',
+        chainId: chainId.value,
+        liquiditySource: currentLiquiditySource,
+        accountId: selectedEvaluationId.value ?? tradeStore.currentAccountId ?? '',
+        timestamp: Date.now(),
+      }
+      
       // This automatically saves to LocalStorage via useUserOrdersStorage
       tradeStore.placeOrder(
-        selectedMarket.value,
-        tradeSide.value,
-        sizeValue,
-        triggerPrice,
-        orderType.value as 'limit' | 'stop',
-        chainId.value,
-        currentLiquiditySource,
-        selectedEvaluationId.value ?? undefined
+        orderData.market,
+        orderData.side,
+        orderData.size,
+        orderData.triggerPrice,
+        orderData.orderType,
+        orderData.chainId,
+        orderData.liquiditySource,
+        orderData.accountId
       )
+
+      // Create order object for notification
+      // We construct it manually since the store function doesn't return the created order
+      const newOrder: OrderType = {
+        id: `ord-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        accountId: orderData.accountId,
+        market: orderData.market,
+        side: orderData.side,
+        size: orderData.size,
+        triggerPrice: orderData.triggerPrice,
+        orderType: orderData.orderType,
+        timestamp: orderData.timestamp,
+        chainId: orderData.chainId,
+        liquiditySource: orderData.liquiditySource,
+      }
+      
+      // Show notification
+      const notificationInstance = notification.create({
+        content: PositionFilledNotification,
+        props: {
+          position: null,
+          order: newOrder,
+          market: selectedMarket.value,
+          side: tradeSide.value,
+          orderType: orderData.orderType,
+          liquiditySource: currentLiquiditySource,
+          marginMode: currentMarginModeType.value,
+          onClose: () => {
+            notificationInstance.destroy()
+          },
+        },
+        duration: 0, // Don't auto-close
+      })
 
       price.value = ''
       size.value = ''
