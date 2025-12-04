@@ -43,7 +43,7 @@ export function useUserEvaluationsStorage(address: Ref<string | undefined>) {
           ...evalItem,
           displayStatus: {
             ...evalItem.displayStatus,
-            showDrawdown: show,
+            showDashboard: show,
           },
         }
       }
