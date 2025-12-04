@@ -15,11 +15,12 @@
       </div>
       <!-- Navigation -->
       <div class="flex items-center">
-        <button
-          class="flex items-center justify-center h-[32px] px-4 py-[6px] text-[14px] font-semibold leading-[20px] text-white"
+        <div
+          class="flex items-center justify-center h-[32px] px-[8px] py-[3px] text-[14px] leading-[20px] border border-solid"
+          :class="modeConfig?.classes || 'bg-[rgba(255,255,255,0.1)] border-[rgba(255,255,255,0.1)] text-white'"
         >
-          Evaluation Mode
-        </button>
+          {{ modeConfig?.label || 'Training Mode' }}
+        </div>
       </div>
     </div>
 
@@ -171,6 +172,7 @@ const tradeStore = useTradeStore()
 const {
   evaluationList,
   selectedEvaluationId,
+  selectedEvaluation,
   selectEvaluation: selectEvaluationBase,
 } = useEvaluationAccount()
 
@@ -204,8 +206,35 @@ watch(
 
 function selectAccount(account: Account) {
   selectEvaluationBase(account.id)
-  router.push({ name: ROUTE_NAMES.Dashboard })
 }
+
+const modeConfig = computed(() => {
+  if (!selectedEvaluation.value) {
+    return null
+  }
+
+  const accountType = selectedEvaluation.value.accountType
+
+  switch (accountType) {
+    case 'trading':
+      return {
+        label: 'Training Mode',
+        classes: 'bg-white bg-opacity-10 border-white border-opacity-10 text-white',
+      }
+    case 'evaluation':
+      return {
+        label: 'Evaluation Mode',
+        classes: 'bg-[#FFB110] bg-opacity-10 border-[#FFB110] border-opacity-10 text-[#FFB110]',
+      }
+    case 'funded':
+      return {
+        label: 'Funded Mode',
+        classes: 'bg-[#10C8A8] bg-opacity-10 border-[#10C8A8] border-opacity-10 text-[#10C8A8]',
+      }
+    default:
+      return null
+  }
+})
 
 
 // Chain selector logic
