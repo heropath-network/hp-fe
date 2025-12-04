@@ -1,4 +1,4 @@
-import { TradeHistory } from '@/types/trading'
+import { TradeHistory, Position } from '@/types/trading'
 import * as _ from 'lodash-es'
 
 export function getAccountHistoryPnl(history: TradeHistory[]): bigint {
@@ -34,4 +34,25 @@ export function countTradesWinRate(history: TradeHistory[]): {
     }
   })
   return result
+}
+
+export function getPositionsUnrealizedPnl(positions: Position[], price: Record<string, number>): bigint {
+  return positions.reduce((acc, position) => {
+    const marketPrice = price[position.market]
+    if (!marketPrice) {
+      return acc
+    }
+
+    const entryPriceNum = Number(position.entryPrice.toString())
+    const sizeNum = Number(position.size.toString())
+
+    let pnl = 0
+    if (position.side === 'long') {
+      pnl = (marketPrice - entryPriceNum) * sizeNum
+    } else {
+      pnl = (entryPriceNum - marketPrice) * sizeNum
+    }
+
+    return acc + BigInt(Math.floor(pnl))
+  }, BigInt(0))
 }
