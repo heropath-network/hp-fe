@@ -41,10 +41,10 @@ function generateRows(frame: string, count = 20): TraderRow[] {
     return {
       address: randomAddress(),
       volume: randomNumber(3_000_00, 10_000_000) * volumeMultiplier,
-      leverage: randomNumber(3, 30),
+      leverage: randomNumber(1, 5),
       win: wins,
       loss: losses,
-      pnl: pnlBase * pnlNoise * (Math.random() > 0.22 ? 1 : -1),
+      pnl: pnlBase * pnlNoise * (Math.random() > 0.22 ? 1 : -1) * 0.013,
     }
   })
 }

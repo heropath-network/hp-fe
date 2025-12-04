@@ -109,13 +109,13 @@ function formatTimeAgo(timestamp: string): string {
   const days = Math.floor(hours / 24)
 
   if (days > 0) {
-    return `${days} day${days > 1 ? 's' : ''} ago`
+    return `${days} day${days > 1 ? 's' : ''}`
   } else if (hours > 0) {
-    return `${hours} hour${hours > 1 ? 's' : ''} ago`
+    return `${hours} hour${hours > 1 ? 's' : ''}`
   } else if (minutes > 0) {
-    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`
+    return `${minutes} minute${minutes > 1 ? 's' : ''}`
   } else {
-    return `${seconds} second${seconds > 1 ? 's' : ''} ago`
+    return `${seconds} second${seconds > 1 ? 's' : ''}`
   }
 }
 </script>
