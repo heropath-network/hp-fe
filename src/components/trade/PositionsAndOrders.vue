@@ -16,7 +16,6 @@
         {{ tab.label }}
         <span
           v-if="getTabCount(tab.key) > 0"
-          class="ml-1.5 text-xs"
         >
           ({{ getTabCount(tab.key) }})
         </span>
