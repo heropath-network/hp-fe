@@ -48,9 +48,7 @@
         @click="showCrossBreakdown = !showCrossBreakdown"
       >
         <span class="font-medium text-slate-400">Cross Margin Ratio</span>
-        <span class="inline-flex items-center font-semibold text-slate-50">
-          {{ formattedMarginRatio }}
-        </span>
+        <MarginRatioStatus :value="marginRatioPercent" :show-value="true" />
       </button>
 
       <div v-if="showCrossBreakdown" class="ml-4 space-y-2">
@@ -70,6 +68,7 @@ import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useTradeStore } from '@/stores/tradeStore'
 import { formatCurrency } from '@/utils/bigint'
+import MarginRatioStatus from '@/components/trade/MarginRatioStatus.vue'
 
 const tradeStore = useTradeStore()
 const { accountBalance, positions, totalPnL } = storeToRefs(tradeStore)
@@ -140,7 +139,6 @@ const effectiveLeverage = computed(() => {
 
 const effectiveLeverageDisplay = computed(() => `${effectiveLeverage.value.toFixed(2)}x`)
 const formattedMarginUsage = computed(() => `${marginUsagePercent.value.toFixed(2)}%`)
-const formattedMarginRatio = computed(() => `${marginRatioPercent.value.toFixed(2)}%`)
 </script>
 
 
