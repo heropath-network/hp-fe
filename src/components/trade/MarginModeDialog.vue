@@ -49,7 +49,7 @@
               </button>
               <button
                 @click="increaseLeverage"
-                :disabled="localLeverage >= 100"
+                :disabled="localLeverage >= 5"
                 class="flex h-8 w-8 items-center justify-center bg-[#373737] text-white transition hover:bg-[#323232] disabled:opacity-50 disabled:cursor-not-allowed font-['IBM_Plex_Sans',sans-serif]"
               >
                 +
@@ -60,20 +60,20 @@
 
         <!-- Leverage Slider -->
         <div class="relative">
-          <div class="relative h-4">
-            <div class="absolute inset-0 flex items-center">
-              <div class="w-full h-1 bg-[#323232] rounded-full relative">
+          <div class="relative h-4 px-2">
+            <div class="absolute inset-x-2 top-1/2 -translate-y-1/2 flex items-center">
+              <div class="w-full h-[5px] bg-[#323232] rounded-full relative">
                 <div 
                   class="absolute left-0 top-0 h-full bg-[#10c8a8] rounded-full"
-                  :style="{ width: `${((localLeverage - 1) / 99) * 100}%` }"
+                  :style="{ width: `${((localLeverage - 1) / 4) * 100}%` }"
                 ></div>
                 <!-- Slider markers -->
                 <div class="absolute inset-0 flex justify-between items-center pointer-events-none">
-                  <div class="w-1 h-1 rounded-full bg-[#9b9b9b]"></div>
-                  <div class="w-1 h-1 rounded-full bg-[#9b9b9b]"></div>
-                  <div class="w-1 h-1 rounded-full bg-[#9b9b9b]"></div>
-                  <div class="w-1 h-1 rounded-full bg-[#9b9b9b]"></div>
-                  <div class="w-1 h-1 rounded-full bg-[#9b9b9b]"></div>
+                  <div class="w-[3px] h-[3px] rounded-full bg-[#9b9b9b]" :class="localLeverage > 1 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"></div>
+                  <div class="w-[3px] h-[3px] rounded-full bg-[#9b9b9b]" :class="localLeverage > 2 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"></div>
+                  <div class="w-[3px] h-[3px] rounded-full bg-[#9b9b9b]" :class="localLeverage > 3 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"></div>
+                  <div class="w-[3px] h-[3px] rounded-full bg-[#9b9b9b]" :class="localLeverage > 4 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"></div>
+                  <div class="w-[3px] h-[3px] rounded-full bg-[#9b9b9b]" :class="localLeverage > 5 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"></div>
                 </div>
               </div>
             </div>
@@ -81,23 +81,23 @@
               v-model.number="localLeverage"
               type="range"
               min="1"
-              max="100"
+              max="5"
               step="1"
               class="absolute inset-0 w-full h-4 opacity-0 cursor-pointer z-10"
             />
             <div 
               class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg pointer-events-none z-20"
-              :style="{ left: `calc(${((localLeverage - 1) / 99) * 100}% - 8px)` }"
+              :style="{ left: sliderThumbLeft }"
             >
               <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-[#323232] rounded-full"></div>
             </div>
           </div>
           <div class="mt-2 flex justify-between text-[12px] leading-[16px] text-[#9b9b9b] font-['IBM_Plex_Sans',sans-serif]">
             <span>1x</span>
-            <span>25x</span>
-            <span>50x</span>
-            <span>75x</span>
-            <span>100x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
           </div>
         </div>
       </div>
@@ -124,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import Dialog from '@/components/Dialog.vue'
 
 interface Props {
@@ -149,6 +149,16 @@ const emit = defineEmits<Emits>()
 const localMarginMode = ref<'isolated' | 'cross'>(props.marginMode)
 const localLeverage = ref(props.leverage)
 
+// Calculate slider thumb position to keep it within bounds
+// Container has 8px padding (px-2), track is offset by 8px (inset-x-2)
+// Circle is 16px wide, positioned to stay within the padded container
+const sliderThumbLeft = computed(() => {
+  const percentage = (localLeverage.value - 1) / 4
+  // Position: percentage of track width (which is calc(100% - 16px))
+  // This ensures the circle stays within the 8px padding on both sides
+  return `calc((100% - 16px) * ${percentage})`
+})
+
 watch(() => props.show, (newValue) => {
   if (newValue) {
     localMarginMode.value = props.marginMode
@@ -165,8 +175,8 @@ watch(() => props.leverage, (newValue) => {
 })
 
 function increaseLeverage() {
-  if (localLeverage.value < 100) {
-    localLeverage.value++
+  if (localLeverage.value < 5) {
+    localLeverage.value++ 
   }
 }
 
