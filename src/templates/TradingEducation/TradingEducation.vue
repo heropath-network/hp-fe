@@ -3,12 +3,19 @@ import { computed } from 'vue'
 import BaseIcon from '@/components/BaseIcon.vue'
 import { ROUTE_NAMES } from '@/router'
 import { useRouter } from 'vue-router'
+import Edu1Img from '@/assets/icons/edu/edu1.svg'
+import Edu2Img from '@/assets/icons/edu/edu2.svg'
+import Edu3Img from '@/assets/icons/edu/edu3.svg'
+import Edu4Img from '@/assets/icons/edu/edu4.svg'
+import Edu5Img from '@/assets/icons/edu/edu5.svg'
+import Edu6Img from '@/assets/icons/edu/edu6.svg'
 
 const router = useRouter()
 
 type EducationCard = {
   title: string
   timestamp: string
+  banner: any
   tags: { label: string; variant: 'primary' | 'secondary' }[]
 }
 
@@ -16,6 +23,7 @@ const tradingFundamentalsCards: EducationCard[] = [
   {
     title: 'Trader’s Dictionary',
     timestamp: '1764828500',
+    banner: Edu1Img,
     tags: [
       { label: 'Beginner', variant: 'primary' },
       { label: 'Fundamentals', variant: 'secondary' },
@@ -24,6 +32,7 @@ const tradingFundamentalsCards: EducationCard[] = [
   {
     title: 'Risk Management Basics',
     timestamp: '1764828500',
+    banner: Edu2Img,
     tags: [
       { label: 'Beginner', variant: 'primary' },
       { label: 'Fundamentals', variant: 'secondary' },
@@ -32,6 +41,7 @@ const tradingFundamentalsCards: EducationCard[] = [
   {
     title: 'Scalping Trading 101',
     timestamp: '1764828500',
+    banner: Edu3Img,
     tags: [
       { label: 'Beginner', variant: 'primary' },
       { label: 'Fundamentals', variant: 'secondary' },
@@ -51,6 +61,7 @@ const technicalAnalysisCards: EducationCard[] = [
   {
     title: 'Market Environment - Ranges vs. Trends',
     timestamp: '1764828500',
+    banner: Edu4Img,
     tags: [
       { label: 'Intermediate', variant: 'primary' },
       { label: 'TA', variant: 'secondary' },
@@ -59,6 +70,7 @@ const technicalAnalysisCards: EducationCard[] = [
   {
     title: 'Support and Resistance',
     timestamp: '1764828500',
+    banner: Edu5Img,
     tags: [
       { label: 'Intermediate', variant: 'primary' },
       { label: 'TA', variant: 'secondary' },
@@ -67,6 +79,7 @@ const technicalAnalysisCards: EducationCard[] = [
   {
     title: 'Supply and Demand Trading',
     timestamp: '1764828500',
+    banner: Edu6Img,
     tags: [
       { label: 'Intermediate', variant: 'primary' },
       { label: 'TA', variant: 'secondary' },
@@ -144,7 +157,15 @@ function formatTimeAgo(timestamp: string): string {
 
       <div class="grid gap-4 md:grid-cols-3 items-stretch">
         <article v-for="(card, cardIndex) in row" :key="`${card.title}-${cardIndex}`" class="flex flex-col h-full">
-          <div class="h-[216px] w-full bg-[var(--hp-primary-green)]" />
+          <div class="h-[216px] w-full bg-[var(--hp-line-normal-color)]">
+            <img
+              :src="card.banner"
+              alt="Education Banner"
+              class="h-full w-full object-cover drop select-none"
+              draggable="false"
+              @dragstart.prevent
+            />
+          </div>
 
           <div class="flex flex-col justify-between gap-3 bg-[var(--hp-bg-normal)] px-6 py-5 flex-1">
             <div>
@@ -183,7 +204,15 @@ function formatTimeAgo(timestamp: string): string {
 
       <div class="grid gap-4 md:grid-cols-3 items-stretch">
         <article v-for="(card, cardIndex) in row" :key="`${card.title}-${cardIndex}`" class="flex flex-col h-full">
-          <div class="h-[216px] w-full bg-[var(--hp-primary-green)]" />
+          <div class="h-[216px] w-full bg-[var(--hp-line-normal-color)]">
+            <img
+              :src="card.banner"
+              alt="Education Banner"
+              class="h-full w-full object-cover drop select-none"
+              draggable="false"
+              @dragstart.prevent
+            />
+          </div>
 
           <div class="flex flex-col justify-between gap-3 bg-[var(--hp-bg-normal)] px-6 py-5 flex-1">
             <div>
@@ -194,7 +223,7 @@ function formatTimeAgo(timestamp: string): string {
                   class="border px-2 py-1 text-xs font-medium leading-4"
                   :class="
                     tag.variant === 'primary'
-                      ? 'border-[var(--hp-text-green)] text-[var(--hp-text-green)]'
+                      ? 'border-[var(--hp-text-yellow)] text-[var(--hp-text-yellow)]'
                       : 'border-[var(--hp-text-color)] text-[var(--hp-text-color)]'
                   "
                 >

@@ -12,6 +12,7 @@ $lineLightColor: #414141;
 $blackColor: #0a0a0a;
 $textGreen: #10c8a8;
 $textRed: #ff4e59;
+$textYellow: #ffb110;
 
 :export {
   bgDark: $bgDark;
@@ -23,8 +24,10 @@ $textRed: #ff4e59;
   brandBlue: $brandBlue;
   whiteColor: $whiteColor;
   lineColor: $lineColor;
+  lineNormalColor: $lineNormalColor;
   lineLightColor: $lineLightColor;
   blackColor: $blackColor;
   textGreen: $textGreen;
   textRed: $textRed;
+  textYellow: $textYellow;
 }
