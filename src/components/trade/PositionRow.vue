@@ -366,8 +366,7 @@ async function closePosition(positionId: string) {
       liquiditySource: position.liquiditySource,
     }
 
-    // Close the position (this updates storage)
-    tradeStore.closePosition(positionId)
+   
 
     // Show notification
     const notificationInstance = notification.create({
@@ -385,6 +384,7 @@ async function closePosition(positionId: string) {
         fillPromise: new Promise<void>((resolve) => {
           setTimeout(() => {
             resolve()
+            tradeStore.closePosition(positionId)
           }, DURATION_SUCCESS_NOTIFICATION)
         }),
         onClose: () => {
