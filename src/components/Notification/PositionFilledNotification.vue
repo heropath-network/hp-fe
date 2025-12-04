@@ -15,17 +15,21 @@
         <div class="flex items-center gap-1">
           <span class="text-base font-semibold leading-6 text-white">{{ titleLabel }}</span>
           <div
-            class="flex px-2 py-[2px] border border-[rgba(16,200,168,0.1)] bg-[rgba(16,200,168,0.1)]"
-          >
-            <span class="text-xs leading-4 text-[#10c8a8] font-normal">{{ sideLabel }}</span>
+            class="flex px-2 py-[2px] border"
+            :class="isLong ? 'border-green-success bg-green-success bg-opacity-10' : 'border-red-error bg-red-error bg-opacity-10'"
+            >
+            <span class="text-xs leading-4 font-normal" :class="isLong ? 'text-green-success' : 'text-red-error'">{{ sideLabel }}</span>
           </div>
         </div>
       </div>
-      <!-- Filled Status -->
+      <!-- Status -->
       <div class="flex items-center gap-1">
-        <span class="text-sm font-medium leading-5 text-[#10c8a8] text-right">Filled</span>
-        <div class="relative shrink-0 size-5 rounded-full flex items-center justify-center bg-[#10c8a8] bg-opacity-10">
-          <i class="iconfont icon-margin-mode-selected text-green-success text-xs"></i>
+        <span class="text-sm font-medium leading-5 text-right" :class="isFilled ? 'text-green-success' : 'text-[#9b9b9b]'">{{ statusLabel }}</span>
+        <div v-if="isFilled" class="relative shrink-0 size-5 rounded-full flex items-center justify-center bg-green-success bg-opacity-10">
+          <i class="iconfont icon-margin-mode-selected text-green-success text-[18px]"></i>
+        </div> 
+        <div v-else class="relative shrink-0 size-5 rounded-full flex items-center justify-center">
+            <i class="iconfont icon-loading-small animate-spin text-[#9b9b9b] text-[18px]"></i>
         </div>
       </div>
     </div>
@@ -74,9 +78,10 @@
       </div>
 
       <!-- Progress Bar -->
-      <div class="relative h-1.5 w-full rounded bg-[#373f5c] overflow-hidden">
+      <div class="relative h-1.5 w-full rounded bg-[#272727] overflow-hidden">
         <div
-          class="absolute inset-0 h-full rounded bg-gradient-to-r from-[#0eb195] to-[#11ccab]"
+          class="absolute inset-0 h-full rounded bg-gradient-to-r from-[#0eb195] to-[#11ccab] transition-all duration-500 ease-out"
+          :style="{ width: progressWidth }"
         ></div>
       </div>
     </div>
@@ -84,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { formatNumber } from '@/utils/bigint'
 import { LIQUIDITY_SOURCES, type LiquiditySourceId } from '@/constants/liquiditySources'
 import type { Position, Order } from '@/storages/trading'
@@ -97,11 +102,46 @@ interface Props {
   orderType: 'market' | 'limit' | 'stop'
   liquiditySource: LiquiditySourceId
   marginMode: 'isolated' | 'cross'
+  fillPromise?: Promise<any>
 }
 
 const props = withDefaults(defineProps<Props>(), {
   position: null,
   order: null,
+  fillPromise: undefined,
+})
+
+const currentStatus = ref<'pending' | 'filled'>('pending')
+
+const isFilled = computed(() => {
+  return currentStatus.value === 'filled'
+})
+
+// Status label
+const statusLabel = computed(() => {
+  return currentStatus.value === 'pending' ? 'Pending' : 'Filled'
+})
+
+// Progress bar width
+const progressWidth = computed(() => {
+  return currentStatus.value === 'pending' ? '50%' : '100%'
+})
+
+// Wait for Promise to resolve before changing to filled status
+onMounted(() => {
+  if (props.fillPromise) {
+    props.fillPromise
+      .then(() => {
+        currentStatus.value = 'filled'
+      })
+      .catch((error) => {
+        console.error('Fill promise rejected:', error)
+        // Optionally handle error state here
+      })
+  } else {
+    // If no promise provided, default to filled
+    currentStatus.value = 'filled'
+  }
 })
 
 interface Emits {
@@ -130,9 +170,13 @@ const titleLabel = computed(() => {
   return props.position ? 'Open Position' : 'Place Order'
 })
 
+const isLong = computed(() => {
+  return props.side === 'long'
+})
+
 // Side label
 const sideLabel = computed(() => {
-  return props.side === 'long' ? 'Long' : 'Short'
+  return isLong.value ? 'Long' : 'Short'
 })
 
 // Order type label
