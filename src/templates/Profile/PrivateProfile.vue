@@ -191,8 +191,9 @@ function onUpdatePublicProfileStatus(accountId: string, value: boolean) {
         >
           <span>Date</span>
           <span>Account Number</span>
+          <span>Account Type</span>
           <div class="flex items-center gap-2">
-            <span>Dropdown (Hide/Show)</span>
+            <span>Dashboard (Hide/Show)</span>
             <span
               class="flex size-4 items-center justify-center rounded-full bg-[var(--hp-bg-light)] text-[11px] font-medium text-[var(--hp-text-color)]"
               aria-hidden="true"
@@ -200,7 +201,6 @@ function onUpdatePublicProfileStatus(accountId: string, value: boolean) {
               ?
             </span>
           </div>
-          <span>Account Type</span>
           <div class="flex items-center gap-2">
             <span>Public Profile (Hide/Show)</span>
             <span
@@ -228,13 +228,14 @@ function onUpdatePublicProfileStatus(accountId: string, value: boolean) {
           >
             <span class="text-[var(--hp-white-color)]">{{ formatDate(account.timestamp) }}</span>
             <span class="text-[var(--hp-white-color)]">#{{ account.accountId }}</span>
+
+            <span class="text-[var(--hp-white-color)]">{{ getAccountTypeLabel(account.accountType) }}</span>
             <div>
               <HpSwitch
-                :enabled="account.displayStatus.showDrawdown"
+                :enabled="account.displayStatus.showDashboard"
                 @change="onUpdateDropdownStatus(account.accountId, $event)"
               />
             </div>
-            <span class="text-[var(--hp-white-color)]">{{ getAccountTypeLabel(account.accountType) }}</span>
             <div>
               <HpSwitch
                 :enabled="account.displayStatus.showPublic"

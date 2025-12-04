@@ -6,7 +6,7 @@ export interface UserEvaluation {
   accountType: 'funded' | 'evaluation' | 'trading'
   accountStatus: 'active' | 'inactive'
   displayStatus: {
-    showDrawdown: boolean
+    showDashboard: boolean
     showPublic: boolean
   }
   timestamp: number

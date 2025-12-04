@@ -25,7 +25,7 @@ const isEnabled = computed({
 <template>
   <Switch
     v-model="isEnabled"
-    :class="isEnabled ? 'bg-[var(--hp-primary-green)]' : 'bg-[var(--hp-line-normal-color)]'"
+    :class="isEnabled ? 'bg-[var(--hp-primary-green)]' : 'bg-[var(--hp-line-light-color)]'"
     class="relative flex items-center h-[16px] w-[28px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75"
   >
     <span

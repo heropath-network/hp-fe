@@ -28,7 +28,7 @@ const accountTradeHistory = computed(() => {
 })
 
 const evaluationList = computed(() => {
-  return evaluations.value.filter((item) => item.displayStatus.showDrawdown)
+  return evaluations.value.filter((item) => item.displayStatus.showDashboard)
 })
 
 const displayDate = computed(() => {
@@ -200,7 +200,9 @@ watch(
       <div class="space-y-6 bg-[var(--hp-bg-normal)] p-6">
         <p class="text-xl font-semibold leading-7">
           <span class="text-[var(--hp-primary-green)]">${{ formatNumber(accountSize, 2) }}</span>
-          <span class="pl-1">Evaluation</span>
+          <span class="pl-1">{{
+            selectedEvaluation ? getAccountTypeLabel(selectedEvaluation?.accountType) : 'Evaluation'
+          }}</span>
         </p>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
@@ -240,14 +242,26 @@ watch(
       <p class="text-xl font-semibold leading-7">${{ formatNumber(accountBalance, 2) }} Current Equity</p>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <article class="flex h-[100px] flex-col justify-center gap-2 bg-[var(--hp-bg-light)] px-6 py-5">
-          <div>
-            <p class="text-xl font-semibold leading-7 text-[var(--hp-text-green)]">
-              ${{ formatNumber(targetEquity, 2) }}
-            </p>
-            <p class="text-sm leading-5 text-[var(--hp-text-color)]">Profit Target Equity</p>
-          </div>
-        </article>
+        <template v-if="selectedEvaluation?.accountType === 'funded'">
+          <article class="flex h-[100px] flex-col justify-center gap-2 bg-[var(--hp-bg-light)] px-6 py-5">
+            <div>
+              <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
+                {{ selectedEvaluation.evaluationConfig.profitSplit }}%
+              </p>
+              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Profit Share</p>
+            </div>
+          </article>
+        </template>
+        <template v-else>
+          <article class="flex h-[100px] flex-col justify-center gap-2 bg-[var(--hp-bg-light)] px-6 py-5">
+            <div>
+              <p class="text-xl font-semibold leading-7 text-[var(--hp-text-green)]">
+                ${{ formatNumber(targetEquity, 2) }}
+              </p>
+              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Profit Target Equity</p>
+            </div>
+          </article>
+        </template>
 
         <article class="relative flex h-[100px] flex-col justify-center gap-2 bg-[var(--hp-bg-light)] px-6 py-5">
           <div>
