@@ -100,7 +100,7 @@
     <!-- Actions Column -->
     <td class="px-4 py-6 flex justify-center">
       <button
-        @click="closePosition(position.id)"
+        @click="showCloseDialog = true"
         :disabled="signing"
         :class="[
           'flex items-center justify-center gap-1 bg-[#272727] px-[17px] py-2 transition',
@@ -117,6 +117,15 @@
       </button>
     </td>
   </tr>
+
+  <!-- Close Position Dialog -->
+  <ClosePositionDialog
+    :visible="showCloseDialog"
+    :position="position"
+    :market-price="currentMarketPrice"
+    @close="showCloseDialog = false"
+    @confirm="handleClosePositionConfirm"
+  />
 </template>
 
 <script setup lang="ts">
@@ -134,6 +143,7 @@ import { useNotification } from '@/composables/useNotification'
 import PositionFilledNotification from '@/components/Notification/PositionFilledNotification.vue'
 import { LoadingIcon, Tooltip } from '@/components'
 import { storeToRefs } from 'pinia'
+import ClosePositionDialog from '@/components/trade/ClosePositionDialog.vue'
 
 const props = defineProps<{
   position: Position
@@ -146,6 +156,7 @@ const chainId = useChainId()
 const { selectedEvaluationId } = useEvaluationAccount()
 const notification = useNotification()
 const signing = ref(false)
+const showCloseDialog = ref(false)
 
 const { accountBalance, positions, totalPnL } = storeToRefs(tradeStore)
 
@@ -190,6 +201,15 @@ function getMarkPrice(market: string): string {
   const price = tradeStore.marketPrices[market]?.price
   return price ? formatNumber(BigInt(price), 2) : '0.00'
 }
+
+const currentMarketPrice = computed(() => {
+  const price = tradeStore.marketPrices[props.position.market]?.price
+  if (price) {
+    // Price is already stored as bigint in marketPrices
+    return price
+  }
+  return props.position.entryPrice
+})
 
 function getPositionSizeUSD(): string {
   // Position value in USD = collateral * leverage
@@ -304,6 +324,18 @@ async function requestClosePositionSignature() {
       contents,
     },
   } as any)
+}
+
+/**
+ * Handles the confirm event from ClosePositionDialog
+ * Closes the position with the specified amount
+ */
+async function handleClosePositionConfirm(closeAmount: bigint) {
+  showCloseDialog.value = false
+  
+  // For now, we'll close the full position regardless of the amount
+  // In the future, this could support partial closes
+  await closePosition(props.position.id)
 }
 
 /**
