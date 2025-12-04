@@ -22,6 +22,8 @@ import { useMuxV3Price24h, useMuxRealtimePrice } from '@/packages/mux-v3'
 import { useFourMemeWebSocketPrice, useFourMemePrice24h, getFourMemeMarket } from '@/packages/four-meme'
 import { ProjectId } from '@/constants'
 import type { Bar } from '@/types/tradingview'
+import { useChartPositions } from './chart/useChartPositions'
+import { useChartOrders } from './chart/useChartOrders'
 
 const tradeStore = useTradeStore()
 
@@ -36,6 +38,10 @@ const { price: bnbUsdPrice } = useBnbUsdPrice()
 const showChart = ref(false)
 const widget = ref<Widget | null>(null)
 const dataResolution = ref(5)
+
+// Initialize chart positions and orders compositions
+useChartPositions(selectedMarket, widget)
+useChartOrders(selectedMarket, widget)
 
 const latestBarData = ref<{
   chartSymbol: string | undefined
