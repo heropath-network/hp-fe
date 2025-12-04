@@ -31,7 +31,6 @@
 import { ref } from 'vue'
 import TradeHeader from '@/components/trade/TradeHeader.vue'
 import TradeStatistics from '@/components/trade/TradeStatistics.vue'
-import AccountInfo from '@/components/trade/AccountInfo.vue'
 import PriceChart from '@/components/trade/PriceChart.vue'
 import TradingForm from '@/components/trade/TradingForm.vue'
 import PositionsAndOrders from '@/components/trade/PositionsAndOrders.vue'
