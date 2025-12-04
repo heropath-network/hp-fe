@@ -17,9 +17,11 @@ module.exports = {
         },
         green: {
           success: '#10C8A8',
+          hover: '#12D0AF',
         },
         red: {
           error: '#FF4E59',
+          hover: '#FF5C67',
         },
       },
     },

@@ -868,6 +868,8 @@ async function handleTrade() {
 
   try {
     await requestTradeSignature(actionLabel)
+    const DURATION_SUCCESS_NOTIFICATION = 3000
+    const DURATION_CLOSE_NOTIFICATION = DURATION_SUCCESS_NOTIFICATION + 2000
 
     if (orderType.value === 'market') {
       const currentLiquiditySource = tradeStore.getLiquiditySourceFromOracle(tradeStore.selectedOracle)
@@ -923,7 +925,7 @@ async function handleTrade() {
         liquiditySource: positionData.liquiditySource,
       }
       
-      // Show notification
+      // Show notification with fill Promise
       const notificationInstance = notification.create({
         content: PositionFilledNotification,
         props: {
@@ -934,11 +936,16 @@ async function handleTrade() {
           orderType: 'market',
           liquiditySource: currentLiquiditySource,
           marginMode: currentMarginModeType.value,
+          fillPromise: new Promise<void>((resolve) => {
+            setTimeout(() => {
+              resolve()
+            }, DURATION_SUCCESS_NOTIFICATION)
+          }),
           onClose: () => {
             notificationInstance.destroy()
           },
         },
-        duration: 0, // Don't auto-close
+        duration: DURATION_CLOSE_NOTIFICATION, 
       })
 
       size.value = ''
@@ -987,7 +994,7 @@ async function handleTrade() {
         liquiditySource: orderData.liquiditySource,
       }
       
-      // Show notification
+      // Show notification with fill Promise
       const notificationInstance = notification.create({
         content: PositionFilledNotification,
         props: {
@@ -998,11 +1005,16 @@ async function handleTrade() {
           orderType: orderData.orderType,
           liquiditySource: currentLiquiditySource,
           marginMode: currentMarginModeType.value,
+          fillPromise: new Promise<void>((resolve) => {
+            setTimeout(() => {
+              resolve()
+            }, DURATION_SUCCESS_NOTIFICATION)
+          }),
           onClose: () => {
             notificationInstance.destroy()
           },
         },
-        duration: 0, // Don't auto-close
+        duration: DURATION_CLOSE_NOTIFICATION,
       })
 
       price.value = ''
