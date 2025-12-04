@@ -1,3 +1,5 @@
+import { FOUR_MEME_MARKETS as FOUR_MEME_MARKETS_CONST } from '@/constants/fourMemeMarkets'
+
 export const CRYPTO_MARKETS = [
   'BTC/USD',
   'ETH/USD',
@@ -15,14 +17,9 @@ export const CRYPTO_MARKETS = [
   'AAVE/USD',
 ] as const
 
-export const PERP_MARKETS = [
-  'ARB/USD',
-  'AVAX/USD',
-  'MATIC/USD',
-  'OP/USD',
-] as const
+export const PERP_MARKETS = ['ARB/USD', 'AVAX/USD', 'MATIC/USD', 'OP/USD'] as const
 
-export const FOUR_MEME_MARKETS = ['ALIF', 'BIBI', 'BOL', 'RCHV', 'GG', 'AJC', 'AIF'] as const
+export const FOUR_MEME_MARKETS = FOUR_MEME_MARKETS_CONST.map((market) => market.symbol)
 
 export const FOREX_MARKETS = [
   'EUR/USD',
@@ -89,5 +86,4 @@ export const STOCKS_MARKETS = [
 
 export const AVAILABLE_MARKETS = [...CRYPTO_MARKETS, ...FOREX_MARKETS, ...STOCKS_MARKETS, ...FOUR_MEME_MARKETS] as const
 
-export type MarketSymbol = typeof AVAILABLE_MARKETS[number]
-
+export type MarketSymbol = (typeof AVAILABLE_MARKETS)[number]

@@ -11,6 +11,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { FOUR_MEME_MARKETS } from '@/constants/fourMemeMarkets'
 
 interface Props {
   symbol: string
@@ -22,14 +23,25 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const baseSymbol = computed(() => props.symbol.split('/')[0])
-const iconUrl = ref(`/img/tokens/${baseSymbol.value}.svg`)
+
+const memeMarket = computed(() => {
+  return FOUR_MEME_MARKETS.find((market) => market.symbol === baseSymbol.value)
+})
+
+const getIconUrl = (symbol: string) => {
+  const market = FOUR_MEME_MARKETS.find((m) => m.symbol === symbol)
+  return market ? market.icon : `/img/tokens/${symbol}.svg`
+}
+
+const iconUrl = ref(getIconUrl(baseSymbol.value))
 
 watch(baseSymbol, (newSymbol) => {
-  iconUrl.value = `/img/tokens/${newSymbol}.svg`
+  iconUrl.value = getIconUrl(newSymbol)
 })
 
 function onImageError() {
-  if (iconUrl.value !== '/img/tokens/Unknown.svg') {
+  // Only fallback to Unknown.svg if it's not already a meme market icon
+  if (!memeMarket.value && iconUrl.value !== '/img/tokens/Unknown.svg') {
     iconUrl.value = '/img/tokens/Unknown.svg'
   }
 }
