@@ -79,12 +79,9 @@ export function usePriceOrchestrator() {
   async function fetchFourMemePrices() {
     const prices = await fourMemePrices.fetchAllPrices()
 
-    // Only update store if FOUR_MEME oracle is selected
-    if (tradeStore.selectedOracle === ProjectId.FOUR_MEME) {
-      prices.forEach((priceData, symbol) => {
-        tradeStore.updateMarketPrice(symbol, priceData.price, priceData.change24h)
-      })
-    }
+    prices.forEach((priceData, symbol) => {
+      tradeStore.updateMarketPrice(symbol, priceData.price, priceData.change24h)
+    })
   }
 
   async function refreshPricesOnOracleChange() {
