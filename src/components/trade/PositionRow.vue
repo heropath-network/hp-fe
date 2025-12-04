@@ -18,6 +18,9 @@
               {{ position.side.charAt(0).toUpperCase() + position.side.slice(1) }}  {{ position.leverage }}x
             </span> 
             <ChainLabel :chain-id="position.chainId" :liquidity-source="position.liquiditySource" />
+            <Tooltip :content="`Margin Ratio: ${marginRatioPercent.toFixed(2)}%`">
+              <MarginRatioStatus :value="marginRatioPercent" />
+            </Tooltip>
           </div>
         </div>
       </div>
@@ -124,11 +127,13 @@ import { calculatePositionPnL, calculateTradeHistoryPnL } from '@/utils/pnl'
 import type { Position, TradeHistory } from '@/storages/trading'
 import MarketIcon from '@/components/common/MarketIcon.vue'
 import ChainLabel from '@/components/common/ChainLabel.vue'
+import MarginRatioStatus from '@/components/trade/MarginRatioStatus.vue'
 import { useConnection, useSignTypedData, useChainId } from '@wagmi/vue'
 import { useEvaluationAccount } from '@/composables/useEvaluationAccount'
 import { useNotification } from '@/composables/useNotification'
 import PositionFilledNotification from '@/components/Notification/PositionFilledNotification.vue'
-import { LoadingIcon } from '@/components'
+import { LoadingIcon, Tooltip } from '@/components'
+import { storeToRefs } from 'pinia'
 
 const props = defineProps<{
   position: Position
@@ -141,6 +146,45 @@ const chainId = useChainId()
 const { selectedEvaluationId } = useEvaluationAccount()
 const notification = useNotification()
 const signing = ref(false)
+
+const { accountBalance, positions, totalPnL } = storeToRefs(tradeStore)
+
+// Calculate cross margin ratio (account-level)
+const accountValueUsd = computed(() => accountBalance.value + totalPnL.value)
+
+function leverageToBigInt(value: number): bigint {
+  const normalized = Number.isFinite(value) ? Math.max(1, Math.floor(value)) : 1
+  return BigInt(normalized)
+}
+
+const totalPositionNotional = computed(() => {
+  if (!positions.value.length) return BigInt(0)
+  return positions.value.reduce((sum, pos) => sum + pos.collateral * leverageToBigInt(pos.leverage), BigInt(0))
+})
+
+const MAINTENANCE_MARGIN_RATE_BPS = BigInt(500)
+const BPS_DENOMINATOR = BigInt(10000)
+
+const maintenanceMarginUsd = computed(() => {
+  if (totalPositionNotional.value === BigInt(0)) return BigInt(0)
+  return (totalPositionNotional.value * MAINTENANCE_MARGIN_RATE_BPS) / BPS_DENOMINATOR
+})
+
+function percentOf(numerator: bigint, denominator: bigint): number {
+  if (numerator === BigInt(0)) {
+    return 0
+  }
+  if (denominator <= BigInt(0)) {
+    return 100
+  }
+  const scaled = (numerator * BigInt(10000)) / denominator
+  return Math.min(Number(scaled) / 100, 999)
+}
+
+const marginRatioPercent = computed(() => {
+  if (maintenanceMarginUsd.value === BigInt(0)) return 0
+  return percentOf(maintenanceMarginUsd.value, accountValueUsd.value)
+})
 
 function getMarkPrice(market: string): string {
   const price = tradeStore.marketPrices[market]?.price

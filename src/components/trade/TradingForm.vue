@@ -416,16 +416,7 @@
                 <path d="M4 6L8 10L12 6" stroke="#9b9b9b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="text-[13px] leading-[18px] text-[#10c8a8]">{{ formattedMarginRatio }}</span>
-              <!-- Bar Chart -->
-              <div class="flex items-center gap-1">
-                <div class="w-0.5 h-3 bg-[#10c8a8]"></div>
-                <div class="w-0.5 h-3 bg-[#323232]"></div>
-                <div class="w-0.5 h-3 bg-[#323232]"></div>
-                <div class="w-0.5 h-3 bg-[#323232]"></div>
-              </div>
-            </div>
+            <MarginRatioStatus :value="marginRatioPercent" :show-value="true" />
           </div>
 
           <!-- Maintenance Margin (shown when Cross Margin Ratio is expanded) -->
@@ -490,6 +481,7 @@ import LiquiditySourcesDialog from '@/components/trade/LiquiditySourcesDialog.vu
 import MarketSelect from '@/components/trade/MarketSelect.vue'
 import ConfirmOrderDialog from '@/components/trade/ConfirmOrderDialog.vue'
 import PositionFilledNotification from '@/components/Notification/PositionFilledNotification.vue'
+import MarginRatioStatus from '@/components/trade/MarginRatioStatus.vue'
 import { useNotification } from '@/composables/useNotification'
 import SourceLiquidityLabel from '@/components/common/SourceLiquidityLabel.vue'
 import Tooltip from '@/components/common/Tooltip.vue'
@@ -1128,7 +1120,6 @@ const effectiveLeverage = computed(() => {
 
 const effectiveLeverageDisplay = computed(() => `${effectiveLeverage.value.toFixed(0)}x`)
 const formattedMarginUsage = computed(() => `${marginUsagePercent.value.toFixed(2)}%`)
-const formattedMarginRatio = computed(() => `${marginRatioPercent.value.toFixed(2)}%`)
 
 const marginUsageAmount = computed(() => {
   return collateralLocked.value
