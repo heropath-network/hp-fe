@@ -1,13 +1,13 @@
 <template>
   <div class="flex h-full flex-col bg-[var(--hp-bg-dark)]">
-    <!-- Tabs -->
-    <div class="flex items-center border-b border-gray-800 px-4">
+    <!-- Content Tabs (Positions/Orders/History) -->
+    <div class="flex items-center pr-4">
       <button
         v-for="tab in tabs"
         :key="tab.key"
         @click="selectedTab = tab.key"
         :class="[
-          'relative px-4 py-3 text-sm font-semibold transition',
+          'relative px-4 py-4 text-sm font-semibold transition',
           selectedTab === tab.key
             ? 'text-white'
             : 'text-gray-400 hover:text-gray-300'
@@ -20,10 +20,6 @@
         >
           ({{ getTabCount(tab.key) }})
         </span>
-        <div
-          v-if="selectedTab === tab.key"
-          class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500"
-        ></div>
       </button>
 
       <!-- Right side actions -->
@@ -33,9 +29,9 @@
             <span class="text-sm text-gray-400">Label Positions</span>
             <Switch :enabled="chartShowPositions" @update:enabled="chartShowPositions = $event" />
           </div>
-          <div v-if="positions.length > 0" class="h-4 w-px bg-gray-800"></div>
+          <div v-if="filteredPositions.length > 0" class="h-4 w-px bg-gray-800"></div>
           <button
-            v-if="positions.length > 0"
+            v-if="filteredPositions.length > 0"
             @click="closeAllPositions"
             class="bg-red-error px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-error/90"
           >
@@ -47,9 +43,9 @@
             <span class="text-sm text-gray-400">Label Orders</span>
             <Switch :enabled="chartShowOrders" @update:enabled="chartShowOrders = $event" />
           </div>
-          <div v-if="orders.length > 0" class="h-4 w-px bg-gray-800"></div>
+          <div v-if="filteredOrders.length > 0" class="h-4 w-px bg-gray-800"></div>
           <button
-            v-if="orders.length > 0"
+            v-if="filteredOrders.length > 0"
             @click="cancelAllOrders"
             class="bg-gray-700 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-gray-600"
           >
@@ -70,10 +66,36 @@
       </div>
     </div>
 
+    <!-- Market Type Tabs (Perps/Meme) -->
+    <div class="flex items-center  px-4">
+      <button
+        @click="selectedMarketType = 'perps'"
+        :class="[
+          'flex h-full items-center justify-center shrink-0  px-[23px] py-[7px]',
+          selectedMarketType === 'perps'
+            ? 'bg-[#272727] text-white'
+            : 'bg-[#1d1d1d] text-[#9b9b9b]'
+        ]"
+      >
+        <p class="text-[13px] font-medium leading-[18px]">Perps</p>
+      </button>
+      <button
+        @click="selectedMarketType = 'meme'"
+        :class="[
+          'flex h-full items-center justify-center shrink-0 px-[23px] py-[7px]',
+          selectedMarketType === 'meme'
+            ? 'bg-[#272727] text-white'
+            : 'bg-[#1d1d1d] text-[#9b9b9b]'
+        ]"
+      >
+        <p class="text-[13px] font-medium leading-[18px]">Meme</p>
+      </button>
+    </div>
+
     <!-- Content -->
     <div class="flex-1 overflow-hidden">
-      <PositionsTable v-show="selectedTab === 'positions'" />
-      <OrdersTable v-show="selectedTab === 'orders'" />
+      <PositionsTable v-show="selectedTab === 'positions'" :positions="filteredPositions" />
+      <OrdersTable v-show="selectedTab === 'orders'" :orders="filteredOrders" />
       <HistoryTable v-show="selectedTab === 'history'" />
     </div>
   </div>
@@ -88,9 +110,11 @@ import HistoryTable from './HistoryTable.vue'
 import { fromBigInt } from '@/utils/bigint'
 import Switch from '@/components/Switch.vue'
 import { CHART_SHOW_POSITION_STORAGE, CHART_SHOW_ORDER_STORAGE } from '@/storages/chart'
+import { PERP_MARKETS } from '@/constants/markets'
 
 const tradeStore = useTradeStore()
 
+const selectedMarketType = ref<'perps' | 'meme'>('perps')
 const selectedTab = ref<'positions' | 'orders' | 'history'>('positions')
 
 const chartShowPositions = CHART_SHOW_POSITION_STORAGE
@@ -102,13 +126,33 @@ const tabs = [
   { key: 'history' as const, label: 'History' }
 ]
 
-const positions = computed(() => tradeStore.positions)
-const orders = computed(() => tradeStore.orders)
+const allPositions = computed(() => tradeStore.positions)
+const allOrders = computed(() => tradeStore.orders)
 const tradeHistory = computed(() => tradeStore.tradeHistory)
 
+// Filter positions and orders based on selected market type
+const filteredPositions = computed(() => {
+  if (selectedMarketType.value === 'meme') {
+    // Return empty array for meme (not implemented yet as per user's note)
+    return []
+  }
+  
+  // Filter for perps markets
+  return allPositions.value
+})
+
+const filteredOrders = computed(() => {
+  if (selectedMarketType.value === 'meme') {
+    // Return empty array for meme (not implemented yet as per user's note)
+    return []
+  }
+  
+  return allOrders.value
+})
+
 function getTabCount(key: 'positions' | 'orders' | 'history'): number {
-  if (key === 'positions') return positions.value.length
-  if (key === 'orders') return orders.value.length
+  if (key === 'positions') return filteredPositions.value.length
+  if (key === 'orders') return filteredOrders.value.length
   return 0
 }
 
@@ -118,7 +162,7 @@ function getTabCount(key: 'positions' | 'orders' | 'history'): number {
  */
 function closeAllPositions() {
   if (confirm('Are you sure you want to close all positions?')) {
-    const positionIds = positions.value.map(p => p.id)
+    const positionIds = filteredPositions.value.map(p => p.id)
     positionIds.forEach(id => tradeStore.closePosition(id))
   }
 }
@@ -129,7 +173,7 @@ function closeAllPositions() {
  */
 function cancelAllOrders() {
   if (confirm('Are you sure you want to cancel all orders?')) {
-    const orderIds = orders.value.map(o => o.id)
+    const orderIds = filteredOrders.value.map(o => o.id)
     orderIds.forEach(id => tradeStore.cancelOrder(id))
   }
 }
