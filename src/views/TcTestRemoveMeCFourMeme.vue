@@ -14,15 +14,25 @@
             {{ market.symbol }}/BNB
           </option>
         </select>
-        <a
-          v-if="selectedMarket"
-          :href="`https://four.meme/token/${selectedMarket.address}`"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="mt-3 inline-flex items-center text-sm text-blue-400 hover:text-blue-300"
-        >
-          View on four.meme →
-        </a>
+        <div v-if="selectedMarket" class="mt-3 flex items-center gap-3">
+          <img
+            v-if="selectedMarket.icon"
+            :src="selectedMarket.icon"
+            :alt="selectedMarket.symbol"
+            class="h-10 w-10 rounded-full"
+          />
+          <div>
+            <div class="text-white font-medium">{{ selectedMarket.symbol }}/BNB</div>
+            <a
+              :href="`https://four.meme/token/${selectedMarket.address}`"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sm text-blue-400 hover:text-blue-300"
+            >
+              View on four.meme →
+            </a>
+          </div>
+        </div>
       </div>
 
       <!-- current price display -->
