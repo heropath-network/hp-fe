@@ -408,7 +408,7 @@
               <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Effective Leverage</span>
               <div class="h-px w-full bg-[#272727] mt-0.5"></div>
             </div>
-            <span class="text-[13px] leading-[18px] text-white">{{ effectiveLeverageDisplay }}</span>
+            <span class="text-[13px] leading-[18px] text-white">{{ leverage }}x</span>
           </div>
 
           <!-- Cross Margin Ratio (with dropdown) -->
@@ -519,7 +519,6 @@ const orderType = ref<'market' | 'limit' | 'stop'>('market')
 const price = ref('')
 const size = ref('')
 const sizePercentage = ref(0)
-const leverage = ref(10)
 const showMarginModeDialog = ref(false)
 const showLiquiditySourcesDialog = ref(false)
 const showMarketSelect = ref(false)
@@ -534,6 +533,8 @@ const signing = ref(false)
 const notification = useNotification()
 
 const marginSetting = computed(() => tradeStore.getMarginSetting(selectedMarket.value))
+const leverage = ref(marginSetting.value.leverage ?? 5)
+
 const activeLiquiditySourcesCount = computed(() => activeLiquiditySources.value.length)
 const liquiditySourcesTotal = computed(() => liquiditySources.value.length)
 
