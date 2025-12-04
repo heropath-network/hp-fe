@@ -10,9 +10,8 @@ export function useEvaluationAccount() {
   const { address } = useConnection()
   const { data: evaluations } = useUserEvaluationsStorage(address)
 
-  // Filter evaluations that should be shown (same logic as Dashboard)
   const evaluationList = computed(() => {
-    return evaluations.value?.filter((item) => item.displayStatus.showDrawdown) || []
+    return evaluations.value || []
   })
 
   // Get selected evaluation
