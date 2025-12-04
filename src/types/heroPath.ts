@@ -24,9 +24,9 @@ export interface UserPayouts {
 }
 
 export enum QuestTaskId {
-  FollowX = 'follow-x',
-  TradePerp = 'trade-perp',
+  TradeAster = 'trade-aster',
   SwapPancake = 'swap-pancake',
+  DepositVenus = 'deposit-venus',
   TradeMeme = 'trade-meme',
 }
 

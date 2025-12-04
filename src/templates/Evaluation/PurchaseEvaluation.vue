@@ -210,7 +210,7 @@ async function handlePurchase() {
       accountType: 'evaluation',
       accountStatus: 'active',
       displayStatus: {
-        showDrawdown: true,
+        showDashboard: true,
         showPublic: true,
       },
       timestamp: Math.floor(Date.now() / 1000),

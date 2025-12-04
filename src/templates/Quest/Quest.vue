@@ -5,10 +5,10 @@ import { useRouter } from 'vue-router'
 import BaseIcon from '@/components/BaseIcon.vue'
 import { generateUUID } from '@/utils/common'
 import { QuestTaskId } from '@/types/heroPath'
-import XIcon from '@/assets/icons/quest/x.svg'
-import TradePerpIcon from '@/assets/icons/quest/tradePerp.svg'
+import TradeAsterIcon from '@/assets/icons/quest/tradeAster.svg'
+import SwapPancakeIcon from '@/assets/icons/quest/swapPancake.svg'
+import DepositVenusIcon from '@/assets/icons/quest/depositVenus.svg'
 import TradeMemeIcon from '@/assets/icons/quest/tradeMeme.svg'
-import SwapIcon from '@/assets/icons/quest/swap.svg'
 import TradingLogoIcon from '@/assets/icons/quest/tradingLogo.svg'
 import { useUserQuestTaskStatusStorage, useUserQuestDiscountStatusStorage } from '@/storages/heroPath'
 import { ROUTE_NAMES } from '@/router'
@@ -61,30 +61,30 @@ const { addDiscountStatus } = useUserQuestDiscountStatusStorage(address)
 
 const tasks = ref<QuestTask[]>([
   {
-    id: QuestTaskId.FollowX,
-    title: 'Follow @Aster_DEX on X',
-    description: 'Follow @Aster_DEX on X to stay updated with quests and announcements.',
+    id: QuestTaskId.TradeAster,
+    title: 'Long/Short 2 markets on Aster with more than $50 collateral',
+    description: 'Long/Short 2 markets on Aster with more than $50 collateral.',
     status: 'pending',
-    icon: XIcon,
-  },
-  {
-    id: QuestTaskId.TradePerp,
-    title: 'Trade Perps on Aster',
-    description: 'Open at least one perpetual position on Aster (any pair).',
-    status: 'pending',
-    icon: TradePerpIcon,
+    icon: TradeAsterIcon,
   },
   {
     id: QuestTaskId.SwapPancake,
-    title: 'Swap on Pancake',
-    description: 'Complete one swap on Pancake with your connected wallet.',
+    title: 'Swap on Pancake for more than 5 times',
+    description: 'Swap on Pancake for more than 5 times.',
     status: 'pending',
-    icon: SwapIcon,
+    icon: SwapPancakeIcon,
+  },
+  {
+    id: QuestTaskId.DepositVenus,
+    title: 'Deposit more than $50 on Venus protocol for more than 1 week',
+    description: 'Deposit more than $50 on Venus protocol for more than 1 week.',
+    status: 'pending',
+    icon: DepositVenusIcon,
   },
   {
     id: QuestTaskId.TradeMeme,
-    title: 'Trade Meme Coin on Form',
-    description: 'Trade $20 Meme Coin on Form',
+    title: 'Trade 5 meme coins on Four.meme',
+    description: 'Trade 5 meme coins on Four.meme.',
     status: 'pending',
     icon: TradeMemeIcon,
   },
@@ -94,7 +94,7 @@ const allTasksIsCompleted = computed(() => {
   return tasks.value.every((task) => task.status === 'completed')
 })
 
-const openTasks = ref<Set<QuestTaskId>>(new Set([QuestTaskId.FollowX]))
+const openTasks = ref<Set<QuestTaskId>>(new Set([QuestTaskId.TradeMeme]))
 
 function toggleTask(id: QuestTaskId) {
   const next = new Set(openTasks.value)
@@ -164,9 +164,9 @@ watch(
 <template>
   <section ref="containerDom" class="mt-4 flex flex-col gap-6 pb-28 text-[var(--hp-white-color)]">
     <header class="flex flex-col gap-2">
-      <h1 class="text-2xl font-semibold leading-8">Hero&apos;s Rebirth - Get Evaluation Opportunities</h1>
+      <h1 class="text-2xl font-semibold leading-8">Hero's Rebirth - Get Evaluation Discounts</h1>
       <p class="text-sm leading-5 text-[var(--hp-text-color)]">
-        Complete the following tasks to get a free
+        Complete the following tasks to get a discounted
         <span @click="resetAllTasksCompleted">evaluation</span>
         <span @click="setAllTasksCompleted"> opportunity</span>.
       </p>
@@ -174,16 +174,11 @@ watch(
 
     <div class="flex items-center gap-2 text-sm leading-5 text-[var(--hp-text-color)]">
       <BaseIcon name="time" size="16" class="text-[var(--hp-text-color)]" />
-      <span>2025/11/24 16:00- 2025/12/31 16:00 GMT+08:00</span>
+      <span>2025/12/05 00:00- 2026/01/05 16:00 GMT+0</span>
     </div>
 
     <div class="flex flex-col gap-4">
-      <article
-        v-for="task in tasks"
-        :key="task.id"
-        class="bg-[var(--hp-bg-normal)]"
-        :class="task.id === 'swap-pancake' ? 'bg-[var(--hp-bg-light)]' : 'bg-[var(--hp-bg-normal)]'"
-      >
+      <article v-for="task in tasks" :key="task.id" class="bg-[var(--hp-bg-normal)]">
         <button
           type="button"
           class="flex w-full items-center justify-between px-6 py-5 text-left group"
@@ -198,7 +193,7 @@ watch(
             />
 
             <div class="flex items-center gap-3">
-              <img :src="task.icon" alt="" class="w-[18px] h-[18px]" />
+              <img :src="task.icon" alt="" class="w-[24px] h-[24px]" />
               <p class="text-base font-medium leading-6">{{ task.title }}</p>
             </div>
           </div>
@@ -216,7 +211,7 @@ watch(
           </template>
         </button>
 
-        <div v-if="isOpen(task.id)" class="px-14 pb-5 text-sm leading-5 text-[var(--hp-text-color)]">
+        <div v-if="isOpen(task.id)" class="px-14 pb-5 ml-[10px] text-sm leading-5 text-[var(--hp-text-color)]">
           {{ task.description }}
         </div>
       </article>

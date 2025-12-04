@@ -132,9 +132,9 @@ export function useUserQuestTaskStatusStorage(address: Ref<string | undefined>) 
   })
 
   const defaultStatus: Record<QuestTaskId, boolean> = {
-    [QuestTaskId.FollowX]: false,
-    [QuestTaskId.TradePerp]: false,
+    [QuestTaskId.TradeAster]: false,
     [QuestTaskId.SwapPancake]: false,
+    [QuestTaskId.DepositVenus]: false,
     [QuestTaskId.TradeMeme]: false,
   }
 
