@@ -6,14 +6,18 @@ import { computed, ref, watch } from 'vue'
 import { useDayCountDown } from '@/use/useDayCountDown'
 import BaseIcon from '@/components/BaseIcon.vue'
 import router, { ROUTE_NAMES } from '@/router'
-import { useUserTradeHistoryStorage } from '@/storages/trading'
-import { getAccountHistoryPnl, getAccountTotalVolume } from '@/utils/evaluation'
+import { useUserTradeHistoryStorage, useUserPositionsStorage } from '@/storages/trading'
+import { getAccountHistoryPnl, getAccountTotalVolume, getPositionsUnrealizedPnl } from '@/utils/evaluation'
+import { useAllTokenPrices } from '@/use/useTokenPrices'
 
 const { remainingText: dayCountDown } = useDayCountDown()
 
 const { address, isConnected } = useConnection()
 const { data: evaluations } = useUserEvaluationsStorage(address)
 const { data: allTradeHistory } = useUserTradeHistoryStorage(address)
+const { data: allPositions } = useUserPositionsStorage(address)
+
+const { prices: allTokenPrices } = useAllTokenPrices()
 
 const selectedEvaluationId = ref<string | null>(null)
 const selectedEvaluation = computed(
@@ -25,6 +29,13 @@ const accountTradeHistory = computed(() => {
     return []
   }
   return allTradeHistory.value.filter((trade) => trade.accountId === selectedEvaluation.value!.accountId)
+})
+
+const accountPositions = computed(() => {
+  if (!selectedEvaluation.value) {
+    return []
+  }
+  return allPositions.value.filter((position) => position.accountId === selectedEvaluation.value!.accountId)
 })
 
 const evaluationList = computed(() => {
@@ -55,8 +66,22 @@ const accountSize = computed(() => {
   return selectedEvaluation.value.evaluationConfig.accountSize
 })
 
+const historyPnl = computed(() => {
+  if (!selectedEvaluation.value) {
+    return BigInt(0)
+  }
+  return getAccountHistoryPnl(accountTradeHistory.value)
+})
+
+const positionsUnrealizedPnl = computed(() => {
+  if (!selectedEvaluation.value) {
+    return BigInt(0)
+  }
+  return getPositionsUnrealizedPnl(accountPositions.value, allTokenPrices.value)
+})
+
 const pnl = computed(() => {
-  return Number(getAccountHistoryPnl(accountTradeHistory.value))
+  return Number(historyPnl.value + positionsUnrealizedPnl.value)
 })
 
 const accountBalance = computed(() => {
