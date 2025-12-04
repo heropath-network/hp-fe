@@ -6,12 +6,12 @@ import { useUserPayoutsStorage, useUserWithdrawalHistoryStorage, useUserEvaluati
 import { LoadingIcon } from '@/components'
 import { UserWithdrawalHistory } from '@/types/heroPath'
 import { useUserTradeHistoryStorage } from '@/storages/trading'
-import { getAccountHistoryPnl } from '@/use/evaluation'
+import { getAccountHistoryPnl } from '@/utils/evaluation'
+import { SHARE_OF_PROFIT } from '@/constants'
 
 const USDC_TOKEN_ADDRESS = '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d'
 const TOKEN_SYMBOL = 'USDC'
 const PAYOUT_NETWORK = 'BEP20'
-const SHARE_OF_PROFIT = 0.9
 
 const { isConnected, address } = useConnection()
 const { signTypedDataAsync } = useSignTypedData()

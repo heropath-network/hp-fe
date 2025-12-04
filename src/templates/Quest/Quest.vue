@@ -12,7 +12,6 @@ import SwapIcon from '@/assets/icons/quest/swap.svg'
 import TradingLogoIcon from '@/assets/icons/quest/tradingLogo.svg'
 import { useUserQuestTaskStatusStorage, useUserQuestDiscountStatusStorage } from '@/storages/heroPath'
 import { ROUTE_NAMES } from '@/router'
-import { template } from 'lodash-es'
 
 type QuestTask = {
   id: QuestTaskId

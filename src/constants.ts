@@ -18,3 +18,5 @@ export const ORACLE_NAMES: Record<ProjectId, string> = {
 }
 
 export const QUEST_DISCOUNT_AMOUNT = 50 // USD
+
+export const SHARE_OF_PROFIT = 0.9
