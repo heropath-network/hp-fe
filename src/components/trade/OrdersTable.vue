@@ -39,10 +39,19 @@ import { computed } from 'vue'
 import { useTradeStore } from '@/stores/tradeStore'
 import OrderRow from './OrderRow.vue'
 import noDataIcon from '@/assets/img/no-data.svg'
+import type { Order } from '@/storages/trading'
+
+interface Props {
+  orders?: Order[]
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  orders: undefined
+})
 
 const tradeStore = useTradeStore()
 
-const orders = computed(() => tradeStore.orders)
+const orders = computed(() => props.orders ?? tradeStore.orders)
 
 /**
  * Clears all orders from LocalStorage

@@ -41,9 +41,18 @@ import { computed } from 'vue'
 import { useTradeStore } from '@/stores/tradeStore'
 import PositionRow from './PositionRow.vue'
 import noDataIcon from '@/assets/img/no-data.svg'
+import type { Position } from '@/storages/trading'
+
+interface Props {
+  positions?: Position[]
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  positions: undefined
+})
 
 const tradeStore = useTradeStore()
 
-const positions = computed(() => tradeStore.positions)
+const positions = computed(() => props.positions ?? tradeStore.positions)
 </script>
 
