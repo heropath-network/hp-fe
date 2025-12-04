@@ -216,7 +216,6 @@ interface Chain {
 }
 
 const availableChains: Chain[] = [
-
 {
     id: bsc.id,
     name: 'BNB Chain',
@@ -229,7 +228,7 @@ const currentChainId = computed(() => chainId.value)
 const { switchChain: switchChainWagmi } = useSwitchChain()
 
 const currentChain = computed(() => {
-  return availableChains.find((chain) => chain.id === currentChainId.value) || availableChains[1] // Default to BNB Chain
+  return availableChains.find((chain) => chain.id === currentChainId.value) || availableChains[0] // Default to BNB Chain
 })
 
 async function switchChain(targetChainId: number) {
