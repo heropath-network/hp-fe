@@ -1,5 +1,5 @@
 const UserEvaluationsKey = 'user:evaluation:history:{addr}'
-const UserPayoutsKey = 'user:payouts:{addr}'
+const UserPrizesKey = 'user:prizes:{addr}'
 const UserWithdrawalHistoryKey = 'user:withdrawal:history:{addr}'
 const UserPositionsKey = 'user:positions:{addr}'
 const UserOrdersKey = 'user:orders:{addr}'
@@ -11,7 +11,7 @@ const SelectedEvaluationAccountKey = 'heroPath:selectedEvaluationAccount:{addr}'
 
 export {
   UserTradeHistory,
-  UserPayoutsKey,
+  UserPrizesKey,
   UserWithdrawalHistoryKey,
   UserQuestTaskStatusKey,
   UserQuestDiscountStatusKey,

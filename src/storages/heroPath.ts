@@ -3,14 +3,15 @@ import { useLocalStorage } from '@vueuse/core'
 import {
   UserEvaluationsKey,
   AccountShowInLeaderboardKey,
-  UserPayoutsKey,
+  UserPrizesKey,
   UserWithdrawalHistoryKey,
   UserQuestDiscountStatusKey,
   UserQuestTaskStatusKey,
   SelectedEvaluationAccountKey,
 } from './keys'
 import { EMPTY_ADDRESS } from '@/constants'
-import { UserEvaluation, UserPayouts, UserWithdrawalHistory, QuestDiscount, QuestTaskId } from '@/types/heroPath'
+import { UserEvaluation, UserPrizes, UserWithdrawalHistory, QuestDiscount, QuestTaskId } from '@/types/heroPath'
+import { inferPlanFromConfig } from '@/utils/evaluationPlan'
 
 export function useAccountShowInLeaderboard(address: Ref<string | undefined>) {
   const key = computed(() => {
@@ -28,6 +29,30 @@ export function useUserEvaluationsStorage(address: Ref<string | undefined>) {
   })
 
   const storage = useLocalStorage<UserEvaluation[]>(key, [])
+
+  // Backfill missing plan values for legacy data if needed
+  function hydrateEvaluationPlans() {
+    let updated = false
+    const hydrated = storage.value.map((evaluation) => {
+      if (evaluation.plan) {
+        return evaluation
+      }
+      const inferredPlan = inferPlanFromConfig(evaluation.evaluationConfig)
+      if (!inferredPlan) {
+        return evaluation
+      }
+      updated = true
+      return {
+        ...evaluation,
+        plan: inferredPlan,
+      }
+    })
+    if (updated) {
+      storage.value = hydrated
+    }
+  }
+
+  hydrateEvaluationPlans()
 
   function clear() {
     storage.value = []
@@ -78,17 +103,17 @@ export function useUserEvaluationsStorage(address: Ref<string | undefined>) {
   }
 }
 
-export function useUserPayoutsStorage(address: Ref<string | undefined>) {
+export function useUserPrizesStorage(address: Ref<string | undefined>) {
   const key = computed(() => {
-    return UserPayoutsKey.replace('{addr}', address.value?.toLowerCase() ?? EMPTY_ADDRESS)
+    return UserPrizesKey.replace('{addr}', address.value?.toLowerCase() ?? EMPTY_ADDRESS)
   })
 
-  const defaultPayouts: UserPayouts = { withdrawnAmount: 0 }
+  const defaultPrizes: UserPrizes = { withdrawnAmount: 0 }
 
-  const storage = useLocalStorage<UserPayouts>(key, defaultPayouts)
+  const storage = useLocalStorage<UserPrizes>(key, defaultPrizes)
 
   function clear() {
-    storage.value = defaultPayouts
+    storage.value = defaultPrizes
   }
 
   function updateWithdrawnAmount(amount: number) {

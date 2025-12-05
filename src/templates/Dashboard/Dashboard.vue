@@ -13,6 +13,8 @@ import { useEvaluationAccount } from '@/composables/useEvaluationAccount'
 import { useRoute } from 'vue-router'
 import { formatNumber, multiplyBigInt, toBigInt, absBigInt } from '@/utils/bigint'
 import type { EvaluationPlanBaseConfig } from '@/types/evaluation'
+import { inferPlanFromConfig } from '@/utils/evaluationPlan'
+import AboutAccountDialog from '@/templates/Evaluation/AboutAccountDialog.vue'
 
 const { remainingText: dayCountDown } = useDayCountDown()
 
@@ -24,6 +26,8 @@ const { prices: allTokenPrices } = useAllTokenPrices()
 const route = useRoute()
 
 const { evaluationList, selectedEvaluationId, selectedEvaluation, selectEvaluation } = useEvaluationAccount()
+
+const showAboutAccountDialog = ref(false)
 
 const accountTradeHistory = computed(() => {
   if (!selectedEvaluation.value) {
@@ -109,16 +113,9 @@ const selectedPlanBase = computed<EvaluationPlanBaseConfig | null>(() => {
     return null
   }
 
-  const { evaluationConfig } = selectedEvaluation.value
-  const matchedPlan = Object.values(EvaluationPlanConfig).find((plan) =>
-    plan.levels.some(
-      (level) =>
-        level.level === evaluationConfig.level &&
-        level.accountSize === evaluationConfig.accountSize &&
-        level.profitGoal === evaluationConfig.profitGoal &&
-        level.fee === evaluationConfig.fee,
-    ),
-  )
+  const { evaluationConfig, plan } = selectedEvaluation.value
+  const resolvedPlanKey = EvaluationPlanConfig[plan] ? plan : inferPlanFromConfig(evaluationConfig)
+  const matchedPlan = resolvedPlanKey ? EvaluationPlanConfig[resolvedPlanKey] : null
 
   return matchedPlan?.base ?? null
 })
@@ -185,7 +182,7 @@ function openTradeTerminal() {
       <div class="flex flex-col gap-1">
         <h1 class="text-2xl font-semibold leading-8">
           <template v-if="isConnected">Welcome Back, {{ ellipsisMiddle(address) }}</template>
-          <template v-else>Welcome Back, Guest</template>
+          <template v-else>Place Connect Wallet</template>
         </h1>
         <p class="text-sm leading-5 text-[var(--hp-text-color)]">{{ displayDate }}</p>
       </div>
@@ -251,11 +248,28 @@ function openTradeTerminal() {
 
     <div class="flex flex-col gap-4">
       <div class="space-y-6 bg-[var(--hp-bg-normal)] p-6">
-        <p class="text-xl font-semibold leading-7">
+        <div class="text-xl font-semibold leading-7">
           <span class="text-[var(--hp-primary-green)]">${{ formatNumber(accountSize, 2) }}</span>
-          <span class="pl-1">{{
-            selectedEvaluation ? getAccountTypeLabel(selectedEvaluation?.accountType) : 'Evaluation'
-          }}</span>
+          <span class="pl-1">
+            <template v-if="selectedEvaluation?.accountType === 'funded'">Hero Account</template>
+            <template v-else>Evaluation</template>
+          </span>
+        </div>
+        <p class="text-[14px] leading-[20px] text-[var(--hp-text-color)] font-[400] mt-1">
+          <template v-if="!isConnected"
+            >Start your HeroPath journey by taking an evaluation and get a chance to acquire a hero account.</template
+          >
+          <template v-else-if="selectedEvaluation?.accountType === 'funded'">
+            Trade with the hero account and contribute trading signals/insights to the protocol’s own independent
+            trading strategy and earn prizes.
+            <span class="underline cursor-pointer">Learn More</span>
+          </template>
+          <template v-else>
+            Complete the evaluation to acquire a hero account after proving your trading skills.
+            <span @click="showAboutAccountDialog = true" class="text-[var(--hp-primary-green)] underline cursor-pointer"
+              >About Hero Account</span
+            >
+          </template>
         </p>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
@@ -269,7 +283,7 @@ function openTradeTerminal() {
             <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
               {{ pnl < 0 ? '-' : '' }}${{ formatNumber(absBigInt(pnl), 2) }}
             </p>
-            <p class="text-sm leading-5 text-[var(--hp-text-color)]">PNL</p>
+            <p class="text-sm leading-5 text-[var(--hp-text-color)]">Total Profit</p>
           </div>
 
           <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
@@ -303,9 +317,7 @@ function openTradeTerminal() {
           <template v-if="selectedEvaluation?.accountType === 'funded'">
             <article class="flex h-[100px] flex-col justify-center gap-2 bg-[var(--hp-bg-light)] px-6 py-5">
               <div>
-                <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
-                  {{ profitSplit }}%
-                </p>
+                <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">{{ profitSplit }}%</p>
                 <p class="text-sm leading-5 text-[var(--hp-text-color)]">Profit Share</p>
               </div>
             </article>
@@ -351,4 +363,5 @@ function openTradeTerminal() {
       </div>
     </div>
   </section>
+  <AboutAccountDialog v-if="showAboutAccountDialog" @close="showAboutAccountDialog = false" />
 </template>

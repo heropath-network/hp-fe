@@ -5,7 +5,7 @@ import { useAccountShowInLeaderboard, useUserEvaluationsStorage } from '@/storag
 import { useConnection } from '@wagmi/vue'
 import { formatDate, getAccountTypeLabel, getAccountStatusLabel } from '@/utils/common'
 import { useUserTradeHistoryStorage } from '@/storages/trading'
-import { useUserPayoutsStorage } from '@/storages/heroPath'
+import { useUserPrizesStorage } from '@/storages/heroPath'
 import { countTradesWinRate, getAccountHistoryPnl, getAccountTotalVolume } from '@/utils/evaluation'
 import { SHARE_OF_PROFIT } from '@/constants'
 import * as _ from 'lodash-es'
@@ -20,7 +20,7 @@ const {
 } = useUserEvaluationsStorage(address)
 
 const { data: userTradeHistory } = useUserTradeHistoryStorage(address)
-const { data: payoutsInfo } = useUserPayoutsStorage(address)
+const { data: prizesInfo } = useUserPrizesStorage(address)
 
 const evaluationTradeHistory = computed(() => {
   if (!userEvaluations.value || !userTradeHistory.value) {
@@ -61,7 +61,7 @@ const filteredUserEvaluations = computed(() => {
 
 const leaderboardVisible = useAccountShowInLeaderboard(address)
 
-const withdrawnAmount = computed(() => toBigInt(payoutsInfo.value.withdrawnAmount))
+const withdrawnAmount = computed(() => toBigInt(prizesInfo.value.withdrawnAmount))
 
 const evaluationTradingVolume = computed(() => {
   return getAccountTotalVolume(evaluationTradeHistory.value)

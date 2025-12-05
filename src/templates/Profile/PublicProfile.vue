@@ -10,7 +10,7 @@ import { useUserEvaluationsStorage } from '@/storages/heroPath'
 import { formatDate, getAccountTypeLabel, getAccountStatusLabel } from '@/utils/common'
 import BaseIcon from '@/components/BaseIcon.vue'
 import { useUserTradeHistoryStorage } from '@/storages/trading'
-import { useUserPayoutsStorage } from '@/storages/heroPath'
+import { useUserPrizesStorage } from '@/storages/heroPath'
 import { countTradesWinRate, getAccountHistoryPnl, getAccountTotalVolume } from '@/utils/evaluation'
 import { SHARE_OF_PROFIT } from '@/constants'
 import * as _ from 'lodash-es'
@@ -27,8 +27,8 @@ const userEvaluations = computed(() => {
 })
 
 const { data: userTradeHistory } = useUserTradeHistoryStorage(address)
-const { data: payoutsInfo } = useUserPayoutsStorage(address)
-const withdrawnAmount = computed(() => toBigInt(payoutsInfo.value.withdrawnAmount))
+const { data: prizesInfo } = useUserPrizesStorage(address)
+const withdrawnAmount = computed(() => toBigInt(prizesInfo.value.withdrawnAmount))
 
 const evaluationTradeHistory = computed(() => {
   if (!userEvaluations.value || !userTradeHistory.value) {

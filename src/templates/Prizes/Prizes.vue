@@ -2,27 +2,42 @@
 import { ellipsisMiddle, formatDate, getWithdrawalStatusLabel } from '@/utils/common'
 import { computed, ref } from 'vue'
 import { useConnection, useSignTypedData } from '@wagmi/vue'
-import { useUserPayoutsStorage, useUserWithdrawalHistoryStorage, useUserEvaluationsStorage } from '@/storages/heroPath'
-import { LoadingIcon } from '@/components'
+import { useUserPrizesStorage, useUserWithdrawalHistoryStorage, useUserEvaluationsStorage } from '@/storages/heroPath'
+import { LoadingIcon, BaseIcon } from '@/components'
 import { UserWithdrawalHistory } from '@/types/heroPath'
 import { useUserTradeHistoryStorage } from '@/storages/trading'
 import { getAccountHistoryPnl } from '@/utils/evaluation'
 import { SHARE_OF_PROFIT } from '@/constants'
 import { formatNumber, fromBigInt, multiplyBigInt, toBigInt } from '@/utils/bigint'
+import { PrizeTokens } from '@/config/prizeTokens'
 
 const USDC_TOKEN_ADDRESS = '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d'
-const TOKEN_SYMBOL = 'USDC'
 const PAYOUT_NETWORK = 'BEP20'
-const USDC_DECIMALS = 6
 
 const { isConnected, address } = useConnection()
 const { signTypedDataAsync } = useSignTypedData()
 const withdrawing = ref(false)
 
+const requireSymbolIcon = (symbol: string) => {
+  return new URL(`/src/assets/icons/tokens/${symbol}.svg`, import.meta.url).href
+}
+
 const { data: evaluations } = useUserEvaluationsStorage(address)
-const { data: payoutsInfo, updateWithdrawnAmount } = useUserPayoutsStorage(address)
+const { data: prizesInfo, updateWithdrawnAmount } = useUserPrizesStorage(address)
 const { data: withdrawalHistory, addWithdrawalHistory } = useUserWithdrawalHistoryStorage(address)
 const { data: allTradeHistory } = useUserTradeHistoryStorage(address)
+
+const showTokenDropdown = ref(false)
+const selectedToken = ref(PrizeTokens[0])
+
+function selectToken(token: (typeof PrizeTokens)[number]) {
+  selectedToken.value = token
+  showTokenDropdown.value = false
+}
+
+function getPrizeTokenBySymbol(symbol: string) {
+  return PrizeTokens.find((token) => token.symbol === symbol) ?? undefined
+}
 
 const amount = ref('')
 
@@ -49,12 +64,12 @@ const totalPnl = computed(() => {
 })
 
 const profitAvailable = computed(() => {
-  const available = totalPnl.value - toBigInt(payoutsInfo.value.withdrawnAmount)
+  const available = totalPnl.value - toBigInt(prizesInfo.value.withdrawnAmount)
   return available > 0n ? available : BigInt(0)
 })
 
 const totalAccountProfit = computed(() => {
-  return toBigInt(payoutsInfo.value.withdrawnAmount) + profitAvailable.value
+  return toBigInt(prizesInfo.value.withdrawnAmount) + profitAvailable.value
 })
 
 const isValidAmount = computed(() => {
@@ -70,7 +85,7 @@ async function handleWithdraw() {
   if (!isValidAmount.value || !isConnected.value) return
 
   const parsedAmount = toBigInt(amount.value)
-  const decimalShift = 10n ** BigInt(18 - USDC_DECIMALS)
+  const decimalShift = 10n ** BigInt(18 - selectedToken.value.formatDecimals)
   const amountBigInt = parsedAmount / decimalShift
   const historyAmount = parseFloat(fromBigInt(parsedAmount, 6))
 
@@ -78,6 +93,7 @@ async function handleWithdraw() {
     timestamp: Math.floor(Date.now() / 1000),
     address: USDC_TOKEN_ADDRESS,
     amount: historyAmount,
+    tokenSymbol: selectedToken.value.symbol,
     status: 'success',
   }
 
@@ -98,13 +114,13 @@ async function handleWithdraw() {
         account: {
           wallet: address.value!,
         },
-        token: TOKEN_SYMBOL,
-        address: USDC_TOKEN_ADDRESS,
+        token: selectedToken.value.symbol,
+        address: address.value!,
         amount: amountBigInt,
       },
     } as any)
     addWithdrawalHistory(historyData)
-    const newWithdrawnAmount = toBigInt(payoutsInfo.value.withdrawnAmount) + parsedAmount
+    const newWithdrawnAmount = toBigInt(prizesInfo.value.withdrawnAmount) + parsedAmount
     updateWithdrawnAmount(parseFloat(fromBigInt(newWithdrawnAmount, 6)))
     amount.value = ''
   } catch (error) {
@@ -117,7 +133,14 @@ async function handleWithdraw() {
 
 <template>
   <section class="mt-4 flex flex-col gap-10 text-[var(--hp-white-color)]">
-    <h1 class="text-2xl font-semibold leading-8">Payouts</h1>
+    <div>
+      <h1 class="text-2xl font-semibold leading-8">Hero Prizes</h1>
+      <div class="text-[14px] mt-2 leading-[20px] text-[var(--hp-text-color)]">
+        After contributing trading signals/insights to the protocol’s own independent trading strategy, the protocol
+        will distribute hero prizes every 7 days.The prizes for each hero account are calculated based on the
+        contribution to the protocol’s trading strategy. Learn More
+      </div>
+    </div>
 
     <div class="flex flex-col gap-6 bg-[var(--hp-bg-normal)] p-6">
       <p class="text-xl font-semibold leading-7">Profit Structure Overview</p>
@@ -125,19 +148,19 @@ async function handleWithdraw() {
       <div class="grid gap-4 md:grid-cols-3">
         <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] px-6 py-5">
           <p class="text-xl font-semibold leading-7">
-            {{ isConnected ? formatNumber(profitAvailable, 2) : 'N/A' }}
+            {{ isConnected && profitAvailable > 0n ? `$${formatNumber(profitAvailable, 2)}` : 'N/A' }}
           </p>
           <p class="text-sm leading-5 text-[var(--hp-text-color)]">Profit Available</p>
         </div>
         <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] px-6 py-5">
           <p class="text-xl font-semibold leading-7">
-            {{ isConnected ? formatNumber(totalAccountProfit, 2) : 'N/A' }}
+            {{ isConnected && totalAccountProfit > 0n ? `$${formatNumber(totalAccountProfit, 2)}` : 'N/A' }}
           </p>
           <p class="text-sm leading-5 text-[var(--hp-text-color)]">Your Total Account Profit</p>
         </div>
         <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] px-6 py-5">
-          <p class="text-xl font-semibold leading-7">90%</p>
-          <p class="text-sm leading-5 text-[var(--hp-text-color)]">The Share of Profit You Keep</p>
+          <p class="text-xl font-semibold leading-7">5 Days</p>
+          <p class="text-sm leading-5 text-[var(--hp-text-color)]">Next Prize Distribution In</p>
         </div>
       </div>
     </div>
@@ -146,22 +169,70 @@ async function handleWithdraw() {
       <p class="text-xl font-semibold leading-7">Payout Details</p>
 
       <div class="flex flex-col gap-4 bg-[var(--hp-bg-light)] p-4">
-        <div class="grid gap-3 md:grid-cols-2">
+        <div class="grid gap-3 md:grid-cols-2 h-[86px]">
           <div
             class="flex flex-col gap-2 border border-[var(--hp-line-light-color)] bg-[var(--hp-bg-normal)] px-4 py-3"
           >
             <div class="flex items-center gap-1 text-sm leading-5 text-[var(--hp-text-color)]">
-              <span>Amount</span>
+              <span>To Claim</span>
               <span class="text-[var(--hp-primary-green)]">*</span>
             </div>
-            <input
-              v-model="amount"
-              type="text"
-              inputmode="decimal"
-              @input="handleAmountInput"
-              placeholder="$0.00"
-              class="h-7 w-full bg-transparent text-xl font-semibold text-[var(--hp-white-color)] placeholder:text-[var(--hp-text-color)] focus:outline-none"
-            />
+            <div class="relative flex w-full items-center gap-3">
+              <input
+                v-model="amount"
+                type="text"
+                inputmode="decimal"
+                @input="handleAmountInput"
+                placeholder="$0.00"
+                class="flex-1 bg-transparent text-xl font-semibold text-[var(--hp-white-color)] placeholder:text-[var(--hp-text-color)] focus:outline-none"
+              />
+              <div class="shrink-0">
+                <button
+                  type="button"
+                  class="group flex items-center gap-2 rounded-sm text-lg font-semibold text-[var(--hp-white-color)] transition hover:text-[var(--hp-primary-green)]"
+                  @click="showTokenDropdown = !showTokenDropdown"
+                >
+                  <img
+                    class="h-[22px] w-[22px]"
+                    :src="requireSymbolIcon(selectedToken.symbol)"
+                    :alt="selectedToken.symbol"
+                  />
+                  <span>{{ selectedToken.symbol }}</span>
+                  <BaseIcon
+                    name="downArrow"
+                    size="12"
+                    class="text-[var(--hp-text-color)] transition-transform duration-200 group-hover:text-[var(--hp-primary-green)]"
+                    :class="showTokenDropdown ? 'rotate-180' : ''"
+                  />
+                </button>
+              </div>
+
+              <div v-if="showTokenDropdown" class="fixed inset-0 z-10" @click="showTokenDropdown = false" />
+              <div
+                v-if="showTokenDropdown"
+                class="absolute left-[-16px] top-[calc(100%+24px)] z-20 w-[calc(100%+32px)] overflow-hidden border border-[var(--hp-line-light-color)] bg-[var(--hp-bg-light)] shadow-[0_12px_30px_rgba(0,0,0,0.35)]"
+              >
+                <button
+                  v-for="token in PrizeTokens"
+                  :key="token.symbol"
+                  type="button"
+                  class="flex w-full items-center gap-2 px-4 py-3 text-left transition hover:bg-[var(--hp-line-normal-color)]"
+                  @click="selectToken(token)"
+                >
+                  <img class="h-[22px] w-[22px]" :src="requireSymbolIcon(token.symbol)" :alt="token.symbol" />
+                  <span
+                    class="text-base font-semibold"
+                    :class="
+                      selectedToken.symbol === token.symbol
+                        ? 'text-[var(--hp-text-color)]'
+                        : 'text-[var(--hp-white-color)]'
+                    "
+                  >
+                    {{ token.symbol }}
+                  </span>
+                </button>
+              </div>
+            </div>
           </div>
 
           <div
@@ -185,7 +256,7 @@ async function handleWithdraw() {
           :disabled="confirmIsDisabled"
           @click="handleWithdraw"
         >
-          USDC Payout <LoadingIcon v-if="withdrawing" :is-black="true" class="ml-2" />
+          {{ selectedToken.symbol }} HERO Prizes<LoadingIcon v-if="withdrawing" :is-black="true" class="ml-2" />
         </button>
       </div>
     </div>
@@ -220,7 +291,10 @@ async function handleWithdraw() {
             >
               <div class="px-6">{{ formatDate(item.timestamp) }}</div>
               <div class="px-6">{{ ellipsisMiddle(item.address) }}</div>
-              <div class="px-6">{{ formatNumber(toBigInt(item.amount), 2) }} {{ TOKEN_SYMBOL }}</div>
+              <div class="px-6">
+                {{ formatNumber(toBigInt(item.amount), getPrizeTokenBySymbol(item.tokenSymbol)?.formatDecimals ?? 2) }}
+                {{ item.tokenSymbol }}
+              </div>
               <div class="px-6">{{ getWithdrawalStatusLabel(item.status) }}</div>
             </div>
           </template>

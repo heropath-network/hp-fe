@@ -14,7 +14,7 @@ const router = useRouter()
 
 type EducationCard = {
   title: string
-  timestamp: string
+  readMinutes: number
   banner: any
   tags: { label: string; variant: 'primary' | 'secondary' }[]
 }
@@ -22,7 +22,7 @@ type EducationCard = {
 const tradingFundamentalsCards: EducationCard[] = [
   {
     title: 'Trader’s Dictionary',
-    timestamp: '1764828500',
+    readMinutes: 12,
     banner: Edu1Img,
     tags: [
       { label: 'Beginner', variant: 'primary' },
@@ -31,7 +31,7 @@ const tradingFundamentalsCards: EducationCard[] = [
   },
   {
     title: 'Risk Management Basics',
-    timestamp: '1764828500',
+    readMinutes: 9,
     banner: Edu2Img,
     tags: [
       { label: 'Beginner', variant: 'primary' },
@@ -40,7 +40,7 @@ const tradingFundamentalsCards: EducationCard[] = [
   },
   {
     title: 'Scalping Trading 101',
-    timestamp: '1764828500',
+    readMinutes: 21,
     banner: Edu3Img,
     tags: [
       { label: 'Beginner', variant: 'primary' },
@@ -60,7 +60,7 @@ const tradingFundamentalsCardRows = computed(() => {
 const technicalAnalysisCards: EducationCard[] = [
   {
     title: 'Market Environment - Ranges vs. Trends',
-    timestamp: '1764828500',
+    readMinutes: 18,
     banner: Edu4Img,
     tags: [
       { label: 'Intermediate', variant: 'primary' },
@@ -69,7 +69,7 @@ const technicalAnalysisCards: EducationCard[] = [
   },
   {
     title: 'Support and Resistance',
-    timestamp: '1764828500',
+    readMinutes: 14,
     banner: Edu5Img,
     tags: [
       { label: 'Intermediate', variant: 'primary' },
@@ -78,7 +78,7 @@ const technicalAnalysisCards: EducationCard[] = [
   },
   {
     title: 'Supply and Demand Trading',
-    timestamp: '1764828500',
+    readMinutes: 15,
     banner: Edu6Img,
     tags: [
       { label: 'Intermediate', variant: 'primary' },
@@ -95,42 +95,6 @@ const technicalAnalysisCardRows = computed(() => {
   return rows
 })
 
-function formatTimeAgo(timestamp: string): string {
-  // normalize timestamp to milliseconds
-  let timeValue: number
-  if (/^\d+$/.test(timestamp)) {
-    // numeric timestamp (seconds or milliseconds)
-    timeValue = timestamp.length <= 10 ? Number(timestamp) * 1000 : Number(timestamp)
-  } else {
-    const parsed = Date.parse(timestamp)
-    if (isNaN(parsed)) {
-      return 'unknown'
-    }
-    timeValue = parsed
-  }
-
-  const now = Date.now()
-  const diff = now - timeValue
-
-  if (diff < 0) {
-    return 'just now'
-  }
-
-  const seconds = Math.floor(diff / 1000)
-  const minutes = Math.floor(seconds / 60)
-  const hours = Math.floor(minutes / 60)
-  const days = Math.floor(hours / 24)
-
-  if (days > 0) {
-    return `${days} day${days > 1 ? 's' : ''}`
-  } else if (hours > 0) {
-    return `${hours} hour${hours > 1 ? 's' : ''}`
-  } else if (minutes > 0) {
-    return `${minutes} minute${minutes > 1 ? 's' : ''}`
-  } else {
-    return `${seconds} second${seconds > 1 ? 's' : ''}`
-  }
-}
 function openTradeTerminal() {
   window.open(router.resolve({ name: ROUTE_NAMES.Trade }).href, '_blank')
 }
@@ -192,7 +156,7 @@ function openTradeTerminal() {
 
             <div class="flex items-center gap-2 text-sm leading-5 text-[var(--hp-text-color)]">
               <BaseIcon name="time" size="16" class="text-[var(--hp-text-color)]" />
-              <span>{{ formatTimeAgo(card.timestamp) }}</span>
+              <span>{{ card.readMinutes }} minutes</span>
             </div>
           </div>
         </article>
@@ -239,7 +203,7 @@ function openTradeTerminal() {
 
             <div class="flex items-center gap-2 text-sm leading-5 text-[var(--hp-text-color)]">
               <BaseIcon name="time" size="16" class="text-[var(--hp-text-color)]" />
-              <span>{{ formatTimeAgo(card.timestamp) }}</span>
+              <span>{{ card.readMinutes }} minutes</span>
             </div>
           </div>
         </article>

@@ -9,7 +9,7 @@
             <th class="px-4 py-3 text-left font-medium">Operation</th>
             <th class="px-4 py-3 text-left font-medium">Side</th>
             <th class="px-4 py-3 text-left font-medium">Size</th>
-            <th class="px-4 py-3 text-left font-medium">Amount</th>
+            <th class="px-4 py-3 text-left font-medium">Entry Price</th>
             <th class="px-4 py-3 text-left font-medium">Fee</th>
             <!-- <th class="px-4 py-3 text-right font-medium">Exit Price</th> -->
             <th class="px-4 py-3 text-left font-medium">Realized PNL & ROE</th>
@@ -24,11 +24,7 @@
               </div>
             </td>
           </tr>
-          <HistoryRow
-            v-for="trade in history"
-            :key="trade.id"
-            :trade="trade"
-          />
+          <HistoryRow v-for="trade in history" :key="trade.id" :trade="trade" />
         </tbody>
       </table>
     </div>
@@ -96,8 +92,7 @@ const averagePnL = computed(() => {
 
 const winRate = computed(() => {
   if (history.value.length === 0) return 0
-  const wins = history.value.filter(trade => trade.pnl > 0).length
+  const wins = history.value.filter((trade) => trade.pnl > 0).length
   return ((wins / history.value.length) * 100).toFixed(1)
 })
 </script>
-

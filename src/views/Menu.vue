@@ -9,7 +9,7 @@ enum MenuItem {
   Profile = 'Profile',
   Evaluation = 'Evaluation',
   Quest = 'Quest',
-  Payouts = 'Payouts',
+  Prizes = 'Prizes',
   TradingEducation = 'TradingEducation',
   Leaderboard = 'Leaderboard',
   Ecosystem = 'Ecosystem',
@@ -41,10 +41,10 @@ const menuItems = [
     routeName: ROUTE_NAMES.Quest,
   },
   {
-    id: MenuItem.Payouts,
-    label: 'Payouts',
-    icon: 'menu-payouts',
-    routeName: ROUTE_NAMES.Payouts,
+    id: MenuItem.Prizes,
+    label: 'Prizes',
+    icon: 'menu-prizes',
+    routeName: ROUTE_NAMES.Prizes,
   },
   {
     id: MenuItem.Profile,

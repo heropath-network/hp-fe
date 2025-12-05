@@ -93,41 +93,6 @@
         <!-- Collateral & Profits Settings -->
         <div class="flex flex-col gap-2">
           <div class="flex items-center justify-between">
-            <span class="text-[14px] leading-[20px] text-[#9b9b9b]">Collateral & Profits In</span>
-            <div class="relative token-selector-container">
-              <button
-                @click.stop="showTokenSelector = !showTokenSelector"
-                class="flex items-center gap-1 bg-[#373737] px-2 py-1 hover:bg-[#414141] transition-colors"
-              >
-                <MarketIcon :symbol="selectedToken" :size="20" />
-                <span class="text-[14px] font-medium leading-[20px] text-white">{{ selectedToken }}</span>
-                <i
-                  class="iconfont icon-down text-white text-[16px] transition-transform"
-                  :class="{ 'rotate-180': showTokenSelector }"
-                ></i>
-              </button>
-
-              <!-- Dropdown Menu -->
-              <div
-                v-if="showTokenSelector"
-                class="absolute right-0 top-full mt-1 bg-[#272727] border border-[#373737] rounded overflow-hidden z-10 min-w-[120px]"
-              >
-                <button
-                  v-for="token in tokenOptions"
-                  :key="token"
-                  @click.stop="selectToken(token)"
-                  :class="[
-                    'w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-[#373737] transition-colors',
-                    selectedToken === token ? 'bg-[#373737]' : '',
-                  ]"
-                >
-                  <MarketIcon :symbol="token" :size="16" />
-                  <span class="text-[14px] font-medium leading-[20px] text-white">{{ token }}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center justify-between">
             <span class="text-[14px] leading-[20px] text-[#9b9b9b]">Profit Token Swap Slippage</span>
             <div class="flex items-center gap-1">
               <span class="text-[14px] leading-[20px] text-white text-right">≤ 1.000%</span>

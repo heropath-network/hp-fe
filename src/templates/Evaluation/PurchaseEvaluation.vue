@@ -4,7 +4,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { ROUTE_NAMES } from '@/router'
 import { EvaluationPlan, EvaluationConfig } from '@/types/evaluation'
 import { useConnection, useSignTypedData } from '@wagmi/vue'
-import { TOKEN_PRICES, PaymentTokens } from '@/config/paymentTokens'
+import { PaymentTokens } from '@/config/paymentTokens'
+import { TOKEN_PRICES } from '@/config/tokensPrices'
 import { useUserEvaluationsStorage } from '@/storages/heroPath'
 import { generateTimeBasedSixDigitId } from '@/utils/common'
 import { BaseIcon, LoadingIcon } from '@/components'
@@ -250,6 +251,7 @@ async function handlePurchase() {
     addEvaluation({
       accountId: evaluationId,
       evaluationConfig,
+      plan: activePlan.value,
       accountType: 'evaluation',
       accountStatus: 'active',
       displayStatus: {

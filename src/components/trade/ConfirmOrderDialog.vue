@@ -3,29 +3,28 @@
     <template #title>
       <div class="flex items-center justify-between w-full">
         <span class="text-[16px] font-semibold leading-[24px] text-white">
-          Confirm Market Order - 
+          Confirm Market Order -
           <span :class="tradeSide === 'long' ? 'text-[#10c8a8]' : 'text-red-error'">
             {{ tradeSide === 'long' ? 'Long' : 'Short' }} {{ leverage }}X
           </span>
         </span>
       </div>
     </template>
-    
+
     <div class="confirm-order-dialog flex flex-col gap-6">
       <!-- Input Boxes Section -->
       <div class="flex flex-col gap-2 relative">
-        <!-- Use (USDC) Input Box -->
+        <!-- Use (USD) Input Box -->
         <div class="bg-[#272727] p-4 flex flex-col gap-2">
           <div class="flex items-center gap-2">
-            <span class="text-[14px] leading-[20px] text-[#9b9b9b] font-normal">Use: ${{ formatNumber(useAmount) }}</span>
+            <span class="text-[14px] leading-[20px] text-[#9b9b9b] font-normal"
+              >Use: ${{ formatNumber(useAmount) }}</span
+            >
           </div>
           <div class="flex items-center justify-between">
             <span class="text-[20px] leading-[28px] text-white font-semibold">{{ formatNumber(useAmount) }}</span>
             <div class="flex items-center gap-1">
-              <div class="relative shrink-0 size-5">
-                <MarketIcon symbol="USDC" :size="20" />
-              </div>
-              <span class="text-[18px] leading-[28px] text-white font-medium">USDC</span>
+              <span class="text-[18px] leading-[28px] text-white font-medium">USD</span>
             </div>
           </div>
         </div>
@@ -48,11 +47,7 @@
             <span class="text-[20px] leading-[28px] text-white font-semibold">{{ formatNumber(size) }}</span>
             <div class="flex items-center gap-1">
               <div class="relative shrink-0 size-5">
-                <img
-                  :src="tokenIconSrc"
-                  :alt="tokenSymbol"
-                  class="block w-full h-full object-contain"
-                />
+                <img :src="tokenIconSrc" :alt="tokenSymbol" class="block w-full h-full object-contain" />
               </div>
               <span class="text-[18px] leading-[28px] text-white font-medium">{{ tokenSymbol }}</span>
             </div>
@@ -60,11 +55,7 @@
           <!-- Chain Label -->
           <div class="absolute top-0 right-0 bg-[#414141] size-6 flex items-center justify-center">
             <div class="relative shrink-0 size-4">
-              <img
-                src="/img/liquidity/aster.svg"
-                alt="Aster"
-                class="block w-full h-full object-contain"
-              />
+              <img src="/img/liquidity/aster.svg" alt="Aster" class="block w-full h-full object-contain" />
             </div>
           </div>
         </div>
@@ -84,7 +75,10 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-1">
             <span class="text-[14px] leading-[20px] text-[#9b9b9b] font-normal">Market Price</span>
-            <Tooltip :width="300" content="Market price is the current trading price at which your order will be executed.">
+            <Tooltip
+              :width="300"
+              content="Market price is the current trading price at which your order will be executed."
+            >
               <div class="relative shrink-0 size-4 cursor-help flex items-center justify-center">
                 <i class="iconfont icon-question text-[#9b9b9b] text-[14px]"></i>
               </div>
@@ -151,9 +145,9 @@
         @click="handleConfirm"
         :class="[
           'w-full py-[14px] text-[16px] font-medium text-center transition',
-          tradeSide === 'long' 
-            ? 'bg-[#6ce99e] text-gray-1000 hover:bg-[#5dd88a]' 
-            : 'bg-red-error text-gray-1000 hover:bg-red-hover'
+          tradeSide === 'long'
+            ? 'bg-[#6ce99e] text-gray-1000 hover:bg-[#5dd88a]'
+            : 'bg-red-error text-gray-1000 hover:bg-red-hover',
         ]"
       >
         Confirm {{ tradeSide === 'long' ? 'Long' : 'Short' }} {{ tokenSymbol }}
@@ -232,4 +226,3 @@ function formatPrice(value: string | number): string {
   width: 100%;
 }
 </style>
-
