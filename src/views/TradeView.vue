@@ -7,7 +7,7 @@
 
         <TradeStatistics @open-market-select="showMarketSelect = true" />
 
-        <div class="flex-1 overflow-hidden min-h-[50vh] max-h-[50vh]">
+        <div class="flex-1 overflow-hidden h-[401px]">
           <PriceChart />
         </div>
 
