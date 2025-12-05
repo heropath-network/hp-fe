@@ -5,6 +5,7 @@ import { Popover, PopoverButton } from "@headlessui/vue";
 interface Props {
   content: string;
   width?: number;
+  contentClass?: string;
 }
 
 defineProps<Props>(
@@ -44,7 +45,7 @@ function setOpen(value: boolean) {
         @mouseenter="setOpen(true)"
         @mouseleave="setOpen(false)"
       >
-        <div class="tooltip-content whitespace-pre-wrap">{{ content }}</div>
+        <div class="tooltip-content whitespace-pre-wrap" :class="contentClass">{{ content }}</div>
       </div>
     </transition>
   </Popover>
