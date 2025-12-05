@@ -8,17 +8,11 @@
         @click="selectedTab = tab.key"
         :class="[
           'relative px-4 py-4 text-sm font-semibold transition',
-          selectedTab === tab.key
-            ? 'text-white'
-            : 'text-gray-400 hover:text-white'
+          selectedTab === tab.key ? 'text-white' : 'text-gray-400 hover:text-white',
         ]"
       >
         {{ tab.label }}
-        <span
-          v-if="getTabCount(tab.key) > 0"
-        >
-          ({{ getTabCount(tab.key) }})
-        </span>
+        <span v-if="getTabCount(tab.key) > 0"> ({{ getTabCount(tab.key) }}) </span>
       </button>
 
       <!-- Right side actions -->
@@ -57,7 +51,12 @@
             class="flex items-center gap-1.5 bg-gray-700 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-gray-600"
           >
             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
             Export CSV
           </button>
@@ -66,14 +65,12 @@
     </div>
 
     <!-- Market Type Tabs (Perps/Meme) -->
-    <div class="flex items-center  px-4">
+    <div class="flex items-center px-4">
       <button
         @click="selectedMarketType = 'perps'"
         :class="[
           'flex h-full items-center justify-center shrink-0  px-[23px] py-[7px]',
-          selectedMarketType === 'perps'
-            ? 'bg-[#272727] text-white'
-            : 'bg-[#1d1d1d] text-[#9b9b9b]  hover:text-white'
+          selectedMarketType === 'perps' ? 'bg-[#272727] text-white' : 'bg-[#1d1d1d] text-[#9b9b9b]  hover:text-white',
         ]"
       >
         <p class="text-[13px] font-medium leading-[18px]">Perps</p>
@@ -82,9 +79,7 @@
         @click="selectedMarketType = 'meme'"
         :class="[
           'flex h-full items-center justify-center shrink-0 px-[23px] py-[7px]',
-          selectedMarketType === 'meme'
-            ? 'bg-[#272727] text-white'
-            : 'bg-[#1d1d1d] text-[#9b9b9b] hover:text-white'
+          selectedMarketType === 'meme' ? 'bg-[#272727] text-white' : 'bg-[#1d1d1d] text-[#9b9b9b] hover:text-white',
         ]"
       >
         <p class="text-[13px] font-medium leading-[18px]">Spot</p>
@@ -93,7 +88,11 @@
 
     <!-- Content -->
     <div class="flex-1 overflow-hidden">
-      <PositionsTable v-show="selectedTab === 'positions'" :positions="filteredPositions" />
+      <PositionsTable
+        v-show="selectedTab === 'positions'"
+        :positions="filteredPositions"
+        :marketType="selectedMarketType"
+      />
       <OrdersTable v-show="selectedTab === 'orders'" :orders="filteredOrders" />
       <HistoryTable v-show="selectedTab === 'history'" />
     </div>
@@ -122,7 +121,7 @@ const chartShowOrders = CHART_SHOW_ORDER_STORAGE
 const tabs = [
   { key: 'positions' as const, label: 'Positions' },
   { key: 'orders' as const, label: 'Orders' },
-  { key: 'history' as const, label: 'History' }
+  { key: 'history' as const, label: 'History' },
 ]
 
 const allPositions = computed(() => tradeStore.positions)
@@ -135,7 +134,7 @@ const filteredPositions = computed(() => {
     // Return empty array for meme (not implemented yet as per user's note)
     return []
   }
-  
+
   // Filter for perps markets
   return allPositions.value
 })
@@ -145,7 +144,7 @@ const filteredOrders = computed(() => {
     // Return empty array for meme (not implemented yet as per user's note)
     return []
   }
-  
+
   return allOrders.value
 })
 
@@ -161,8 +160,8 @@ function getTabCount(key: 'positions' | 'orders' | 'history'): number {
  */
 function closeAllPositions() {
   if (confirm('Are you sure you want to close all positions?')) {
-    const positionIds = filteredPositions.value.map(p => p.id)
-    positionIds.forEach(id => tradeStore.closePosition(id))
+    const positionIds = filteredPositions.value.map((p) => p.id)
+    positionIds.forEach((id) => tradeStore.closePosition(id))
   }
 }
 
@@ -172,8 +171,8 @@ function closeAllPositions() {
  */
 function cancelAllOrders() {
   if (confirm('Are you sure you want to cancel all orders?')) {
-    const orderIds = filteredOrders.value.map(o => o.id)
-    orderIds.forEach(id => tradeStore.cancelOrder(id))
+    const orderIds = filteredOrders.value.map((o) => o.id)
+    orderIds.forEach((id) => tradeStore.cancelOrder(id))
   }
 }
 
@@ -182,9 +181,9 @@ function exportHistory() {
 
   // CSV headers
   const headers = ['Market', 'Side', 'Size', 'Entry Price', 'Exit Price', 'PnL', 'Opened', 'Closed']
-  
+
   // CSV rows
-  const rows = tradeHistory.value.map(trade => [
+  const rows = tradeHistory.value.map((trade) => [
     trade.market,
     trade.side,
     fromBigInt(trade.size, 4),
@@ -192,14 +191,11 @@ function exportHistory() {
     fromBigInt(trade.exitPrice, 2),
     fromBigInt(trade.pnl, 2),
     new Date(trade.timestamp).toISOString(),
-    new Date(trade.closeTimestamp).toISOString()
+    new Date(trade.closeTimestamp).toISOString(),
   ])
 
   // Create CSV content
-  const csvContent = [
-    headers.join(','),
-    ...rows.map(row => row.join(','))
-  ].join('\n')
+  const csvContent = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n')
 
   // Download
   const blob = new Blob([csvContent], { type: 'text/csv' })
@@ -211,4 +207,3 @@ function exportHistory() {
   window.URL.revokeObjectURL(url)
 }
 </script>
-
