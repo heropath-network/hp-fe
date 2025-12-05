@@ -9,7 +9,7 @@ import { useUserEvaluationsStorage } from '@/storages/heroPath'
 import { generateTimeBasedSixDigitId } from '@/utils/common'
 import { BaseIcon, LoadingIcon } from '@/components'
 import { usePaymentTokenPrices } from '@/use/usePaymentTokenPrices'
-import { EvaluationPlanConfig } from '@/config/evaluation'
+import { EvaluationGlobalConfigInfo, EvaluationPlanConfig } from '@/config/evaluation'
 
 const requireSymbolIcon = (symbol: string) => {
   return new URL(`/src/assets/icons/tokens/${symbol}.svg`, import.meta.url).href
@@ -84,6 +84,11 @@ const purchaseTotal = computed(() => (basePrice.value + profitSplitFee.value).to
 const productLabel = computed(() => {
   const size = selectedAccount.value?.accountSize ?? 0
   return `$${size.toLocaleString()}`
+})
+
+const profitSplitLabel = computed(() => {
+  const split = EvaluationGlobalConfigInfo.profitSplit
+  return `${split}/${100 - split} Profit Split`
 })
 
 function formatCurrency(value: number | string) {
@@ -422,7 +427,7 @@ async function handlePurchase() {
             <div class="flex items-center justify-between">
               <label class="flex cursor-pointer items-center gap-2 text-[var(--hp-text-color)]">
                 <input v-model="profitSplitChecked" type="checkbox" class="h-4 w-4 accent-[var(--hp-primary-green)]" />
-                <span>{{ selectedAccount.profitSplit }}/{{ 100 - selectedAccount.profitSplit }} Profit Split</span>
+                <span>{{ profitSplitLabel }}</span>
               </label>
               <span class="text-[var(--hp-white-color)]">{{ formatCurrency(profitSplitFee) }}</span>
             </div>

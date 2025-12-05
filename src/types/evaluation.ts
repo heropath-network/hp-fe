@@ -4,13 +4,16 @@ export enum EvaluationPlan {
   LegendPlan = 'LegendPlan',
 }
 
-export interface EvaluationConfig {
-  level: number
-  accountSize: number
+export interface EvaluationGlobalConfig {
   profitSplit: number
-  profitGoal: number
   maxDailyLoss: number
   maxDrawdown: number
   leverage: number
+}
+
+export interface EvaluationConfig {
+  level: number
+  accountSize: number
+  profitGoal: number
   fee: number
 }
