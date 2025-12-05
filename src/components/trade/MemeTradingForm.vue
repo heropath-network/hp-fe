@@ -336,8 +336,12 @@
         </div>
 
         <!-- Enter Amount Button -->
-        <div class="bg-green-success opacity-50 flex items-center justify-center px-0 py-[14px] ">
-          <span class="text-gray-1000 text-sm text-center font-medium leading-5">Enter an amount</span>
+        <div 
+            class="bg-green-success flex items-center justify-center px-0 py-[14px]" 
+            :class="buyAmount ? 'cursor-pointer' : 'opacity-50'"
+        >
+          <span v-if="!buyAmount"  class="text-gray-1000 text-sm text-center font-medium leading-5">Enter an amount</span>
+          <span v-else class="text-gray-1000 text-sm text-center font-medium leading-5">{{ tradeSide === 'buy' ? 'Buy' : 'Sell' }}</span>
         </div>
 
         <!-- Settings Section -->
