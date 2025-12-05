@@ -78,7 +78,7 @@ type StoredTradeHistory = Omit<
 
 export function useUserPositionsStorage(address: Ref<string | undefined>) {
   const key = computed(() => {
-    return UserPositionsKey.replace('{addr}', address.value ?? EMPTY_ADDRESS)
+    return UserPositionsKey.replace('{addr}', address.value?.toLowerCase() ?? EMPTY_ADDRESS)
   })
 
   const storage = useLocalStorage<StoredPosition[]>(key, [])
@@ -149,7 +149,7 @@ export function useUserPositionsStorage(address: Ref<string | undefined>) {
 
 export function useUserOrdersStorage(address: Ref<string | undefined>) {
   const key = computed(() => {
-    return UserOrdersKey.replace('{addr}', address.value ?? EMPTY_ADDRESS)
+    return UserOrdersKey.replace('{addr}', address.value?.toLowerCase() ?? EMPTY_ADDRESS)
   })
 
   const storage = useLocalStorage<StoredOrder[]>(key, [])
@@ -216,7 +216,7 @@ export function useUserOrdersStorage(address: Ref<string | undefined>) {
 
 export function useUserTradeHistoryStorage(address: Ref<string | undefined>) {
   const key = computed(() => {
-    return UserTradeHistory.replace('{addr}', address.value ?? EMPTY_ADDRESS)
+    return UserTradeHistory.replace('{addr}', address.value?.toLowerCase() ?? EMPTY_ADDRESS)
   })
 
   const storage = useLocalStorage<StoredTradeHistory[]>(key, [])
