@@ -131,6 +131,9 @@ function formatTimeAgo(timestamp: string): string {
     return `${seconds} second${seconds > 1 ? 's' : ''}`
   }
 }
+function openTradeTerminal() {
+  window.open(router.resolve({ name: ROUTE_NAMES.Trade }).href, '_blank')
+}
 </script>
 
 <template>
@@ -141,11 +144,7 @@ function formatTimeAgo(timestamp: string): string {
         <button
           type="button"
           class="flex items-center gap-2 bg-[var(--hp-primary-green)] px-6 py-[14px] text-base font-medium text-[var(--hp-black-color)] transition hover:bg-[var(--hp-primary-green-hover)]"
-          @click="
-            () => {
-              router.push({ name: ROUTE_NAMES.Trade })
-            }
-          "
+          @click="openTradeTerminal"
         >
           Go to Training
           <BaseIcon name="arrow" size="18" class="rotate-[270deg] text-[var(--hp-black-color)]" />
