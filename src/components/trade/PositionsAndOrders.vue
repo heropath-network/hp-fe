@@ -87,7 +87,7 @@
             : 'bg-[#1d1d1d] text-[#9b9b9b]'
         ]"
       >
-        <p class="text-[13px] font-medium leading-[18px]">Meme</p>
+        <p class="text-[13px] font-medium leading-[18px]">Spot</p>
       </button>
     </div>
 

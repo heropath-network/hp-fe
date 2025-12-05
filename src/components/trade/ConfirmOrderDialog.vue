@@ -11,7 +11,7 @@
       </div>
     </template>
     
-    <div class="confirm-order-dialog flex flex-col gap-6 pb-4">
+    <div class="confirm-order-dialog flex flex-col gap-6">
       <!-- Input Boxes Section -->
       <div class="flex flex-col gap-2 relative">
         <!-- Use (USDC) Input Box -->
