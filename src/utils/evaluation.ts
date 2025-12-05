@@ -38,7 +38,8 @@ export function countTradesWinRate(history: TradeHistory[]): {
 
 export function getPositionsUnrealizedPnl(positions: Position[], price: Record<string, number>): bigint {
   return positions.reduce((acc, position) => {
-    const marketPrice = price[position.market]
+    const market = position.market.split('/')[0]
+    const marketPrice = price[market ?? '']
     if (!marketPrice) {
       return acc
     }

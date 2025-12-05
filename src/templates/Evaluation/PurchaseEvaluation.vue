@@ -255,7 +255,7 @@ async function handlePurchase() {
       updateDiscountStatus(unusedDiscounts.value[0]?.id || '', true)
     }
 
-    router.push({ name: ROUTE_NAMES.Dashboard })
+    router.push({ name: ROUTE_NAMES.Dashboard, query: { id: evaluationId } })
   } catch (error) {
     // handle error (e.g., user rejected signing)
     console.error('Purchase failed:', error)
