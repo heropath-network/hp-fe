@@ -17,6 +17,7 @@ export interface Position {
   liquidationPrice: bigint
   timestamp: number
   chainId: number
+  isIsolatedMargin?: boolean
   liquiditySource: LiquiditySourceId
 }
 
