@@ -6,10 +6,12 @@ import { EvaluationPlan, EvaluationConfig } from '@/types/evaluation'
 import { useConnection, useSignTypedData } from '@wagmi/vue'
 import { TOKEN_PRICES, PaymentTokens } from '@/config/paymentTokens'
 import { useUserEvaluationsStorage } from '@/storages/heroPath'
-import { generateTimeBasedSixDigitId } from '@/utils/common'
+import { formatNumber, generateTimeBasedSixDigitId } from '@/utils/common'
 import { BaseIcon, LoadingIcon } from '@/components'
 import { usePaymentTokenPrices } from '@/use/usePaymentTokenPrices'
 import { EvaluationGlobalConfigInfo, EvaluationPlanConfig } from '@/config/evaluation'
+import { useUserQuestDiscountStatusStorage } from '@/storages/heroPath'
+import { QUEST_DISCOUNT_AMOUNT } from '@/constants'
 
 const requireSymbolIcon = (symbol: string) => {
   return new URL(`/src/assets/icons/tokens/${symbol}.svg`, import.meta.url).href
@@ -35,6 +37,8 @@ const { isConnected, address } = useConnection()
 const signing = ref(false)
 
 const { addEvaluation } = useUserEvaluationsStorage(address)
+const { data: discountData, updateDiscountStatus } = useUserQuestDiscountStatusStorage(address)
+const unusedDiscounts = computed(() => discountData.value?.filter((item) => !item.isUsed) ?? [])
 
 const paymentTokens = PaymentTokens
 
@@ -69,9 +73,13 @@ watch(
   { immediate: true },
 )
 
+const selectedTokenPrice = computed(() => {
+  return apiPrices.value[selectedToken.value.symbol] ?? TOKEN_PRICES[selectedToken.value.symbol] ?? 0
+})
+
 const selectedTokenUsdBalance = computed(() => {
   const balance = Number(selectedToken.value.balance ?? 0)
-  const price = apiPrices.value[selectedToken.value.symbol] ?? TOKEN_PRICES[selectedToken.value.symbol] ?? 0
+  const price = selectedTokenPrice.value
   return balance * price
 })
 
@@ -79,7 +87,29 @@ const selectedAccount = computed(() => accountOptions.value[selectedAccountIndex
 
 const basePrice = computed(() => (selectedAccount.value ? selectedAccount.value.fee : 0))
 const profitSplitFee = computed(() => (profitSplitChecked.value ? Number((basePrice.value * 0.1).toFixed(2)) : 0))
-const purchaseTotal = computed(() => (basePrice.value + profitSplitFee.value).toFixed(2))
+const purchaseTotal = computed(() => basePrice.value + profitSplitFee.value)
+const discountPurchaseTotal = computed(() => {
+  if (unusedDiscounts.value.length > 0) {
+    return Math.max(0, Number(purchaseTotal.value) - QUEST_DISCOUNT_AMOUNT)
+  }
+  return purchaseTotal.value
+})
+
+const purchaseTotalTokenAmount = computed(() => {
+  const price = selectedTokenPrice.value
+  if (price > 0) {
+    return Number(purchaseTotal.value) / price
+  }
+  return null
+})
+
+const discountPurchaseTotalTokenAmount = computed(() => {
+  const price = selectedTokenPrice.value
+  if (price > 0) {
+    return Number(discountPurchaseTotal.value) / price
+  }
+  return null
+})
 
 const productLabel = computed(() => {
   const size = selectedAccount.value?.accountSize ?? 0
@@ -160,7 +190,7 @@ function handleBack() {
 
 const isInsufficientBalance = computed(() => {
   const balanceUsd = selectedTokenUsdBalance.value
-  return balanceUsd < Number(purchaseTotal.value)
+  return balanceUsd < Number(discountPurchaseTotal.value)
 })
 
 const confirmButtonDisabled = computed(() => {
@@ -220,6 +250,10 @@ async function handlePurchase() {
       },
       timestamp: Math.floor(Date.now() / 1000),
     })
+
+    if (unusedDiscounts.value.length > 0) {
+      updateDiscountStatus(unusedDiscounts.value[0]?.id || '', true)
+    }
 
     router.push({ name: ROUTE_NAMES.Dashboard })
   } catch (error) {
@@ -359,15 +393,7 @@ async function handlePurchase() {
             <div class="border border-[var(--hp-line-light-color)] p-4 w-[calc(50%-6px)]">
               <div class="flex items-center justify-between text-sm text-[var(--hp-text-color)]">
                 <span>Pay <span class="text-[var(--hp-primary-green)]">*</span></span>
-                <span>
-                  Balance:
-                  {{
-                    Number(selectedToken.balance ?? 0).toLocaleString(undefined, {
-                      minimumFractionDigits: Number(selectedToken.formatDecimals ?? 0),
-                      maximumFractionDigits: Number(selectedToken.formatDecimals ?? 0),
-                    })
-                  }}
-                </span>
+                <span> Balance: {{ formatNumber(selectedToken.balance, selectedToken.formatDecimals) }} </span>
               </div>
               <div class="relative">
                 <button
@@ -434,7 +460,31 @@ async function handlePurchase() {
             <div class="flex items-center justify-between">
               <span class="text-[var(--hp-text-color)]">Purchase</span>
               <span class="text-xl font-semibold text-[var(--hp-primary-green)]">
-                {{ profitSplitChecked ? `${purchaseTotal} ${selectedToken.symbol}` : formatCurrency(basePrice) }}
+                <template v-if="unusedDiscounts.length > 0">
+                  <template v-if="discountPurchaseTotal <= 0">Free</template>
+                  <template v-else>
+                    <span class="opacity-70 line-through">{{
+                      purchaseTotalTokenAmount
+                        ? formatNumber(purchaseTotalTokenAmount, selectedToken.formatDecimals)
+                        : '--'
+                    }}</span>
+                    <span class="ml-1">{{
+                      discountPurchaseTotalTokenAmount
+                        ? formatNumber(discountPurchaseTotalTokenAmount, selectedToken.formatDecimals)
+                        : '--'
+                    }}</span>
+                    {{ selectedToken.symbol }}
+                  </template>
+                </template>
+                <template v-else>
+                  {{
+                    purchaseTotalTokenAmount
+                      ? `${formatNumber(purchaseTotalTokenAmount, selectedToken.formatDecimals)} ${
+                          selectedToken.symbol
+                        }`
+                      : '--'
+                  }}
+                </template>
               </span>
             </div>
           </div>
