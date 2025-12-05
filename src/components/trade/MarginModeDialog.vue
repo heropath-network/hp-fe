@@ -168,9 +168,13 @@
       <!-- Confirm Button -->
       <button
         @click="handleConfirm"
-        class="w-full py-[14px] text-[14px] font-medium text-center transition bg-[#6CE99E] text-gray-1000 "
+        :disabled="signing"
+        :class="[
+          'w-full py-[14px] text-[14px] font-medium text-center transition bg-[#6CE99E] text-gray-1000',
+          signing ? 'opacity-50 cursor-not-allowed' : ''
+        ]"
       >
-        Confirm
+        {{ signing ? 'Signing...' : 'Confirm' }}
       </button>
     </div>
   </Dialog>
@@ -179,6 +183,8 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import Dialog from '@/components/Dialog.vue'
+import { useConnection, useSignTypedData } from '@wagmi/vue'
+import { useEvaluationAccount } from '@/composables/useEvaluationAccount'
 
 interface Props {
   show: boolean
@@ -199,8 +205,13 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
+const { isConnected, address } = useConnection()
+const { signTypedDataAsync } = useSignTypedData()
+const { selectedEvaluationId } = useEvaluationAccount()
+
 const localMarginMode = ref<'isolated' | 'cross'>(props.marginMode)
 const localLeverage = ref(props.leverage)
+const signing = ref(false)
 
 
 const sliderThumbLeft = computed(() => {
@@ -236,12 +247,77 @@ function decreaseLeverage() {
   }
 }
 
-function handleConfirm() {
-  emit('confirm', {
-    marginMode: localMarginMode.value,
-    leverage: localLeverage.value,
-  })
-  emit('close')
+async function requestMarginModeSignature() {
+  if (!address.value) {
+    throw new Error('Wallet not connected')
+  }
+
+  const messageLines = [
+    'Margin Mode Change Confirmation',
+    `Account: ${selectedEvaluationId.value ?? 'N/A'}`,
+    `Market: ${props.market}`,
+    `Margin Mode: ${localMarginMode.value === 'isolated' ? 'Isolated' : 'Cross'}`,
+  ]
+
+  if (localMarginMode.value === 'cross') {
+    messageLines.push(`Leverage: ${localLeverage.value}x`)
+  }
+
+  const contents = `${messageLines.join('\n')}\n\n.`
+
+  const leverageValue = Math.max(1, Math.floor(localLeverage.value))
+  if (!Number.isSafeInteger(leverageValue)) {
+    throw new Error(`Leverage value ${leverageValue} is not a safe integer`)
+  }
+
+  await signTypedDataAsync({
+    types: {
+      Person: [{ name: 'wallet', type: 'address' }],
+      MarginModeChange: [
+        { name: 'account', type: 'Person' },
+        { name: 'action', type: 'string' },
+        { name: 'market', type: 'string' },
+        { name: 'marginMode', type: 'string' },
+        { name: 'leverage', type: 'uint256' },
+        { name: 'contents', type: 'string' },
+      ],
+    },
+    primaryType: 'MarginModeChange',
+    message: {
+      account: {
+        wallet: address.value,
+      },
+      action: 'Change Margin Mode',
+      market: props.market,
+      marginMode: localMarginMode.value,
+      leverage: leverageValue, // Pass as number, not BigInt
+      contents,
+    },
+  } as any)
+}
+
+async function handleConfirm() {
+  if (!isConnected.value) {
+    return
+  }
+
+  signing.value = true
+
+  try {
+    await requestMarginModeSignature()
+    
+    // Only emit confirm and close after signature is accepted
+    emit('confirm', {
+      marginMode: localMarginMode.value,
+      leverage: localLeverage.value,
+    })
+    emit('close')
+  } catch (error) {
+    console.error('Margin mode change signing failed:', error)
+    // Don't change the margin mode if signing failed
+  } finally {
+    signing.value = false
+  }
 }
 </script>
 
