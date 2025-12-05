@@ -4,15 +4,15 @@
       <table class="w-full text-sm">
         <thead class="border-b border-gray-800">
           <tr class="text-xs text-gray-400">
+            <th class="px-4 py-3 text-left font-medium">Time</th>
             <th class="px-4 py-3 text-left font-medium">Market</th>
+            <th class="px-4 py-3 text-left font-medium">Operation</th>
             <th class="px-4 py-3 text-left font-medium">Side</th>
-            <th class="px-4 py-3 text-right font-medium">Size</th>
-            <th class="px-4 py-3 text-right font-medium">Entry Price</th>
-            <th class="px-4 py-3 text-right font-medium">Exit Price</th>
-            <th class="px-4 py-3 text-right font-medium">PnL</th>
-            <th class="px-4 py-3 text-left font-medium">Opened</th>
-            <th class="px-4 py-3 text-left font-medium">Closed</th>
-            <th class="px-4 py-3 text-right font-medium">Duration</th>
+            <th class="px-4 py-3 text-left font-medium">Size</th>
+            <th class="px-4 py-3 text-left font-medium">Amount</th>
+            <th class="px-4 py-3 text-left font-medium">Fee</th>
+            <!-- <th class="px-4 py-3 text-right font-medium">Exit Price</th> -->
+            <th class="px-4 py-3 text-left font-medium">Realized PNL & ROE</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-800">

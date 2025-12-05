@@ -1,5 +1,12 @@
 <template>
   <tr class="transition hover:bg-gray-700/50">
+    <!-- Duration Column -->
+    <td class="px-4 py-6 text-left relative">
+      <ChainLabel :chain-id="trade.chainId" :liquidity-source="trade.liquiditySource" />
+      <div class="text-[13px] leading-[18px] text-[#9b9b9b] font-normal">
+        {{ formatDuration(trade.timestamp, trade.closeTimestamp) }}
+      </div>
+    </td>
     <!-- Market Column -->
     <td class="px-4 py-6 relative">
       <div class="flex items-center gap-2">
@@ -10,52 +17,68 @@
           </div>
           <div class="flex items-center gap-2">
             <div class="text-[13px] leading-[18px] text-[#9b9b9b] font-normal">
-              {{ formatDate(trade.timestamp) }}
+                <!-- {{ formatDate(trade.timestamp) }} -->
+                <!-- {{ trade.isIsolatedMargin ? 'Isolated' : 'Cross' }} -->
+                Cross
             </div>
-            <ChainLabel :chain-id="trade.chainId" :liquidity-source="trade.liquiditySource" />
           </div>
         </div>
       </div>
+    </td>
+
+     <!-- Operation Column -->
+     <td class="px-4 py-6">
+      <span>
+        Open {{ trade.side == 'long' ? 'Long' : 'Short' }}
+      </span>
     </td>
     
     <!-- Side Column -->
     <td class="px-4 py-6">
       <span
         :class="[
-          'inline-block px-2 py-0.5 text-xs font-semibold',
+          'inline-block text-xs',
           trade.side === 'long'
-            ? 'bg-green-success/20 text-green-success'
-            : 'bg-red-error/20 text-red-error'
+            ? ' text-green-success'
+            : ' text-red-error'
         ]"
       >
-        {{ trade.side.toUpperCase() }}
+        {{ trade.side == 'long' ? 'Buy' : 'Sell' }}
       </span>
     </td>
     
     <!-- Size Column -->
-    <td class="px-4 py-6 text-right">
+    <td class="px-4 py-6 ">
       <div class="text-[13px] leading-[18px] text-white font-normal">
         {{ formatNumber(trade.size, 4) }}
       </div>
     </td>
     
-    <!-- Entry Price Column -->
-    <td class="px-4 py-6 text-right">
+    <!-- Amount Column -->
+    <td class="px-4 py-6 ">
       <div class="text-[13px] leading-[18px] text-white font-normal">
         ${{ formatNumber(trade.entryPrice, 2) }}
       </div>
     </td>
     
-    <!-- Exit Price Column -->
-    <td class="px-4 py-6 text-right">
+    <!-- Fee Column -->
+    <td class="px-4 py-6 ">
       <div class="text-[13px] leading-[18px] text-white font-normal">
-        ${{ formatNumber(trade.exitPrice, 2) }}
+        $10.34
+        <!-- ${{ formatNumber(trade.fee, 2) }} -->
       </div>
     </td>
     
-    <!-- PnL Column -->
+    <!-- Exit Price Column -->
+    <!-- <td class="px-4 py-6 text-right">
+      <div class="text-[13px] leading-[18px] text-white font-normal">
+        ${{ formatNumber(trade.exitPrice, 2) }}
+      </div>
+    </td> -->
+    
+    <!-- Realized PNL & ROE Column -->
     <td class="px-4 py-6 text-right">
-      <div class="flex flex-col gap-1 items-end">
+      <div class="flex flex-col gap-1 items-start">
         <div
           :class="[
             'text-[13px] leading-[18px] font-normal',
@@ -73,27 +96,6 @@
         >
           {{ formatPnLPercentage(getPnLPercent()) }}
         </div>
-      </div>
-    </td>
-    
-    <!-- Opened Column -->
-    <td class="px-4 py-6">
-      <div class="text-[13px] leading-[18px] text-[#9b9b9b] font-normal">
-        {{ formatDate(trade.timestamp) }}
-      </div>
-    </td>
-    
-    <!-- Closed Column -->
-    <td class="px-4 py-6">
-      <div class="text-[13px] leading-[18px] text-[#9b9b9b] font-normal">
-        {{ formatDate(trade.closeTimestamp) }}
-      </div>
-    </td>
-    
-    <!-- Duration Column -->
-    <td class="px-4 py-6 text-right">
-      <div class="text-[13px] leading-[18px] text-[#9b9b9b] font-normal">
-        {{ formatDuration(trade.timestamp, trade.closeTimestamp) }}
       </div>
     </td>
   </tr>
