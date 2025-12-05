@@ -19,7 +19,8 @@
 
       <!-- Right: Trading Form -->
       <div class="w-[343px]  border-l border-gray-800">
-        <TradingForm />
+        <MemeTradingForm v-if="isMemeMarket" />
+        <TradingForm v-else />
       </div>
     </div>
 
@@ -28,18 +29,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import TradeHeader from '@/components/trade/TradeHeader.vue'
 import TradeStatistics from '@/components/trade/TradeStatistics.vue'
 import PriceChart from '@/components/trade/PriceChart.vue'
 import TradingForm from '@/components/trade/TradingForm.vue'
+import MemeTradingForm from '@/components/trade/MemeTradingForm.vue'
 import PositionsAndOrders from '@/components/trade/PositionsAndOrders.vue'
 import MarketSelect from '@/components/trade/MarketSelect.vue'
 import { usePriceOrchestrator } from '@/composables/usePriceOrchestrator'
+import { useTradeStore } from '@/stores/tradeStore'
+import { isMarketAvailableInFourMeme } from '@/utils/oracleMatching'
 
 usePriceOrchestrator()
 
+const tradeStore = useTradeStore()
+const { selectedMarket } = storeToRefs(tradeStore)
+
 const showMarketSelect = ref(false)
+
+const isMemeMarket = computed(() => {
+  return isMarketAvailableInFourMeme(selectedMarket.value)
+})
 </script>
 
 <style scoped>
