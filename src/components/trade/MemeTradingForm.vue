@@ -1,7 +1,7 @@
 <template>
   <div class="meme-trade-form relative w-[343px] bg-[#1D1D1D]">
     <!-- Main Content Container -->
-    <div class="relative left-[16px] top-[16px] w-[311px] pb-4">
+    <div class="relative left-[16px] pt-4 w-[311px] pb-4">
       <!-- Time Period Tabs (Buy / Long) -->
       <div class="bg-[#272727] flex ">
         <button
@@ -448,14 +448,14 @@
           <div class="flex flex-col gap-[4px] w-[74px]">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Top 10</div>
             <div class="flex gap-[4px] items-center">
-              <i class="iconfont icon-warning text-red-error text-base"></i>
+              <img :src="closedIcon" alt="Warning" class="w-[16px] h-[16px]" />
               <div class="text-red-error text-[13px] leading-[18px] font-medium">87.81%</div>
             </div>
           </div>
           <div class="flex flex-col gap-[4px] items-center justify-center w-[90px]">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">DEV</div>
             <div class="flex gap-[4px] items-center">
-              <i class="iconfont icon-check text-green-success text-base"></i>
+              <img :src="cookIcon" class="w-[16px] h-[16px]" />
               <div class="text-green-success text-[13px] leading-[18px] font-medium">0%</div>
               <i class="iconfont icon-bnb text-white text-[14px]"></i>
             </div>
@@ -467,7 +467,7 @@
           <div class="flex-1 flex flex-col gap-[4px] items-end">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Snipers</div>
             <div class="flex gap-[4px] items-center">
-              <i class="iconfont icon-target text-green-success text-base"></i>
+                <img :src="goalIcon" class="w-[16px] h-[16px]" />
               <div class="text-green-success text-[13px] leading-[18px] font-medium">0%</div>
             </div>
           </div>
@@ -487,9 +487,9 @@
           </div>
           <div class="flex-1 flex flex-col gap-[4px] items-end">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Dex Paid</div>
-            <div class="flex gap-[4px] items-center">
-              <i class="iconfont icon-cto text-white text-[14px]"></i>
-              <div class="text-white text-[13px] leading-[18px] font-medium">$698 CTO</div>
+            <div class="flex gap-[4px] items-center -ml-4">
+              <img :src="birdIcon" class="w-[16px] h-[16px]" />
+              <div class="text-white text-[13px] leading-[18px] font-medium whitespace-nowrap">$698 CTO</div>
             </div>
           </div>
         </div>
@@ -497,19 +497,19 @@
           <div class="flex flex-col gap-[4px] w-[74px]">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">NoHoneypot</div>
             <div class="flex h-[18px] items-center">
-              <i class="iconfont icon-check text-green-success text-base"></i>
+                <img :src="acceptedIcon" class="w-[16px] h-[16px]" />
             </div>
           </div>
           <div class="flex flex-col gap-[4px] items-center justify-center w-[90px]">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Verified</div>
             <div class="flex h-[18px] items-center">
-              <i class="iconfont icon-check text-green-success text-base"></i>
+                <img :src="acceptedIcon" class="w-[16px] h-[16px]" />
             </div>
           </div>
           <div class="flex flex-col gap-[4px] items-center justify-center w-[80px]">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Renounced</div>
             <div class="flex h-[18px] items-center">
-              <i class="iconfont icon-check text-green-success text-base"></i>
+                <img :src="acceptedIcon" class="w-[16px] h-[16px]" />
             </div>
           </div>
           <div class="flex-1 flex flex-col gap-[4px] items-end">
@@ -530,7 +530,7 @@
               <div class="text-white text-[14px] leading-[20px] font-semibold">{{ selectedMarketName }}/WBNB Pool Info</div>
               <i class="iconfont icon-down text-[#9b9b9b] text-[16px] transform rotate-180"></i>
             </div>
-            <img :src="bnbSettingIcon" alt="Bnb Setting" class="w-[16px] h-[16px]" />
+            <img :src="scanIcon" alt="Scan" class="w-[16px] h-[16px]" />
           </div>
           <div class="flex flex-col gap-[8px] ">
             <div class="flex justify-between ">
@@ -581,10 +581,11 @@
             <div class="flex gap-[8px] items-center">
               <div class="flex gap-[4px] items-center">
                 <div class="text-white text-[13px] leading-[18px] underline">0x32...2866 (0BNB)</div>
-                <i class="iconfont icon-copy text-[#9b9b9b] text-[16px]"></i>
+                <img :src="copyIcon" class="w-[16px] h-[16px] cursor-pointer" />
               </div>
-              <i class="iconfont icon-search text-[#9b9b9b] text-[16px]"></i>
-              <i class="iconfont icon-chart text-[#9b9b9b] text-[14px]"></i>
+              <img :src="notCookIcon" class="w-[16px] h-[16px] cursor-pointer" />
+              <img :src="searchIcon" class="w-[16px] h-[16px] cursor-pointer" />
+              <img :src="scanIcon" class="w-[14px] h-[14px] cursor-pointer" />
             </div>
           </div>
           <div class="flex justify-between ">
@@ -593,11 +594,11 @@
             </div>
             <div class="flex gap-[8px] items-center">
               <div class="flex gap-[4px] items-center">
-                <i class="iconfont icon-bnb text-white text-[14px]"></i>
+                <img :src="darkBnbIcon" class="w-[14px] h-[14px]" />
                 <div class="text-white text-[13px] leading-[18px] underline">0xbd...0774</div>
               </div>
               <div class="flex gap-[4px] items-center">
-                <i class="iconfont icon-bnb text-white text-[14px]"></i>
+                <MarketIcon :symbol="'BNB/USD'" :size="14" />
                 <div class="text-white text-[13px] leading-[18px]">3.17</div>
               </div>
               <div class="text-white text-[13px] leading-[18px] underline">68d</div>
@@ -626,7 +627,7 @@
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Pair</div>
             <div class="flex gap-[4px] items-center">
               <div class="text-white text-[13px] leading-[18px] text-right">0xd6..1d57</div>
-              <i class="iconfont icon-copy text-[#9b9b9b] text-[16px]"></i>
+              <img :src="copyIcon" class="w-[16px] h-[16px] cursor-pointer" />
             </div>
           </div>
           <div class="flex justify-between ">
@@ -654,6 +655,17 @@ import gasIcon from '@/assets/icons/gas.svg'
 import removeIcon from '@/assets/icons/remove.svg'
 import slippageIcon from '@/assets/icons/slippage.svg'
 import checkIcon from '@/assets/icons/check.svg'
+import acceptedIcon from '@/assets/icons/accepted.svg'
+import birdIcon from '@/assets/icons/bird.svg'
+import closedIcon from '@/assets/icons/closed.svg'
+import cookIcon from '@/assets/icons/cook.svg'
+import copyIcon from '@/assets/icons/copy.svg'
+import darkBnbIcon from '@/assets/icons/dark-bnb.svg'
+import goalIcon from '@/assets/icons/goal.svg'
+import notCookIcon from '@/assets/icons/not-cook.svg'
+import scanIcon from '@/assets/icons/scan.svg'
+import searchIcon from '@/assets/icons/search.svg'
+
 
 
 
