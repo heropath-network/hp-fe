@@ -7,7 +7,7 @@ import BaseIcon from '@/components/BaseIcon.vue'
 import { useUserQuestDiscountStatusStorage } from '@/storages/heroPath'
 import { useConnection } from '@wagmi/vue'
 import { QUEST_DISCOUNT_AMOUNT } from '@/constants'
-import { EvaluationPlanConfig } from '@/config/evaluation'
+import { EvaluationGlobalConfigInfo, EvaluationPlanConfig } from '@/config/evaluation'
 
 type StepRowCommon = {
   label: string
@@ -18,7 +18,10 @@ type StepRowCommon = {
   rawValues?: number[]
 }
 
-type EvaluationRow = { key: keyof EvaluationConfig } & StepRowCommon
+type EvaluationRow = StepRowCommon & {
+  key?: keyof EvaluationConfig
+  staticValue?: number
+}
 
 const planTabs = [
   { label: 'Champion Plan', value: EvaluationPlan.ChampionPlan },
@@ -45,11 +48,11 @@ const formatLeverage = (value: number) => `Up to ${value}x`
 
 const evaluationRows: EvaluationRow[] = [
   { key: 'accountSize', label: 'Account Size', formatter: formatCurrency, highlight: true },
-  { key: 'profitSplit', label: 'Profit Split', formatter: formatSplit },
+  { staticValue: EvaluationGlobalConfigInfo.profitSplit, label: 'Profit Split', formatter: formatSplit },
   { key: 'profitGoal', label: 'Profit Goal', formatter: formatCurrency },
-  { key: 'maxDailyLoss', label: 'Max.daily loss', formatter: formatPercent },
-  { key: 'maxDrawdown', label: 'Max. drawdown', formatter: formatPercent },
-  { key: 'leverage', label: 'Leverage', formatter: formatLeverage },
+  { staticValue: EvaluationGlobalConfigInfo.maxDailyLoss, label: 'Max.daily loss', formatter: formatPercent },
+  { staticValue: EvaluationGlobalConfigInfo.maxDrawdown, label: 'Max. drawdown', formatter: formatPercent },
+  { staticValue: EvaluationGlobalConfigInfo.leverage, label: 'Leverage', formatter: formatLeverage },
   { key: 'fee', label: 'Evaluation Fee', formatter: formatFee, isFee: true },
 ]
 
@@ -60,7 +63,10 @@ const tableRows = computed(() => {
 
   return definition.map((row) => ({
     ...row,
-    values: tableData.value.map((item) => row.formatter((item as any)[row.key] as number)),
+    values: tableData.value.map((item) => {
+      const value = row.staticValue ?? (row.key ? (item as EvaluationConfig)[row.key] : 0)
+      return row.formatter(value)
+    }),
   }))
 })
 

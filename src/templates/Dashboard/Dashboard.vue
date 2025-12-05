@@ -9,6 +9,7 @@ import router, { ROUTE_NAMES } from '@/router'
 import { useUserTradeHistoryStorage, useUserPositionsStorage } from '@/storages/trading'
 import { getAccountHistoryPnl, getAccountTotalVolume, getPositionsUnrealizedPnl } from '@/utils/evaluation'
 import { useAllTokenPrices } from '@/use/useTokenPrices'
+import { EvaluationGlobalConfigInfo } from '@/config/evaluation'
 
 const { remainingText: dayCountDown } = useDayCountDown()
 
@@ -106,27 +107,21 @@ const targetEquity = computed(() => {
   if (!selectedEvaluation.value) {
     return 0
   }
-  return (
-    selectedEvaluation.value.evaluationConfig.accountSize *
-    (1 + selectedEvaluation.value.evaluationConfig.profitSplit / 100)
-  )
+  return selectedEvaluation.value.evaluationConfig.accountSize + selectedEvaluation.value.evaluationConfig.profitGoal
 })
 
 const maxDrawdownEquityLimit = computed(() => {
   if (!selectedEvaluation.value) {
     return 0
   }
-  return (
-    selectedEvaluation.value.evaluationConfig.accountSize *
-    (1 - selectedEvaluation.value.evaluationConfig.maxDrawdown / 100)
-  )
+  return selectedEvaluation.value.evaluationConfig.accountSize * (1 - EvaluationGlobalConfigInfo.maxDrawdown / 100)
 })
 
 const maxDailyLossEquityLimit = computed(() => {
   if (!selectedEvaluation.value) {
     return 0
   }
-  return priorDayBalance.value * (1 - selectedEvaluation.value.evaluationConfig.maxDailyLoss / 100)
+  return priorDayBalance.value * (1 - EvaluationGlobalConfigInfo.maxDailyLoss / 100)
 })
 
 const showEvaluationDropdown = ref(false)
@@ -278,7 +273,7 @@ watch(
             <article class="flex h-[100px] flex-col justify-center gap-2 bg-[var(--hp-bg-light)] px-6 py-5">
               <div>
                 <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
-                  {{ selectedEvaluation.evaluationConfig.profitSplit }}%
+                  {{ EvaluationGlobalConfigInfo.profitSplit }}%
                 </p>
                 <p class="text-sm leading-5 text-[var(--hp-text-color)]">Profit Share</p>
               </div>
