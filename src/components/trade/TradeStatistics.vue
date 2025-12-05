@@ -254,6 +254,9 @@ const isLoadingMarkPrice = computed(() => {
 const formattedPrice = computed(() => {
   const price = tradeStore.currentMarketPrice
   if (!price) return '0'
+  if (selectedMarket.value === 'BNB/USD') {
+    return parseFloat((price / BigInt(10 ** 18)).toString()).toFixed(2)
+  }
   return formatSmallPrice(price)
 })
 
