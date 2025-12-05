@@ -58,30 +58,24 @@
             <MenuItems
               class="absolute right-0 z-[9999] mt-2 w-[280px] origin-top-right bg-[#272727] border border-[#373737] shadow-[0px_4px_8px_0px_rgba(0,2,10,0.25)] focus:outline-none"
             >
-                <div class="flex flex-col py-3">
-                  <MenuItem
-                    v-for="account in accounts"
-                    :key="account.id"
-                    v-slot="{ active }"
+              <div class="flex flex-col py-3">
+                <MenuItem v-for="account in accounts" :key="account.id" v-slot="{ active }">
+                  <button
+                    @click="selectAccount(account)"
+                    :class="[
+                      'flex items-center gap-[10px] px-2 py-2.5 w-full text-left transition-colors ',
+                      account.id === selectedEvaluationId ? 'text-gray-400 opacity-50' : 'text-gray-400',
+                      account.id !== selectedEvaluationId && active ? 'bg-[#373737] !text-white' : '',
+                    ]"
                   >
-                    <button
-                      @click="selectAccount(account)"
-                      :class="[
-                        'flex items-center gap-[10px] px-2 py-2.5 w-full text-left transition-colors ',
-                        account.id === selectedEvaluationId ? 'text-gray-400 opacity-50' : 'text-gray-400',
-                        account.id !== selectedEvaluationId && active ? 'bg-[#373737] !text-white' : ''
-                      ]"
-                    >
-                      <span
-                        class="text-[14px] font-medium leading-[20px]"
-                      >
-                        {{ account.label }}
-                      </span>
-                    </button>
-                  </MenuItem>
-                </div>
-              </MenuItems>
-            </transition>
+                    <span class="text-[14px] font-medium leading-[20px]">
+                      {{ account.label }}
+                    </span>
+                  </button>
+                </MenuItem>
+              </div>
+            </MenuItems>
+          </transition>
         </Menu>
       </template>
 
@@ -112,17 +106,13 @@
             class="absolute right-0 z-[9999] mt-2 w-[150px] origin-top-right bg-[#272727] border border-[#373737] shadow-[0px_4px_8px_0px_rgba(0,2,10,0.25)] focus:outline-none"
           >
             <div class="flex flex-col py-3">
-              <MenuItem
-                v-for="chain in availableChains"
-                :key="chain.id"
-                v-slot="{ active }"
-              >
+              <MenuItem v-for="chain in availableChains" :key="chain.id" v-slot="{ active }">
                 <button
                   @click="switchChain(chain.id)"
                   :class="[
                     'flex items-center gap-[10px] px-2 py-2.5 w-full text-left transition-colors',
                     chain.id === currentChainId ? 'text-gray-400 opacity-50' : 'text-gray-400',
-                    chain.id !== currentChainId && active ? 'bg-[#373737] !text-white' : ''
+                    chain.id !== currentChainId && active ? 'bg-[#373737] !text-white' : '',
                   ]"
                 >
                   <img :src="chain.icon" :alt="chain.name" class="h-5 w-5" />
@@ -150,8 +140,8 @@ import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useChainId, useSwitchChain } from '@wagmi/vue'
 import { bsc } from '@wagmi/vue/chains'
-import { toBigInt } from '@/utils/bigint'
-import { formatNumber, getAccountTypeLabel } from '@/utils/common'
+import { formatNumber, toBigInt } from '@/utils/bigint'
+import { getAccountTypeLabel } from '@/utils/common'
 import { useEvaluationAccount } from '@/composables/useEvaluationAccount'
 import { useTradeStore } from '@/stores/tradeStore'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
@@ -181,7 +171,10 @@ const {
 const accounts = computed<Account[]>(() => {
   return evaluationList.value.map((evaluation) => {
     const accountSize = evaluation.evaluationConfig.accountSize
-    const label = `${getAccountTypeLabel(evaluation.accountType)} #${evaluation.accountId}: $${formatNumber(accountSize, 0)}`
+    const label = `${getAccountTypeLabel(evaluation.accountType)} #${evaluation.accountId}: $${formatNumber(
+      toBigInt(accountSize),
+      0,
+    )}`
     return {
       id: evaluation.accountId,
       label,
@@ -238,7 +231,6 @@ const modeConfig = computed(() => {
   }
 })
 
-
 // Chain selector logic
 interface Chain {
   id: number
@@ -247,7 +239,7 @@ interface Chain {
 }
 
 const availableChains: Chain[] = [
-{
+  {
     id: bsc.id,
     name: 'BNB Chain',
     icon: BSCIcon,
@@ -270,5 +262,3 @@ async function switchChain(targetChainId: number) {
   }
 }
 </script>
-
-

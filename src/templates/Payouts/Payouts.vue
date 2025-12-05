@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ellipsisMiddle, formatDate, formatNumber, getWithdrawalStatusLabel } from '@/utils/common'
+import { ellipsisMiddle, formatDate, getWithdrawalStatusLabel } from '@/utils/common'
 import { computed, ref } from 'vue'
 import { useConnection, useSignTypedData } from '@wagmi/vue'
 import { useUserPayoutsStorage, useUserWithdrawalHistoryStorage, useUserEvaluationsStorage } from '@/storages/heroPath'
@@ -8,10 +8,12 @@ import { UserWithdrawalHistory } from '@/types/heroPath'
 import { useUserTradeHistoryStorage } from '@/storages/trading'
 import { getAccountHistoryPnl } from '@/utils/evaluation'
 import { SHARE_OF_PROFIT } from '@/constants'
+import { formatNumber, fromBigInt, multiplyBigInt, toBigInt } from '@/utils/bigint'
 
 const USDC_TOKEN_ADDRESS = '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d'
 const TOKEN_SYMBOL = 'USDC'
 const PAYOUT_NETWORK = 'BEP20'
+const USDC_DECIMALS = 6
 
 const { isConnected, address } = useConnection()
 const { signTypedDataAsync } = useSignTypedData()
@@ -43,20 +45,21 @@ const fundedTradeHistory = computed(() => {
 })
 
 const totalPnl = computed(() => {
-  return Number(getAccountHistoryPnl(fundedTradeHistory.value)) * SHARE_OF_PROFIT
+  return multiplyBigInt(getAccountHistoryPnl(fundedTradeHistory.value), toBigInt(SHARE_OF_PROFIT))
 })
 
 const profitAvailable = computed(() => {
-  return totalPnl.value - payoutsInfo.value.withdrawnAmount
+  const available = totalPnl.value - toBigInt(payoutsInfo.value.withdrawnAmount)
+  return available > 0n ? available : BigInt(0)
 })
 
 const totalAccountProfit = computed(() => {
-  return payoutsInfo.value.withdrawnAmount + profitAvailable.value
+  return toBigInt(payoutsInfo.value.withdrawnAmount) + profitAvailable.value
 })
 
 const isValidAmount = computed(() => {
-  const numeric = parseFloat(amount.value)
-  return !Number.isNaN(numeric) && numeric <= profitAvailable.value
+  const parsed = amount.value ? toBigInt(amount.value) : null
+  return parsed !== null && parsed > 0n && parsed <= profitAvailable.value
 })
 
 const confirmIsDisabled = computed(() => {
@@ -66,20 +69,20 @@ const confirmIsDisabled = computed(() => {
 async function handleWithdraw() {
   if (!isValidAmount.value || !isConnected.value) return
 
-  const numeric = parseFloat(amount.value)
+  const parsedAmount = toBigInt(amount.value)
+  const decimalShift = 10n ** BigInt(18 - USDC_DECIMALS)
+  const amountBigInt = parsedAmount / decimalShift
+  const historyAmount = parseFloat(fromBigInt(parsedAmount, 6))
 
   const historyData: UserWithdrawalHistory = {
     timestamp: Math.floor(Date.now() / 1000),
     address: USDC_TOKEN_ADDRESS,
-    amount: numeric,
+    amount: historyAmount,
     status: 'success',
   }
 
   try {
     withdrawing.value = true
-    // Convert amount to BigInt - viem accepts BigInt for uint256 types
-    // USDC has 6 decimals, so multiply by 1e6
-    const amountBigInt = BigInt(Math.floor(numeric * 1e6))
     await signTypedDataAsync({
       types: {
         Person: [{ name: 'wallet', type: 'address' }],
@@ -101,7 +104,8 @@ async function handleWithdraw() {
       },
     } as any)
     addWithdrawalHistory(historyData)
-    updateWithdrawnAmount(payoutsInfo.value.withdrawnAmount + numeric)
+    const newWithdrawnAmount = toBigInt(payoutsInfo.value.withdrawnAmount) + parsedAmount
+    updateWithdrawnAmount(parseFloat(fromBigInt(newWithdrawnAmount, 6)))
     amount.value = ''
   } catch (error) {
     console.error('Withdrawal failed:', error)
@@ -216,7 +220,7 @@ async function handleWithdraw() {
             >
               <div class="px-6">{{ formatDate(item.timestamp) }}</div>
               <div class="px-6">{{ ellipsisMiddle(item.address) }}</div>
-              <div class="px-6">{{ formatNumber(item.amount, 2) }} {{ TOKEN_SYMBOL }}</div>
+              <div class="px-6">{{ formatNumber(toBigInt(item.amount), 2) }} {{ TOKEN_SYMBOL }}</div>
               <div class="px-6">{{ getWithdrawalStatusLabel(item.status) }}</div>
             </div>
           </template>

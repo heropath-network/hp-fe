@@ -2,6 +2,7 @@
 import { computed, defineComponent, ref, watch } from 'vue'
 import Avatar from '@/components/Wallet/Avatar.vue'
 import { ellipsisMiddle } from '@/utils/common'
+import { formatNumber as formatBigNumber, toBigInt } from '@/utils/bigint'
 
 type TraderRow = {
   address: string
@@ -23,9 +24,9 @@ watch(selectedTimeframe, (frame) => {
 const formattedRows = computed(() =>
   traderRows.value.map((row) => ({
     ...row,
-    volumeLabel: `$${formatNumber(row.volume)}`,
+    volumeLabel: `$${formatBigNumber(toBigInt(row.volume), 0)}`,
     leverageLabel: `${row.leverage.toFixed(1)}x`,
-    pnlLabel: `${row.pnl >= 0 ? '+' : '-'} $${formatNumber(Math.abs(row.pnl))}`,
+    pnlLabel: `${row.pnl >= 0 ? '+' : '-'} $${formatBigNumber(toBigInt(Math.abs(row.pnl)), 0)}`,
     isPositive: row.pnl >= 0,
   })),
 )
@@ -59,13 +60,6 @@ function randomAddress(): string {
 
 function randomNumber(min: number, max: number) {
   return Math.random() * (max - min) + min
-}
-
-function formatNumber(value: number, decimals = 0) {
-  return value.toLocaleString('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  })
 }
 
 const SortIcon = defineComponent({

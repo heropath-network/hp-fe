@@ -7,14 +7,6 @@ export function ellipsisMiddle(str: string | number | undefined, leftNum = 6, ri
   return newStr.slice(0, leftNum) + '...' + newStr.slice(-rightNum)
 }
 
-export function formatNumber(num: number | string, decimalPlaces: number) {
-  const parsedNum = typeof num === 'string' ? parseFloat(num) : num
-  if (isNaN(parsedNum)) {
-    return ''
-  }
-  return parsedNum.toFixed(decimalPlaces)
-}
-
 const MAX_IDS = 1_000_000
 const _used = new Uint8Array(MAX_IDS)
 let _usedCount = 0
