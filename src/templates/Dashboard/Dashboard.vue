@@ -145,6 +145,10 @@ function handleSelectEvaluation(id: string) {
   router.replace({ name: ROUTE_NAMES.Dashboard, query: { ...route.query, id } })
   showEvaluationDropdown.value = false
 }
+
+function openTradeTerminal() {
+  window.open(router.resolve({ name: ROUTE_NAMES.Trade }).href, '_blank')
+}
 </script>
 
 <template>
@@ -250,11 +254,7 @@ function handleSelectEvaluation(id: string) {
         <button
           type="button"
           class="flex items-center w-full justify-center bg-[var(--hp-primary-green)] h-[52px] py-2.5 text-[var(--hp-black-color)] text-[16px] font-[500] transition hover:bg-[var(--hp-primary-green-hover)] active:bg-[var(--hp-primary-green-hover)]"
-          @click="
-            () => {
-              router.push({ name: ROUTE_NAMES.Trade })
-            }
-          "
+          @click="openTradeTerminal"
         >
           Open Trading Terminal
         </button>
