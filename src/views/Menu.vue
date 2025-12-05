@@ -27,12 +27,7 @@ const menuItems = [
     icon: 'menu-dashboard',
     routeName: ROUTE_NAMES.Dashboard,
   },
-  {
-    id: MenuItem.Profile,
-    label: 'Profile',
-    icon: 'menu-profit',
-    routeName: ROUTE_NAMES.Profile,
-  },
+
   {
     id: MenuItem.Evaluation,
     label: 'Evaluation',
@@ -50,6 +45,12 @@ const menuItems = [
     label: 'Payouts',
     icon: 'menu-payouts',
     routeName: ROUTE_NAMES.Payouts,
+  },
+  {
+    id: MenuItem.Profile,
+    label: 'Profile',
+    icon: 'menu-profit',
+    routeName: ROUTE_NAMES.Profile,
   },
   {
     id: MenuItem.TradingEducation,

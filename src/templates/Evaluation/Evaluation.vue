@@ -11,6 +11,7 @@ import { EvaluationGlobalConfigInfo, EvaluationPlanConfig } from '@/config/evalu
 import { TOKEN_PRICES } from '@/config/paymentTokens'
 import HeroIcon from '@/assets/icons/tokens/HERO.svg'
 import { formatNumber, toBigInt } from '@/utils/bigint'
+import AboutAccountDialog from './AboutAccountDialog.vue'
 
 const planTabs = [
   { label: 'Champion Plan', value: EvaluationPlan.ChampionPlan },
@@ -21,6 +22,7 @@ const planTabs = [
 const { address } = useConnection()
 
 const { data: discountData } = useUserQuestDiscountStatusStorage(address)
+const showAboutAccountDialog = ref(false)
 
 const unusedDiscounts = computed(() => discountData.value?.filter((item) => !item.isUsed) ?? [])
 
@@ -82,21 +84,29 @@ const usdToHeroToken = (usdAmount: number) => {
 <template>
   <section class="mt-4 flex flex-col gap-6 text-[var(--hp-white-color)]">
     <header class="flex flex-col gap-4">
-      <div class="flex flex-wrap items-center justify-between gap-4">
-        <h1 class="text-2xl font-semibold leading-[32px]">Evaluation</h1>
-        <button
-          type="button"
-          class="evaluation-discount-btn flex h-[40px] items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--hp-primary-green)] transition-colors"
-          @click="
-            () => {
-              router.push({ name: ROUTE_NAMES.Quest })
-            }
-          "
-        >
-          <BaseIcon name="discount" size="20" class="text-[var(--hp-primary-green)]" />
-          <span>Discount: {{ unusedDiscounts.length }}</span>
-          <BaseIcon name="arrow" size="16" class="rotate-[-90deg]" />
-        </button>
+      <div class="mb-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <h1 class="text-2xl font-semibold leading-[32px]">Evaluation</h1>
+          <button
+            type="button"
+            class="evaluation-discount-btn flex h-[40px] items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--hp-primary-green)] transition-colors"
+            @click="
+              () => {
+                router.push({ name: ROUTE_NAMES.Quest })
+              }
+            "
+          >
+            <BaseIcon name="discount" size="20" class="text-[var(--hp-primary-green)]" />
+            <span>Discount: {{ unusedDiscounts.length }}</span>
+            <BaseIcon name="arrow" size="16" class="rotate-[-90deg]" />
+          </button>
+        </div>
+        <div class="text-[14px] leading-[20px] text-[var(--hp-text-color)] mt-2">
+          Take an evaluation to acquire a hero account after proving your trading skills.
+          <span class="cursor-pointer underline text-[var(--hp-primary-green)]" @click="showAboutAccountDialog = true"
+            >About Hero Account</span
+          >
+        </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
@@ -181,6 +191,7 @@ const usdToHeroToken = (usdAmount: number) => {
       </div>
     </div>
   </section>
+  <AboutAccountDialog v-if="showAboutAccountDialog" @close="showAboutAccountDialog = false" />
 </template>
 
 <style scoped lang="scss">
