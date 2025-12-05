@@ -4,21 +4,22 @@
     <div class="flex items-center min-w-[160px] relative">
       <button
         @click="$emit('openMarketSelect')"
-        class="flex items-center gap-3 text-white hover:text-blue-400 transition-colors cursor-pointer"
+        class="flex items-center gap-3 text-white hover:text-[#6CE99E] transition-colors cursor-pointer"
       >
         <div class="flex items-center gap-3">
           <MarketIcon :symbol="selectedMarket" :size="32" />
           <div class="flex flex-col text-left">
             <div class="flex items-center gap-1">
-              <span class="text-base font-semibold leading-[24px] text-white">{{ selectedMarket }}</span>
+              <span class="text-base font-semibold leading-[24px]">{{ selectedMarket }}</span>
             </div>
             <span class="text-xs mt-[2px] leading-[16px] text-gray-400">
               {{ isMemeMarket ? 'Meme Spot' : `Up to ${maxLeverage}X` }}
             </span>
           </div>
         </div>
-        <svg class="ml-3 h-4 w-4 flex-shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+
+        <svg class="stroke-current" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3.5 6L8 10.5L12.5 6" stroke="stroke-current" stroke-width="2"/>
         </svg>
       </button>
       
@@ -55,13 +56,13 @@
               ({{ priceChange24h >= 0 ? '+' : '' }}{{ priceChange24h.toFixed(2) }}%)
             </div>
             <div
-              v-else-if="!isMarketClosed && isLoadingPriceChange "
-              class="ml-2 h-4 w-[200px] animate-pulse rounded bg-gray-700"
+              v-else-if="!isMarketClosed && isLoadingPriceChange"
+              class="ml-2 h-4 w-24 animate-pulse rounded bg-gray-700"
             ></div>
           </div>
         </div>
 
-        <div class="h-5 w-px bg-gray-800"></div>
+        <div class="h-5 w-px bg-[#272727]"></div>
 
         <div v-if="!isMemeMarket" class="flex items-center flex-1 overflow-x-auto gap-4">
           <!-- Est. 1H Funding (L/S) -->
@@ -77,7 +78,7 @@
           </div>
         </div>
 
-        <div class="h-5 w-px bg-gray-800"></div>
+        <div class="h-5 w-px bg-[#272727]"></div>
 
         <!-- Long / Short (Aggregator) -->
         <div class="flex flex-col min-w-[118px]">
@@ -96,7 +97,7 @@
           </div>
         </div>
 
-        <div class="h-5 w-px bg-gray-800"></div>
+        <div class="h-5 w-px bg-[#272727]"></div>
 
         <!-- 24H High / Low -->
         <div class="flex flex-col min-w-[100px]">
@@ -118,12 +119,12 @@
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Liq</div>
             <div class="text-white text-[13px] leading-[18px] font-medium">$1.6M</div>
           </div>
-          <div class="h-5 w-px bg-gray-800"></div>
+          <div class="h-5 w-px bg-[#272727]"></div>
           <div class="flex flex-col gap-[4px] flex-1">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">24h Vol</div>
             <div class="text-white text-[13px] leading-[18px] font-medium">$627.1K</div>
           </div>
-          <div class="h-5 w-px bg-gray-800"></div>
+          <div class="h-5 w-px bg-[#272727]"></div>
           <div class="flex flex-col gap-[4px] flex-1">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px] whitespace-nowrap">Total Fees</div>
             <div class="flex items-center gap-1">
@@ -131,12 +132,12 @@
               <div class="text-white text-[13px] leading-[18px] font-medium">2.53</div>
             </div>
           </div>
-          <div class="h-5 w-px bg-gray-800"></div>
+          <div class="h-5 w-px bg-[#272727]"></div>
           <div class="flex flex-col gap-[4px] flex-1">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Supply</div>
             <div class="text-white text-[13px] leading-[18px] font-medium">1M</div>
           </div>
-          <div class="h-5 w-px bg-gray-800"></div>
+          <div class="h-5 w-px bg-[#272727]"></div>
           <div class="flex flex-col gap-[4px] flex-1">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]  whitespace-nowrap">Taxes B/S</div>
             <div class="text-[#ffb110] text-[13px] leading-[18px] font-medium">5% / 5%</div>
@@ -155,7 +156,7 @@
         <Menu as="div" class="relative inline-block text-left">
           <div>
             <MenuButton
-              class="flex items-center justify-end gap-1 px-2 text-xs text-gray-300  focus:outline-none"
+              class="flex items-center justify-end gap-1 text-xs text-white hover:text-[#6CE99E] focus:outline-none"
             >
               <div class="relative h-4 w-4 shrink-0">
                 <img
@@ -164,8 +165,10 @@
                   class="h-full w-full object-contain"
                 />
               </div>
-              <span class="text-xs text-white">{{ selectedOracleName || 'Auto Match' }}</span>
-              <i class="iconfont icon-down text-white"></i>
+              <span class="text-xs">{{ selectedOracleName || 'Auto Match' }}</span>
+              <svg class="stroke-current" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3.5 6L8 10.5L12.5 6" stroke="stroke-current" stroke-width="2"/>
+              </svg>
             </MenuButton>
           </div>
 

@@ -22,9 +22,9 @@ const showConnectWalletInfoDialog = () => {
 
 <template>
   <template v-if="isConnected">
-    <div class="flex items-center cursor-pointer group gap-1" @click="showInfoDialog = true">
+    <div class="flex items-center cursor-pointer group gap-1 py-[6px] px-[8px] hover:bg-[var(--hp-primary-green)] text-[var(--hp-text-color)] hover:text-[#0A0A0A]" @click="showInfoDialog = true">
       <Avatar :address="address" :size="20" />
-      <span class="mx-1 text-sm text-[var(--hp-text-color)] group-hover:text-[var(--hp-primary-green)]">
+      <span class="mx-1 text-sm font-medium">
         {{ ellipsisMiddle(address) }}
       </span>
     </div>
