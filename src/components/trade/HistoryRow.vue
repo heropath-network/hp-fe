@@ -64,8 +64,7 @@
     <!-- Fee Column -->
     <td class="px-4 py-6 ">
       <div class="text-[13px] leading-[18px] text-white font-normal">
-        $10.34
-        <!-- ${{ formatNumber(trade.fee, 2) }} -->
+        {{ trade.fee ? `$${formatNumber(trade.fee, 2)}` : '$7.43' }}
       </div>
     </td>
     
@@ -90,8 +89,7 @@
         </div>
         <div
           :class="[
-            'text-[13px] leading-[18px] font-normal',
-            getPnLPercent() >= 0 ? 'text-green-success' : 'text-red-error'
+            'text-[13px] leading-[18px] text-[#9b9b9b]',
           ]"
         >
           {{ formatPnLPercentage(getPnLPercent()) }}

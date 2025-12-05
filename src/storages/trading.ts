@@ -31,6 +31,7 @@ export interface Order {
   orderType: 'limit' | 'stop'
   timestamp: number
   chainId: number
+  isIsolatedMargin?: boolean
   liquiditySource: LiquiditySourceId
 }
 
@@ -49,6 +50,8 @@ export interface TradeHistory {
   closeTimestamp: number
   chainId: number
   liquiditySource: LiquiditySourceId
+  isIsolatedMargin?: boolean
+  fee?: bigint
 }
 
 // Internal storage format (BigInt as strings for LocalStorage)
@@ -66,7 +69,7 @@ type StoredOrder = Omit<Order, 'size' | 'triggerPrice'> & {
 
 type StoredTradeHistory = Omit<
   TradeHistory,
-  'size' | 'entryPrice' | 'exitPrice' | 'pnl' | 'collateral' | 'leverage'
+  'size' | 'entryPrice' | 'exitPrice' | 'pnl' | 'collateral' | 'leverage' | 'fee'
 > & {
   size: string
   entryPrice: string
@@ -74,6 +77,7 @@ type StoredTradeHistory = Omit<
   pnl: string
   collateral?: string // Optional for backward compatibility
   leverage?: number // Optional for backward compatibility
+  fee?: string // Optional fee stored as string
 }
 
 export function useUserPositionsStorage(address: Ref<string | undefined>) {
@@ -229,6 +233,7 @@ export function useUserTradeHistoryStorage(address: Ref<string | undefined>) {
       exitPrice: history.exitPrice.toString(),
       pnl: history.pnl.toString(),
       collateral: history.collateral.toString(),
+      fee: history.fee?.toString(),
     }
   }
 
@@ -248,6 +253,7 @@ export function useUserTradeHistoryStorage(address: Ref<string | undefined>) {
       pnl: BigInt(stored.pnl),
       collateral: defaultCollateral,
       leverage: defaultLeverage,
+      fee: stored.fee ? BigInt(stored.fee) : undefined,
     }
   }
 
