@@ -56,7 +56,7 @@ const displayDate = computed(() => {
 
 const selectedEvaluationLabel = computed(() => {
   if (!selectedEvaluation.value) {
-    return 'Select Evaluation'
+    return 'Select Account'
   }
   const size = toBigInt(selectedEvaluation.value.evaluationConfig.accountSize)
   return `${getAccountTypeLabel(selectedEvaluation.value.accountType)} #${
@@ -182,13 +182,13 @@ function openTradeTerminal() {
       <div class="flex flex-col gap-1">
         <h1 class="text-2xl font-semibold leading-8">
           <template v-if="isConnected">Welcome Back, {{ ellipsisMiddle(address) }}</template>
-          <template v-else>Place Connect Wallet</template>
+          <template v-else>Please Connect Wallet</template>
         </h1>
         <p class="text-sm leading-5 text-[var(--hp-text-color)]">{{ displayDate }}</p>
       </div>
 
       <div class="flex items-center">
-        <div class="relative w-full sm:w-[292px] border-[1px] border-[var(--hp-bg-light)]">
+        <div class="relative w-full border-[1px] border-[var(--hp-bg-light)]">
           <button
             type="button"
             class="flex h-[40px] w-full items-center justify-between rounded border px-4 py-3 text-left text-base font-medium active:bg-transparent focus:outline-none focus:ring-0"
@@ -201,7 +201,7 @@ function openTradeTerminal() {
             <BaseIcon
               name="downArrow"
               size="12"
-              class="transition-transform duration-150 text-[var(--hp-white-color)]"
+              class="transition-transform duration-150 text-[var(--hp-white-color)] ml-1"
               :class="showEvaluationDropdown ? 'rotate-180' : ''"
             />
           </button>
@@ -213,7 +213,7 @@ function openTradeTerminal() {
             class="absolute right-0 top-[calc(100%+8px)] z-20 w-full min-w-[280px] overflow-hidden border border-[var(--hp-line-light-color)] bg-[var(--hp-bg-light)]"
           >
             <template v-if="!dashboardEvaluationList.length">
-              <div class="px-4 py-3 text-sm text-[var(--hp-white-color)]">No evaluation accounts</div>
+              <div class="px-4 py-3 text-sm text-[var(--hp-white-color)]">No Account</div>
             </template>
             <template v-else>
               <button
@@ -338,7 +338,7 @@ function openTradeTerminal() {
               <p class="text-xl font-semibold leading-7 text-[var(--hp-text-red)]">
                 ${{ formatNumber(maxDrawdownEquityLimit, 2) }}
               </p>
-              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Max. drawdown Equity Limit</p>
+              <p class="text-sm leading-5 text-[var(--hp-text-color)]">Max. Drawdown Equity Limit</p>
             </div>
           </article>
 

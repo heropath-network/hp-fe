@@ -45,9 +45,9 @@ export function generateUUID() {
 export function getAccountTypeLabel(type: string) {
   switch (type) {
     case 'funded':
-      return 'Funded'
+      return 'Hero Account'
     case 'evaluation':
-      return 'Evaluation'
+      return 'Evaluation Account'
     case 'trading':
       return 'Trading'
     default:

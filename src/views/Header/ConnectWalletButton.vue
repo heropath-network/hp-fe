@@ -22,7 +22,10 @@ const showConnectWalletInfoDialog = () => {
 
 <template>
   <template v-if="isConnected">
-    <div class="flex items-center cursor-pointer group gap-1 py-[6px] px-[8px] hover:bg-[var(--hp-primary-green)] text-[var(--hp-text-color)] hover:text-[#0A0A0A]" @click="showInfoDialog = true">
+    <div
+      class="flex items-center cursor-pointer group gap-1 py-[6px] px-[8px] hover:bg-[var(--hp-primary-green)] text-[var(--hp-text-color)] hover:text-[#0A0A0A]"
+      @click="showInfoDialog = true"
+    >
       <Avatar :address="address" :size="20" />
       <span class="mx-1 text-sm font-medium">
         {{ ellipsisMiddle(address) }}
@@ -32,7 +35,7 @@ const showConnectWalletInfoDialog = () => {
   <template v-else>
     <button
       type="button"
-      class="rounded bg-[var(--hp-white-color)] h-[32px] px-2 py-1.5 text-[var(--hp-black-color)] text-[14px] font-[500] leading-none transition hover:bg-[var(--hp-primary-green)] active:bg-[var(--hp-primary-green)]"
+      class="bg-[var(--hp-white-color)] h-[32px] px-2 py-1.5 text-[var(--hp-black-color)] text-[14px] font-[500] leading-none transition hover:bg-[var(--hp-primary-green)] active:bg-[var(--hp-primary-green)]"
       @click="showConnectWalletInfoDialog"
     >
       Connect Wallet

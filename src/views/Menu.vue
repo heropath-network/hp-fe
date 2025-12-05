@@ -133,8 +133,12 @@ watch(
           "
         />
         <span
-          class="text-[14px] font-semibold group-hover:text-[var(--hp-white-color)]"
-          :class="item.id === activeItemId ? 'text-[var(--hp-primary-green)]' : 'text-[var(--hp-text-color)]'"
+          class="text-[14px] font-semibold"
+          :class="
+            item.id === activeItemId
+              ? 'text-[var(--hp-primary-green)]'
+              : 'text-[var(--hp-text-color)] group-hover:text-[var(--hp-white-color)]'
+          "
         >
           {{ item.label }}
         </span>

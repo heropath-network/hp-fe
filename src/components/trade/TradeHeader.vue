@@ -42,8 +42,15 @@
             </span>
             <span v-else>Select Evaluation</span>
 
-            <svg :class="open ? 'rotate-180 stroke-[#0A0A0A]' : 'stroke-[#9B9B9B] group-hover/icon:stroke-[#0A0A0A]'" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3.5 6L8 10.5L12.5 6" stroke="stroke-current" stroke-width="2"/>
+            <svg
+              :class="open ? 'rotate-180 stroke-[#0A0A0A]' : 'stroke-[#9B9B9B] group-hover/icon:stroke-[#0A0A0A]'"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M3.5 6L8 10.5L12.5 6" stroke="stroke-current" stroke-width="2" />
             </svg>
           </MenuButton>
 
@@ -89,8 +96,15 @@
           :class="open ? 'bg-[#6CE99E] text-gray-1000' : 'text-white'"
         >
           <img :src="currentChain.icon" :alt="currentChain.name" class="h-5 w-5" />
-          <svg :class="open ? 'rotate-180 stroke-[#0A0A0A]' : 'stroke-[#9B9B9B] group-hover/icon:stroke-[#0A0A0A]'" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3.5 6L8 10.5L12.5 6" stroke="stroke-current" stroke-width="2"/>
+          <svg
+            :class="open ? 'rotate-180 stroke-[#0A0A0A]' : 'stroke-[#9B9B9B] group-hover/icon:stroke-[#0A0A0A]'"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M3.5 6L8 10.5L12.5 6" stroke="stroke-current" stroke-width="2" />
           </svg>
         </MenuButton>
 
@@ -200,7 +214,6 @@ watch(
 
 function selectAccount(account: Account) {
   selectEvaluationBase(account.id)
-  router.push({ name: ROUTE_NAMES.Dashboard })
 }
 
 const modeConfig = computed(() => {
@@ -213,17 +226,17 @@ const modeConfig = computed(() => {
   switch (accountType) {
     case 'trading':
       return {
-        label: 'Training Mode',
+        label: 'Training Account Mode',
         classes: 'bg-white bg-opacity-10 border-white border-opacity-10 text-white',
       }
     case 'evaluation':
       return {
-        label: 'Evaluation Mode',
+        label: 'Evaluation Account Mode',
         classes: 'bg-[#FFB110] bg-opacity-10 border-[#FFB110] border-opacity-10 text-[#FFB110]',
       }
     case 'funded':
       return {
-        label: 'Funded Mode',
+        label: 'Hero Account Mode',
         classes: 'bg-[#10C8A8] bg-opacity-10 border-[#10C8A8] border-opacity-10 text-[#10C8A8]',
       }
     default:
