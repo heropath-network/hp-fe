@@ -2,41 +2,37 @@
 
 HeroPath - Decentralized User-Empowering Prop Trading
 
-Training, evaluation, and ecosystem quests platform for aspiring prop traders.
-
 ## Overview
 
-HP Frontend is the user-facing layer of the HeroPath prop trading ecosystem. It provides trader evaluation, training education, paper trading simulation, and integration with BSC ecosystem protocols like Aster, four.meme, etc.
+HP Frontend is the user-facing layer of the HeroPath prop trading ecosystem. It provides trader evaluation, training education, paper trading simulation, and integration with BNB Chain ecosystem protocols and other needed networks.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                        HeroPath Ecosystem                               │
+│                             HeroPath                                    │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
-│                     ┌────────────────────────────────┐                  │
-│                     │    HP Frontend (This Module)   │                  │
-│                     │                                │                  │
-│   New Trader ──────►│  ┌─────────────────────────┐   │                  │
-│                     │  │     Evaluation Test     │   │                  │
-│                     │  └───────────┬─────────────┘   │                  │
-│                     │              │                 │                  │
-│                     │      ┌───────┴───────┐         │                  │
-│                     │      ▼               ▼         │                  │
-│                     │   ┌─────┐       ┌────────┐     │                  │
-│                     │   │PASS │       │ FAIL   │     │                  │
-│                     │   └──┬──┘       └───┬────┘     │                  │
-│                     │      │              │          │                  │
-│                     │      ▼              ▼          │                  │
-│                     │  Hero Account   Training       │                  │
-│                     │      │          Education      │                  │
-│                     │      │              │          │                  │
-│                     │      │         Leaderboard     │                  │
-│                     │      │              │          │                  │
-│                     │      │         Re-evaluate     │                  │
-│                     └──────┼──────────────┼──────────┘                  │
-│                            │              │                             │
-│                            ▼              │                             │
-│                     Trading Signals ◄─────┘                             │
+│                     ┌───────────────────────────────────┐               │
+│                     │    HP Frontend (This Module)      │               │
+│                     │                                   │               │
+│   New Trader ──────►│  ┌─────────────────────────┐      │               │
+│                     │  │     Evaluation Test     │◄──┐  │               │
+│                     │  └───────────┬─────────────┘   │  │               │
+│                     │              │                 │  │               │
+│                     │      ┌───────┴───────┐         │  │               │
+│                     │      ▼               ▼         │  │               │
+│                     │   ┌──────┐       ┌────────┐    │  │               │
+│                     │   │ PASS │       │  FAIL  │    │  │               │
+│                     │   └──┬───┘       └───┬────┘    │  │               │
+│                     │      │               │         │  │               │
+│                     │      ▼               ▼         │  │               │
+│                     │  Hero Account    Training      │  │               │
+│                     │      │           Education     │  │               │
+│                     │      │               │         │  │               │
+│                     │      │          Re-evaluate ───┘  │               │
+│                     └──────┼────────────────────────────┘               │
+│                            │                                            │
+│                            ▼                                            │
+│              Contribute Trading Signals                                 │
 │                            │                                            │
 │                            ▼                                            │
 │                   ┌─────────────────┐                                   │
