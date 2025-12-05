@@ -369,7 +369,7 @@
               ]"
             ></i>
           </div>
-          <div v-if="showSettings" class="flex flex-col gap-[8px] ">
+          <div v-if="showSettings" class="flex flex-col gap-[8px] outline-none" tabindex="-1">
             <!-- Slippage -->
             <div class="flex items-center justify-between ">
               <div class="flex flex-col">
