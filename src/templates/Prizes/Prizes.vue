@@ -95,7 +95,7 @@ async function handleWithdraw() {
   const historyData: UserWithdrawalHistory = {
     id: crypto.randomUUID(),
     timestamp: Math.floor(Date.now() / 1000),
-    address: USDC_TOKEN_ADDRESS,
+    address: address.value!,
     amount: historyAmount,
     tokenSymbol: selectedToken.value.symbol,
     status: 'success',
@@ -258,7 +258,7 @@ async function handleWithdraw() {
           :disabled="confirmIsDisabled"
           @click="handleWithdraw"
         >
-          {{ selectedToken.symbol }} HERO Prizes<LoadingIcon v-if="withdrawing" :is-black="true" class="ml-2" />
+          {{ selectedToken.symbol }} Prizes<LoadingIcon v-if="withdrawing" :is-black="true" class="ml-2" />
         </button>
       </div>
     </div>
