@@ -14,7 +14,7 @@ import { UserEvaluation, UserPayouts, UserWithdrawalHistory, QuestDiscount, Ques
 
 export function useAccountShowInLeaderboard(address: Ref<string | undefined>) {
   const key = computed(() => {
-    return AccountShowInLeaderboardKey.replace('{addr}', address.value ?? EMPTY_ADDRESS)
+    return AccountShowInLeaderboardKey.replace('{addr}', address.value?.toLowerCase() ?? EMPTY_ADDRESS)
   })
 
   const storage = useLocalStorage<boolean>(key, true)
@@ -24,7 +24,7 @@ export function useAccountShowInLeaderboard(address: Ref<string | undefined>) {
 
 export function useUserEvaluationsStorage(address: Ref<string | undefined>) {
   const key = computed(() => {
-    return UserEvaluationsKey.replace('{addr}', address.value ?? EMPTY_ADDRESS)
+    return UserEvaluationsKey.replace('{addr}', address.value?.toLowerCase() ?? EMPTY_ADDRESS)
   })
 
   const storage = useLocalStorage<UserEvaluation[]>(key, [])
@@ -80,7 +80,7 @@ export function useUserEvaluationsStorage(address: Ref<string | undefined>) {
 
 export function useUserPayoutsStorage(address: Ref<string | undefined>) {
   const key = computed(() => {
-    return UserPayoutsKey.replace('{addr}', address.value ?? EMPTY_ADDRESS)
+    return UserPayoutsKey.replace('{addr}', address.value?.toLowerCase() ?? EMPTY_ADDRESS)
   })
 
   const defaultPayouts: UserPayouts = { withdrawnAmount: 0 }
@@ -107,7 +107,7 @@ export function useUserPayoutsStorage(address: Ref<string | undefined>) {
 
 export function useUserWithdrawalHistoryStorage(address: Ref<string | undefined>) {
   const key = computed(() => {
-    return UserWithdrawalHistoryKey.replace('{addr}', address.value ?? EMPTY_ADDRESS)
+    return UserWithdrawalHistoryKey.replace('{addr}', address.value?.toLowerCase() ?? EMPTY_ADDRESS)
   })
 
   const storage = useLocalStorage<UserWithdrawalHistory[]>(key, [])
@@ -129,7 +129,7 @@ export function useUserWithdrawalHistoryStorage(address: Ref<string | undefined>
 
 export function useUserQuestTaskStatusStorage(address: Ref<string | undefined>) {
   const key = computed(() => {
-    return UserQuestTaskStatusKey.replace('{addr}', address.value ?? EMPTY_ADDRESS)
+    return UserQuestTaskStatusKey.replace('{addr}', address.value?.toLowerCase() ?? EMPTY_ADDRESS)
   })
 
   const defaultStatus: Record<QuestTaskId, boolean> = {
@@ -161,7 +161,7 @@ export function useUserQuestTaskStatusStorage(address: Ref<string | undefined>) 
 
 export function useUserQuestDiscountStatusStorage(address: Ref<string | undefined>) {
   const key = computed(() => {
-    return UserQuestDiscountStatusKey.replace('{addr}', address.value ?? EMPTY_ADDRESS)
+    return UserQuestDiscountStatusKey.replace('{addr}', address.value?.toLowerCase() ?? EMPTY_ADDRESS)
   })
 
   const storage = useLocalStorage<QuestDiscount[]>(key, [])
