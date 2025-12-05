@@ -9,10 +9,11 @@ import { useUserEvaluationsStorage } from '@/storages/heroPath'
 import { generateTimeBasedSixDigitId } from '@/utils/common'
 import { BaseIcon, LoadingIcon } from '@/components'
 import { usePaymentTokenPrices } from '@/use/usePaymentTokenPrices'
-import { EvaluationGlobalConfigInfo, EvaluationPlanConfig } from '@/config/evaluation'
+import { EvaluationPlanConfig } from '@/config/evaluation'
 import { useUserQuestDiscountStatusStorage } from '@/storages/heroPath'
 import { QUEST_DISCOUNT_AMOUNT } from '@/constants'
 import { divideBigInt, formatNumber, fromBigInt, multiplyBigInt, toBigInt } from '@/utils/bigint'
+import HeroIcon from '@/assets/icons/tokens/HERO.svg'
 
 const requireSymbolIcon = (symbol: string) => {
   return new URL(`/src/assets/icons/tokens/${symbol}.svg`, import.meta.url).href
@@ -92,20 +93,34 @@ const basePrice = computed(() => (selectedAccount.value ? toBigInt(selectedAccou
 const profitSplitFee = computed(() =>
   profitSplitChecked.value ? multiplyBigInt(basePrice.value, toBigInt(0.1)) : BigInt(0),
 )
+
+const usdToHeroToken = (usdAmount: number) => {
+  const heroTokenPrice = TOKEN_PRICES['HERO'] || 0
+  if (heroTokenPrice === 0) return 0
+  return usdAmount / heroTokenPrice
+}
+
 const purchaseTotal = computed(() => basePrice.value + profitSplitFee.value)
-const discountPurchaseTotal = computed(() => {
-  if (unusedDiscounts.value.length > 0) {
-    return purchaseTotal.value > questDiscountBigInt ? purchaseTotal.value - questDiscountBigInt : BigInt(0)
+const purchaseTotalHeroAmount = computed(() => {
+  return toBigInt(usdToHeroToken(Number(fromBigInt(purchaseTotal.value, 2))))
+})
+const discountPurchaseInfo = computed(() => {
+  const _usdValue =
+    unusedDiscounts.value.length > 0
+      ? purchaseTotal.value > questDiscountBigInt
+        ? purchaseTotal.value - questDiscountBigInt
+        : BigInt(0)
+      : purchaseTotal.value
+  const usdValue = _usdValue < 0n ? 0n : _usdValue
+
+  const tokenAmount = divideBigInt(usdValue, selectedTokenPriceBigInt.value)
+  const heroTokenAmount = toBigInt(usdToHeroToken(Number(fromBigInt(usdValue, 2))))
+
+  return {
+    usdValue,
+    tokenAmount,
+    heroTokenAmount,
   }
-  return purchaseTotal.value
-})
-
-const purchaseTotalTokenAmount = computed(() => {
-  return divideBigInt(purchaseTotal.value, selectedTokenPriceBigInt.value)
-})
-
-const discountPurchaseTotalTokenAmount = computed(() => {
-  return divideBigInt(discountPurchaseTotal.value, selectedTokenPriceBigInt.value)
 })
 
 const productLabel = computed(() => {
@@ -113,10 +128,10 @@ const productLabel = computed(() => {
   return `$${formatNumber(toBigInt(size), 0)} - ${planTabs.find((tab) => tab.value === activePlan.value)?.label || ''}`
 })
 
-const profitSplitLabel = computed(() => {
-  const split = EvaluationGlobalConfigInfo.profitSplit
-  return `${split}/${100 - split} Profit Split`
-})
+// const profitSplitLabel = computed(() => {
+//   const split = EvaluationGlobalConfigInfo.profitSplit
+//   return `${split}/${100 - split} Profit Split`
+// })
 
 function formatCurrency(value: bigint) {
   return `$${formatNumber(value, 2)}`
@@ -186,7 +201,7 @@ function handleBack() {
 
 const isInsufficientBalance = computed(() => {
   const balanceUsd = selectedTokenUsdBalance.value
-  return balanceUsd < discountPurchaseTotal.value
+  return balanceUsd < discountPurchaseInfo.value.usdValue
 })
 
 const confirmButtonDisabled = computed(() => {
@@ -450,6 +465,22 @@ async function handlePurchase() {
               <span>Price</span>
               <span class="text-[var(--hp-white-color)]">{{ formatCurrency(basePrice) }}</span>
             </div>
+            <div
+              v-if="discountPurchaseInfo.usdValue > 0n || unusedDiscounts.length <= 0"
+              class="flex items-center justify-between text-[var(--hp-text-color)]"
+            >
+              <span>Swap {{ selectedToken.symbol }} Into HERO</span>
+              <span class="text-[var(--hp-white-color)]">
+                {{
+                  `${formatNumber(discountPurchaseInfo.tokenAmount, selectedToken.formatDecimals)} ${
+                    selectedToken.symbol
+                  }`
+                }}
+                →
+                {{ `${formatNumber(discountPurchaseInfo.heroTokenAmount, 0)} HERO` }}
+              </span>
+            </div>
+
             <!-- <div class="flex items-center justify-between">
               <label class="flex cursor-pointer items-center gap-2 text-[var(--hp-text-color)]">
                 <input v-model="profitSplitChecked" type="checkbox" class="h-4 w-4 accent-[var(--hp-primary-green)]" />
@@ -460,30 +491,18 @@ async function handlePurchase() {
             <div class="flex items-center justify-between">
               <span class="text-[var(--hp-text-color)]">Purchase</span>
               <span class="text-xl font-semibold text-[var(--hp-primary-green)]">
-                <template v-if="unusedDiscounts.length > 0">
-                  <template v-if="discountPurchaseTotal <= 0n">Free</template>
-                  <template v-else>
-                    <span class="opacity-70 line-through">{{
-                      purchaseTotalTokenAmount
-                        ? formatNumber(purchaseTotalTokenAmount, selectedToken.formatDecimals)
-                        : '--'
-                    }}</span>
-                    <span class="ml-1">{{
-                      discountPurchaseTotalTokenAmount
-                        ? formatNumber(discountPurchaseTotalTokenAmount, selectedToken.formatDecimals)
-                        : '--'
-                    }}</span>
-                    {{ selectedToken.symbol }}
-                  </template>
-                </template>
+                <template v-if="unusedDiscounts.length > 0 && discountPurchaseInfo.usdValue <= 0n">Free</template>
                 <template v-else>
-                  {{
-                    purchaseTotalTokenAmount
-                      ? `${formatNumber(purchaseTotalTokenAmount, selectedToken.formatDecimals)} ${
-                          selectedToken.symbol
-                        }`
-                      : '--'
-                  }}
+                  <div class="flex items-center">
+                    <span v-if="unusedDiscounts.length > 0" class="mr-1 opacity-70 line-through">
+                      {{ formatNumber(purchaseTotalHeroAmount, 0) }} HERO
+                    </span>
+                    {{ `${formatNumber(discountPurchaseInfo.heroTokenAmount, 0)}HERO` }}
+                    <img :src="HeroIcon" alt="HERO" class="w-[22px] h-[22px] mx-1" />
+                    <span class="font-[500] text-[16px] leading-4"
+                      >(${{ formatNumber(discountPurchaseInfo.usdValue, 2) }})</span
+                    >
+                  </div>
                 </template>
               </span>
             </div>
