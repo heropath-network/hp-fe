@@ -41,7 +41,7 @@ const ChampionPlan: EvaluationConfig[] = [
   },
 ]
 
-const HeroPlan: EvaluationConfig[] = [
+const WarriorPlan: EvaluationConfig[] = [
   {
     level: 1,
     accountSize: 5000,
@@ -121,6 +121,6 @@ const LegendPlan: EvaluationConfig[] = [
 
 export const EvaluationPlanConfig: { [key in EvaluationPlan]: EvaluationConfig[] } = {
   [EvaluationPlan.ChampionPlan]: ChampionPlan,
-  [EvaluationPlan.HeroPlan]: HeroPlan,
+  [EvaluationPlan.WarriorPlan]: WarriorPlan,
   [EvaluationPlan.LegendPlan]: LegendPlan,
 }

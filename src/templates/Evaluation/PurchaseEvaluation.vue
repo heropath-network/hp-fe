@@ -22,7 +22,7 @@ const { prices: apiPrices } = usePaymentTokenPrices()
 
 const planTabs = [
   { label: 'Champion Plan', value: EvaluationPlan.ChampionPlan },
-  { label: 'Hero Plan', value: EvaluationPlan.HeroPlan },
+  { label: 'Warrior Plan', value: EvaluationPlan.WarriorPlan },
   { label: 'Legend Plan', value: EvaluationPlan.LegendPlan },
 ]
 
@@ -57,7 +57,7 @@ const profitSplitChecked = ref(false)
 const affiliateChecked = ref(false)
 const affiliateCode = ref('')
 const agreeProgram = ref(false)
-const agreeRefund = ref(false)
+const agreeRefund = ref(true)
 const pendingLevel = ref<number | null>(null)
 
 const accountOptions = computed<EvaluationConfig[]>(() => {
@@ -89,7 +89,9 @@ const selectedAccount = computed(() => accountOptions.value[selectedAccountIndex
 
 const questDiscountBigInt = toBigInt(QUEST_DISCOUNT_AMOUNT)
 const basePrice = computed(() => (selectedAccount.value ? toBigInt(selectedAccount.value.fee) : BigInt(0)))
-const profitSplitFee = computed(() => (profitSplitChecked.value ? multiplyBigInt(basePrice.value, toBigInt(0.1)) : BigInt(0)))
+const profitSplitFee = computed(() =>
+  profitSplitChecked.value ? multiplyBigInt(basePrice.value, toBigInt(0.1)) : BigInt(0),
+)
 const purchaseTotal = computed(() => basePrice.value + profitSplitFee.value)
 const discountPurchaseTotal = computed(() => {
   if (unusedDiscounts.value.length > 0) {
@@ -108,7 +110,7 @@ const discountPurchaseTotalTokenAmount = computed(() => {
 
 const productLabel = computed(() => {
   const size = selectedAccount.value?.accountSize ?? 0
-  return `$${formatNumber(toBigInt(size), 0)}`
+  return `$${formatNumber(toBigInt(size), 0)} - ${planTabs.find((tab) => tab.value === activePlan.value)?.label || ''}`
 })
 
 const profitSplitLabel = computed(() => {
@@ -204,7 +206,9 @@ async function handlePurchase() {
   }
 
   const evaluationId = generateTimeBasedSixDigitId()
-  const signMsg = `Purchase Evaluation Order\n\nEvaluation ID: ${evaluationId}\nProduct: ${productLabel.value}\nTotal: $${fromBigInt(purchaseTotal.value, 2)}\n\n.`
+  const signMsg = `Purchase Evaluation Order\n\nEvaluation ID: ${evaluationId}\nProduct: ${
+    productLabel.value
+  }\nTotal: $${fromBigInt(purchaseTotal.value, 2)}\n\n.`
 
   try {
     const evaluationConfig = payload.account
@@ -387,7 +391,9 @@ async function handlePurchase() {
             <div class="border border-[var(--hp-line-light-color)] p-4 w-[calc(50%-6px)]">
               <div class="flex items-center justify-between text-sm text-[var(--hp-text-color)]">
                 <span>Pay <span class="text-[var(--hp-primary-green)]">*</span></span>
-                <span> Balance: {{ formatNumber(toBigInt(selectedToken.balance ?? 0), selectedToken.formatDecimals) }} </span>
+                <span>
+                  Balance: {{ formatNumber(toBigInt(selectedToken.balance ?? 0), selectedToken.formatDecimals) }}
+                </span>
               </div>
               <div class="relative">
                 <button
@@ -444,13 +450,13 @@ async function handlePurchase() {
               <span>Price</span>
               <span class="text-[var(--hp-white-color)]">{{ formatCurrency(basePrice) }}</span>
             </div>
-            <div class="flex items-center justify-between">
+            <!-- <div class="flex items-center justify-between">
               <label class="flex cursor-pointer items-center gap-2 text-[var(--hp-text-color)]">
                 <input v-model="profitSplitChecked" type="checkbox" class="h-4 w-4 accent-[var(--hp-primary-green)]" />
                 <span>{{ profitSplitLabel }}</span>
               </label>
               <span class="text-[var(--hp-white-color)]">{{ formatCurrency(profitSplitFee) }}</span>
-            </div>
+            </div> -->
             <div class="flex items-center justify-between">
               <span class="text-[var(--hp-text-color)]">Purchase</span>
               <span class="text-xl font-semibold text-[var(--hp-primary-green)]">
@@ -521,14 +527,14 @@ async function handlePurchase() {
               <span class="text-[var(--hp-primary-green)]">*</span>
             </span>
           </label>
-          <label class="flex cursor-pointer items-start gap-2">
+          <!-- <label class="flex cursor-pointer items-start gap-2">
             <input v-model="agreeRefund" type="checkbox" class="mt-0.5 h-4 w-4 accent-[var(--hp-primary-green)]" />
             <span class="leading-5">
               I agree to the <span class="underline">Refund Policy</span> and
               <span class="underline">Chargeback Policy</span>
               <span class="text-[var(--hp-primary-green)]">*</span>
             </span>
-          </label>
+          </label> -->
         </div>
 
         <button

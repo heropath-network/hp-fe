@@ -88,7 +88,7 @@ tryOnMounted(() => {
             <BaseIcon
               name="copy"
               size="16"
-              class="ml-1 h-4 w-4 text-[var(--hp-text-color)] transition-colors group-hover:text-[var(--hp-primary-green)]"
+              class="ml-1 h-4 w-4 mt-[3px] text-[var(--hp-text-color)] transition-colors group-hover:text-[var(--hp-primary-green)]"
             />
           </div>
           <div class="flex item-center cursor-pointer group ml-6" @click="viewOnExplorer">
@@ -96,7 +96,7 @@ tryOnMounted(() => {
             <BaseIcon
               name="blockLink"
               size="16"
-              class="ml-1 h-4 w-4 text-[var(--hp-text-color)] transition-colors group-hover:text-[var(--hp-primary-green)]"
+              class="ml-1 h-4 w-4 mt-[2px] text-[var(--hp-text-color)] transition-colors group-hover:text-[var(--hp-primary-green)]"
             />
           </div>
         </div>
