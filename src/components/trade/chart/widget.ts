@@ -147,7 +147,7 @@ export default class Widget {
       },
       overrides: override(false),
       settings_overrides: override(false),
-      custom_css_url: 'chart.v6.css',
+      custom_css_url: 'chart.v6.1.css',
     }
   }
 

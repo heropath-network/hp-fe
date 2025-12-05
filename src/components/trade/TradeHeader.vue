@@ -1,22 +1,17 @@
 <template>
   <header
-    class="flex h-16 items-center justify-between bg-[var(--hp-bg-dark)] p-[16px] sticky top-0 left-0 right-0 z-10"
+    class="flex h-16 items-center justify-between bg-[var(--hp-bg-dark)] p-[16px] sticky top-0 left-0 right-0 z-10 border-b border-gray-700"
   >
     <!-- Left: Logo and Navigation -->
     <div class="flex items-center gap-5">
       <!-- Logo -->
       <div class="flex items-center">
-        <button
-          @click="router.push({ name: ROUTE_NAMES.Dashboard })"
-          class="cursor-pointer hover:opacity-80 transition-opacity"
-        >
-          <img src="@/assets/img/HeroPath.svg" alt="Hero PATH" class="h-[32px] w-auto" />
-        </button>
+        <img src="@/assets/img/HeroPath.svg" alt="Hero PATH" class="h-[32px] w-auto" />
       </div>
       <!-- Navigation -->
       <div class="flex items-center">
         <div
-          class="flex items-center justify-center h-[32px] px-[8px] py-[3px] text-[14px] leading-[20px] border border-solid"
+          class="flex items-center justify-center h-[32px] px-[7px] py-[2px] text-[14px] leading-[20px] border border-solid"
           :class="modeConfig?.classes || 'bg-[rgba(255,255,255,0.1)] border-[rgba(255,255,255,0.1)] text-white'"
         >
           {{ modeConfig?.label || 'Training Mode' }}
@@ -30,7 +25,7 @@
       <template v-if="!accounts.length">
         <button
           type="button"
-          class="flex items-center gap-1 px-2 py-[6px] text-[14px] font-medium leading-[20px] bg-[#6CE99E] text-gray-950 transition-colors hover:bg-[#5dd88a] focus:outline-none"
+          class="flex items-center gap-1 px-2 py-[6px] text-[14px] font-medium leading-[20px] bg-[#6CE99E] text-gray-950 transition-colors hover:bg-[#76FFAD] focus:outline-none"
           @click="router.push({ name: ROUTE_NAMES.Evaluation })"
         >
           New Evaluation
@@ -39,14 +34,17 @@
       <template v-else>
         <Menu as="div" class="relative inline-block text-left" v-slot="{ open }">
           <MenuButton
-            class="flex items-center gap-1 px-2 py-[6px] text-[14px] font-medium leading-[20px]  transition-colors hover:bg-[#5dd88a] hover:text-gray-950 focus:outline-none"
-            :class="open ? 'bg-[#6CE99E] text-neutral-950' : 'text-white'"
+            class="flex items-center gap-1 px-2 py-[6px] text-[14px] font-medium leading-[20px]  transition-colors hover:bg-[#5dd88a] hover:text-gray-950 focus:outline-none group/icon text-[#9B9B9B]"
+            :class="open ? 'bg-[#6CE99E] text-neutral-950' : ''"
             >
             <span v-if="selectedAccount">
               {{ selectedAccount.label }}
             </span>
             <span v-else>Select Evaluation</span>
-            <i class="iconfont icon-down" :class="open ? 'rotate-180' : ''"></i>
+
+            <svg :class="open ? 'rotate-180 stroke-[#0A0A0A]' : 'stroke-[#9B9B9B] group-hover/icon:stroke-[#0A0A0A]'" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3.5 6L8 10.5L12.5 6" stroke="stroke-current" stroke-width="2"/>
+            </svg>
           </MenuButton>
 
           <transition
@@ -93,11 +91,13 @@
       <!-- Chain Selector -->
       <Menu as="div" class="relative inline-block text-left" v-slot="{ open }">
         <MenuButton
-          class="flex items-center gap-1 px-2 py-[6px] text-[14px] font-medium leading-[20px] transition-colors hover:bg-[#6CE99E] hover:text-gray-950 focus:outline-none"
-          :class="open ? 'bg-[#6CE99E] text-neutral-950' : 'text-white'"
+          class="flex items-center gap-1 px-2 py-[6px] text-[14px] font-medium leading-[20px] transition-colors hover:bg-[#6CE99E] hover:text-gray-1000 focus:outline-none group/icon"
+          :class="open ? 'bg-[#6CE99E] text-gray-1000' : 'text-white'"
         >
           <img :src="currentChain.icon" :alt="currentChain.name" class="h-5 w-5" />
-          <i class="iconfont icon-down" :class="open ? 'rotate-180' : ''"></i>
+          <svg :class="open ? 'rotate-180 stroke-[#0A0A0A]' : 'stroke-[#9B9B9B] group-hover/icon:stroke-[#0A0A0A]'" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.5 6L8 10.5L12.5 6" stroke="stroke-current" stroke-width="2"/>
+          </svg>
         </MenuButton>
 
         <transition
@@ -158,6 +158,7 @@ import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 import BSCIcon from '@/assets/img/BSC.svg'
 import ConnectWalletButton from '@/views/Header/ConnectWalletButton.vue'
 import { ROUTE_NAMES } from '@/router'
+import downIcon from '@/assets/icons/down.svg'
 
 interface Account {
   id: string

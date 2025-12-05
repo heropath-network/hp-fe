@@ -10,7 +10,7 @@
           'relative px-4 py-4 text-sm font-semibold transition',
           selectedTab === tab.key
             ? 'text-white'
-            : 'text-gray-400 hover:text-gray-300'
+            : 'text-gray-400 hover:text-white'
         ]"
       >
         {{ tab.label }}
@@ -73,7 +73,7 @@
           'flex h-full items-center justify-center shrink-0  px-[23px] py-[7px]',
           selectedMarketType === 'perps'
             ? 'bg-[#272727] text-white'
-            : 'bg-[#1d1d1d] text-[#9b9b9b]'
+            : 'bg-[#1d1d1d] text-[#9b9b9b]  hover:text-white'
         ]"
       >
         <p class="text-[13px] font-medium leading-[18px]">Perps</p>
@@ -84,7 +84,7 @@
           'flex h-full items-center justify-center shrink-0 px-[23px] py-[7px]',
           selectedMarketType === 'meme'
             ? 'bg-[#272727] text-white'
-            : 'bg-[#1d1d1d] text-[#9b9b9b]'
+            : 'bg-[#1d1d1d] text-[#9b9b9b] hover:text-white'
         ]"
       >
         <p class="text-[13px] font-medium leading-[18px]">Spot</p>

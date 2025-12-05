@@ -18,7 +18,7 @@
       </div>
 
       <!-- Right: Trading Form -->
-      <div class="w-[343px]  border-l border-gray-800">
+      <div class="w-[343px]  border-l border-gray-700">
         <MemeTradingForm v-if="isMemeMarket" />
         <TradingForm v-else />
       </div>
@@ -54,8 +54,3 @@ const isMemeMarket = computed(() => {
 })
 </script>
 
-<style scoped>
-.trade-view {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-</style>
