@@ -28,28 +28,38 @@
     
     
     <!-- Size Column -->
-    <td class="px-4 py-6 text-right">
-      <div class="flex flex-col gap-1 items-end">
-        <div class="text-[13px] leading-[18px] text-white font-normal">
+    <td class="px-4 py-6 text-left">
+      <Tooltip :content="formatNumber(position.size, 4) + ' ' + props.position.market.split('/')[0]" :width="100" contentClass="!text-center">
+        <div class="text-[13px] leading-[18px] text-white font-normal underline decoration-dotted decoration-[#9b9b9b] underline-offset-[2px]">
           ${{ getPositionSizeUSD() }}
         </div>
-        <div class="text-[13px] leading-[18px] text-[#9b9b9b] font-normal whitespace-nowrap">
-          {{ formatNumber(position.size, 4) }}
-        </div>
-      </div>
+      </Tooltip>
     </td>
 
 
     <!-- Collateral Column -->
-    <td class="px-4 py-6 text-right">
+    <td class="px-4 py-6 text-left">
       <div class="text-[13px] leading-[18px] text-white font-normal whitespace-nowrap">
-        {{ formatCurrency(position.collateral) }}
+        {{ formatCurrency(position.collateral) }} 
+      </div>
+    </td>
+
+    <!-- Margin Column -->
+    <td class="px-4 py-6 text-left">
+      <div class="flex flex-col gap-1">
+        <div class="text-[13px] leading-[18px] text-white font-normal whitespace-nowrap  flex items-center gap-1">
+          {{ formatCurrency(position.collateral) }} 
+          <img :src="addGreenIcon" class="w-[16px] h-[16px] cursor-pointer" />
+        </div>
+        <div class="text-[13px] leading-[18px] text-[#9b9b9b] font-normal whitespace-nowrap">
+          {{ position.isIsolatedMargin ?  'Isolated' : 'Cross' }}
+        </div>
       </div>
     </td>
     
     <!-- Entry Price Column -->
-    <td class="px-4 py-6 text-right">
-      <div class="flex flex-col gap-1 items-end">
+    <td class="px-4 py-6 text-left">
+      <div class="flex flex-col gap-1 items-start">
         <div class="text-[13px] leading-[18px] text-white font-normal">
           ${{ formatNumber(position.entryPrice, 2) }}
         </div>
@@ -57,8 +67,8 @@
     </td>
     
     <!-- Mark Price Column -->
-    <td class="px-4 py-6 text-right">
-      <div class="flex flex-col gap-1 items-end">
+    <td class="px-4 py-6 text-left">
+      <div class="flex flex-col gap-1 items-start">
         <div class="text-[13px] leading-[18px] text-white font-normal">
           ${{ getMarkPrice(position.market) }}
         </div>
@@ -66,7 +76,7 @@
     </td>
     
     <!-- Liq. Price Column -->
-    <td class="px-4 py-6 text-right">
+    <td class="px-4 py-6 text-left">
       <div class="text-[13px] leading-[18px] text-white font-normal">
         ${{ formatNumber(position.liquidationPrice, 2) }}
       </div>
@@ -75,8 +85,8 @@
     
     
     <!-- PnL Column -->
-    <td class="px-4 py-6 text-right">
-      <div class="flex flex-col gap-1 items-end">
+    <td class="px-4 py-6 text-left">
+      <div class="flex flex-col gap-1 items-start">
         <div
           :class="[
             'text-[13px] leading-[18px] font-normal',
@@ -88,11 +98,11 @@
         </div>
         <div
           :class="[
-            'text-[13px] leading-[18px] font-normal',
-            getPositionPnLPercent() >= 0 ? 'text-green-success' : 'text-red-error'
+            'text-[13px] leading-[18px] font-normal text-[#9B9B9B] flex items-center gap-1',
           ]"
         >
-          {{ formatPnLPercentage(getPositionPnLPercent()) }}
+          {{ formatPnLPercentage(getPositionPnLPercent()) }} 
+          <img :src="xIcon" class="w-[16px] h-[16px] cursor-pointer" />
         </div>
       </div>
     </td>
@@ -144,6 +154,8 @@ import PositionFilledNotification from '@/components/Notification/PositionFilled
 import { LoadingIcon, Tooltip } from '@/components'
 import { storeToRefs } from 'pinia'
 import ClosePositionDialog from '@/components/trade/ClosePositionDialog.vue'
+import xIcon from '@/assets/icons/x.svg'
+import addGreenIcon from '@/assets/icons/add-green.svg'
 
 const props = defineProps<{
   position: Position
@@ -217,6 +229,7 @@ function getPositionSizeUSD(): string {
   const positionValue = props.position.collateral * BigInt(props.position.leverage)
   return formatCurrency(positionValue, 2).replace('$', '')
 }
+
 
 // Calculate comprehensive PnL with fees
 const pnlBreakdown = computed(() => {
