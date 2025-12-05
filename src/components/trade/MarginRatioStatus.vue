@@ -39,21 +39,41 @@ const props = withDefaults(defineProps<Props>(), {
 
 const formattedValue = computed(() => props.value.toFixed(2))
 
-// Calculate number of filled bars (1-5 based on value, where each bar represents ~20%)
-const filledBars = computed(() => {
-  const bars = Math.min(5, Math.max(1, Math.ceil(props.value / 20)))
-  return bars
+/**
+ * Calculates the safe index level based on the provided value.
+ * The safe index is normalized to a range of 1-5 by dividing the value by 20 and clamping it.
+ * @returns {number} Safe index level between 1 and 5
+ */
+const safeIndex = computed(() => Math.min(5, Math.max(1, Math.ceil(props.value / 20))))
+
+/**
+ * Determines the safety status type based on the calculated safe index level.
+ * - 'safe': when safe index is 1 or less
+ * - 'warning': when safe index is between 2 and 3
+ * - 'danger': when safe index is 4 or higher
+ * @returns {string} Safety status type: 'safe', 'warning', or 'danger'
+ */
+const safeIndexType = computed(() => {
+  if (safeIndex.value <= 1) {
+    return 'safe'
+  } else if (safeIndex.value <= 3) {
+    return 'warning'
+  } else {
+    return 'danger'
+  }
 })
+
+const filledBars = computed(() => safeIndex.value)
 
 const emptyBars = computed(() => {
   return 5 - filledBars.value
 })
 
-// Determine status class based on margin ratio
+// Determine status class based on safe index type
 const statusClass = computed(() => {
-  if (filledBars.value <= 1) {
+  if (safeIndexType.value === 'safe') {
     return 'bg-green-success'
-  } else if (filledBars.value <= 3) {
+  } else if (safeIndexType.value === 'warning') {
     return 'bg-yellow-500'
   } else {
     return 'bg-red-error'
@@ -61,9 +81,9 @@ const statusClass = computed(() => {
 })
 
 const textStatusClass = computed(() => {
-  if (filledBars.value <= 1) {
+  if (safeIndexType.value === 'safe') {
     return 'text-green-success'
-  } else if (filledBars.value <= 3) {
+  } else if (safeIndexType.value === 'warning') {
     return 'text-yellow-500'
   } else {
     return 'text-red-error'
