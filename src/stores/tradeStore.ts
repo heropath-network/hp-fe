@@ -263,6 +263,10 @@ export const useTradeStore = defineStore('trade', () => {
       return
     }
 
+    // Get margin setting for the market to determine if isolated margin is enabled
+    const marginSetting = getMarginSetting(market)
+    const isIsolatedMargin = marginSetting.mode === 'isolated'
+
     const position: Position = {
       id: `pos-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       accountId: accountId ?? currentAccountId.value!,
@@ -276,6 +280,7 @@ export const useTradeStore = defineStore('trade', () => {
       timestamp: Date.now(),
       chainId: chainId ?? 56, // Default to BNB Chain (56)
       liquiditySource: liquiditySource ?? getLiquiditySourceFromOracle(selectedOracle.value),
+      isIsolatedMargin,
     }
     const allPositions = [...positionsStorage.data.value, position]
     positionsStorage.updatePositions(allPositions)
