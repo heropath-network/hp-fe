@@ -125,7 +125,7 @@
                     >
                       {{ formatSmallPrice(marketPrices[market].price) }}
                     </span>
-                    <span v-else class="text-base font-semibold leading-6 text-[#9b9b9b]">--</span>
+                    <div v-else class="h-4 w-16 animate-pulse bg-[#9b9b9b]"></div>
                     <span
                       v-if="isMarketClosed(market)"
                       class="text-sm leading-5 font-normal text-[#9b9b9b]"
@@ -142,7 +142,7 @@
                       {{ market24hRates[market] >= 0 ? '+' : '' }}
                       {{ market24hRates[market].toFixed(2) }}%
                     </span>
-                    <span v-else class="text-sm leading-5 font-normal text-[#9b9b9b]">--</span>
+                    <div v-else class="mt-2 h-2 w-12 animate-pulse bg-[#9b9b9b]"></div>
                   </div>
                 </div>
               </div>
