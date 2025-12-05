@@ -341,6 +341,8 @@ export const useTradeStore = defineStore('trade', () => {
       closeTimestamp: Date.now(),
       chainId: position.chainId,
       liquiditySource: position.liquiditySource,
+      fee: pnlBreakdown.totalFees,
+      isIsolatedMargin: position.isIsolatedMargin,
     }
     const allTradeHistory = [historyEntry, ...tradeHistoryStorage.data.value]
     tradeHistoryStorage.updateTradeHistory(allTradeHistory)

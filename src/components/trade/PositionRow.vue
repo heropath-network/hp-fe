@@ -409,6 +409,8 @@ async function closePosition(positionId: string) {
       closeTimestamp: Date.now(),
       chainId: position.chainId,
       liquiditySource: position.liquiditySource,
+      fee: pnlBreakdown.totalFees,
+      isIsolatedMargin: position.isIsolatedMargin,
     }
 
    
