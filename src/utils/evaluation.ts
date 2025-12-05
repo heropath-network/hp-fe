@@ -1,5 +1,6 @@
 import { TradeHistory, Position } from '@/storages/trading'
 import * as _ from 'lodash-es'
+import { multiplyBigInt, toBigInt } from './bigint'
 
 export function getAccountHistoryPnl(history: TradeHistory[]): bigint {
   return history.reduce((acc, trade) => acc + (!!trade.closeTimestamp ? trade.pnl : BigInt(0)), BigInt(0))
@@ -7,7 +8,10 @@ export function getAccountHistoryPnl(history: TradeHistory[]): bigint {
 
 export function getAccountTotalVolume(history: TradeHistory[]): bigint {
   return history.reduce(
-    (acc, trade) => acc + (!!trade.closeTimestamp ? trade.exitPrice * trade.size : trade.entryPrice * trade.size),
+    (acc, trade) => {
+      const price = !!trade.closeTimestamp ? trade.exitPrice : trade.entryPrice
+      return acc + multiplyBigInt(price, trade.size)
+    },
     BigInt(0),
   )
 }
@@ -44,16 +48,10 @@ export function getPositionsUnrealizedPnl(positions: Position[], price: Record<s
       return acc
     }
 
-    const entryPriceNum = Number(position.entryPrice.toString())
-    const sizeNum = Number(position.size.toString())
+    const marketPriceBigInt = toBigInt(marketPrice)
+    const priceDiff = position.side === 'long' ? marketPriceBigInt - position.entryPrice : position.entryPrice - marketPriceBigInt
+    const pnl = multiplyBigInt(priceDiff, position.size)
 
-    let pnl = 0
-    if (position.side === 'long') {
-      pnl = (marketPrice - entryPriceNum) * sizeNum
-    } else {
-      pnl = (entryPriceNum - marketPrice) * sizeNum
-    }
-
-    return acc + BigInt(Math.floor(pnl))
+    return acc + pnl
   }, BigInt(0))
 }

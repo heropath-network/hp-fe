@@ -16,7 +16,7 @@ export function toBigInt(value: number | string): bigint {
     const fraction = (parts[1] || '').padEnd(DECIMALS, '0').substring(0, DECIMALS)
     return BigInt(whole + fraction)
   }
-  return BigInt(Math.floor(value * (10 ** DECIMALS)))
+  return BigInt(Math.floor(value * 10 ** DECIMALS))
 }
 
 /**
@@ -39,7 +39,7 @@ export function formatCurrency(value: bigint, decimals: number = 2): string {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
+    maximumFractionDigits: decimals,
   }).format(num)
 }
 
@@ -50,7 +50,7 @@ export function formatNumber(value: bigint, decimals: number = 2): string {
   const num = parseFloat(fromBigInt(value, decimals))
   return new Intl.NumberFormat('en-US', {
     minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
+    maximumFractionDigits: decimals,
   }).format(num)
 }
 
@@ -82,11 +82,11 @@ export function divideBigInt(a: bigint, b: bigint): bigint {
  */
 export function calculatePnLPercentage(entryPrice: bigint, currentPrice: bigint, side: 'long' | 'short'): number {
   if (entryPrice === BigInt(0)) return 0
-  
+
   const priceDiff = currentPrice - entryPrice
   const multiplier = side === 'long' ? 1 : -1
   const pnlPercent = (Number(priceDiff) / Number(entryPrice)) * 100 * multiplier
-  
+
   return pnlPercent
 }
 
@@ -106,7 +106,7 @@ export function formatPercentage(value: number, decimals: number = 2): string {
  */
 export function formatPrice(value: number | bigint | string, decimals: number = 0): string {
   let num: number
-  
+
   if (typeof value === 'bigint') {
     num = parseFloat(fromBigInt(value, 8))
   } else if (typeof value === 'string') {
@@ -114,16 +114,16 @@ export function formatPrice(value: number | bigint | string, decimals: number = 
   } else {
     num = value
   }
-  
+
   // Round if decimals is 0
   if (decimals === 0) {
     num = Math.round(num)
   }
-  
+
   // Format with thousand separators
   return new Intl.NumberFormat('en-US', {
     minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
+    maximumFractionDigits: decimals,
   }).format(num)
 }
 
@@ -208,4 +208,8 @@ function toPlainString(value: number | bigint | string): string {
   const zeros = -exp - 1
   const shifted = `0.${'0'.repeat(zeros)}${digits}`
   return isNegative ? `-${shifted}` : shifted
+}
+
+export function absBigInt(n: bigint): bigint {
+  return n < 0n ? -n : n
 }

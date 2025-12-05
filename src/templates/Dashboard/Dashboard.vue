@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useConnection } from '@wagmi/vue'
-import { ellipsisMiddle, formatNumber, getAccountTypeLabel } from '@/utils/common'
+import { ellipsisMiddle, getAccountTypeLabel } from '@/utils/common'
 import { computed, ref, watch } from 'vue'
 import { useDayCountDown } from '@/use/useDayCountDown'
 import BaseIcon from '@/components/BaseIcon.vue'
@@ -11,6 +11,7 @@ import { useAllTokenPrices } from '@/use/useTokenPrices'
 import { EvaluationGlobalConfigInfo } from '@/config/evaluation'
 import { useEvaluationAccount } from '@/composables/useEvaluationAccount'
 import { useRoute } from 'vue-router'
+import { formatNumber, multiplyBigInt, toBigInt, absBigInt } from '@/utils/bigint'
 
 const { remainingText: dayCountDown } = useDayCountDown()
 
@@ -21,12 +22,7 @@ const { data: allPositions } = useUserPositionsStorage(address)
 const { prices: allTokenPrices } = useAllTokenPrices()
 const route = useRoute()
 
-const {
-  evaluationList,
-  selectedEvaluationId,
-  selectedEvaluation,
-  selectEvaluation,
-} = useEvaluationAccount()
+const { evaluationList, selectedEvaluationId, selectedEvaluation, selectEvaluation } = useEvaluationAccount()
 
 const accountTradeHistory = computed(() => {
   if (!selectedEvaluation.value) {
@@ -57,7 +53,7 @@ const selectedEvaluationLabel = computed(() => {
   if (!selectedEvaluation.value) {
     return 'Select Evaluation'
   }
-  const size = selectedEvaluation.value.evaluationConfig.accountSize
+  const size = toBigInt(selectedEvaluation.value.evaluationConfig.accountSize)
   return `${getAccountTypeLabel(selectedEvaluation.value.accountType)} #${
     selectedEvaluation.value.accountId
   }: $${formatNumber(size, 0)}`
@@ -65,9 +61,9 @@ const selectedEvaluationLabel = computed(() => {
 
 const accountSize = computed(() => {
   if (!selectedEvaluation.value) {
-    return 0
+    return BigInt(0)
   }
-  return selectedEvaluation.value.evaluationConfig.accountSize
+  return toBigInt(selectedEvaluation.value.evaluationConfig.accountSize)
 })
 
 const historyPnl = computed(() => {
@@ -85,46 +81,36 @@ const positionsUnrealizedPnl = computed(() => {
 })
 
 const pnl = computed(() => {
-  return Number(historyPnl.value + positionsUnrealizedPnl.value)
+  return historyPnl.value + positionsUnrealizedPnl.value
 })
 
 const accountBalance = computed(() => {
-  if (!selectedEvaluation.value) {
-    return 0
-  }
   return accountSize.value + pnl.value
 })
 
 const priorDayBalance = computed(() => {
-  if (!selectedEvaluation.value) {
-    return 0
-  }
-  return selectedEvaluation.value.evaluationConfig.accountSize
+  return accountSize.value
 })
 
 const totalVolume = computed(() => {
-  return Number(getAccountTotalVolume(accountTradeHistory.value))
+  return getAccountTotalVolume(accountTradeHistory.value)
 })
 
 const targetEquity = computed(() => {
   if (!selectedEvaluation.value) {
-    return 0
+    return BigInt(0)
   }
-  return selectedEvaluation.value.evaluationConfig.accountSize + selectedEvaluation.value.evaluationConfig.profitGoal
+  return accountSize.value + toBigInt(selectedEvaluation.value.evaluationConfig.profitGoal)
 })
 
 const maxDrawdownEquityLimit = computed(() => {
-  if (!selectedEvaluation.value) {
-    return 0
-  }
-  return selectedEvaluation.value.evaluationConfig.accountSize * (1 - EvaluationGlobalConfigInfo.maxDrawdown / 100)
+  const maxDrawdownMultiplier = toBigInt(1 - EvaluationGlobalConfigInfo.maxDrawdown / 100)
+  return multiplyBigInt(accountSize.value, maxDrawdownMultiplier)
 })
 
 const maxDailyLossEquityLimit = computed(() => {
-  if (!selectedEvaluation.value) {
-    return 0
-  }
-  return priorDayBalance.value * (1 - EvaluationGlobalConfigInfo.maxDailyLoss / 100)
+  const maxDailyLossMultiplier = toBigInt(1 - EvaluationGlobalConfigInfo.maxDailyLoss / 100)
+  return multiplyBigInt(priorDayBalance.value, maxDailyLossMultiplier)
 })
 
 const showEvaluationDropdown = ref(false)
@@ -219,7 +205,7 @@ function handleSelectEvaluation(id: string) {
                 >
                   {{
                     `${getAccountTypeLabel(evaluation.accountType)} #${evaluation.accountId}: $${formatNumber(
-                      evaluation.evaluationConfig.accountSize,
+                      toBigInt(evaluation.evaluationConfig.accountSize),
                       0,
                     )}`
                   }}
@@ -248,7 +234,9 @@ function handleSelectEvaluation(id: string) {
           </div>
 
           <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
-            <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">${{ formatNumber(pnl, 2) }}</p>
+            <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
+              {{ pnl < 0 ? '-' : '' }}${{ formatNumber(absBigInt(pnl), 2) }}
+            </p>
             <p class="text-sm leading-5 text-[var(--hp-text-color)]">PNL</p>
           </div>
 

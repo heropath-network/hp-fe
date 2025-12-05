@@ -3,12 +3,13 @@ import { computed, Ref, ref } from 'vue'
 import { HpSwitch } from '@/components'
 import { useAccountShowInLeaderboard, useUserEvaluationsStorage } from '@/storages/heroPath'
 import { useConnection } from '@wagmi/vue'
-import { formatNumber, formatDate, getAccountTypeLabel, getAccountStatusLabel } from '@/utils/common'
+import { formatDate, getAccountTypeLabel, getAccountStatusLabel } from '@/utils/common'
 import { useUserTradeHistoryStorage } from '@/storages/trading'
 import { useUserPayoutsStorage } from '@/storages/heroPath'
 import { countTradesWinRate, getAccountHistoryPnl, getAccountTotalVolume } from '@/utils/evaluation'
 import { SHARE_OF_PROFIT } from '@/constants'
 import * as _ from 'lodash-es'
+import { formatNumber, formatPercentage, multiplyBigInt, toBigInt } from '@/utils/bigint'
 
 const { address } = useConnection()
 
@@ -60,12 +61,14 @@ const filteredUserEvaluations = computed(() => {
 
 const leaderboardVisible = useAccountShowInLeaderboard(address)
 
+const withdrawnAmount = computed(() => toBigInt(payoutsInfo.value.withdrawnAmount))
+
 const evaluationTradingVolume = computed(() => {
-  return Number(getAccountTotalVolume(evaluationTradeHistory.value))
+  return getAccountTotalVolume(evaluationTradeHistory.value)
 })
 
 const fundedTradingVolume = computed(() => {
-  return Number(getAccountTotalVolume(fundedTradeHistory.value))
+  return getAccountTotalVolume(fundedTradeHistory.value)
 })
 
 const lifetimeTradingVolume = computed(() => {
@@ -73,11 +76,12 @@ const lifetimeTradingVolume = computed(() => {
 })
 
 const totalPnl = computed(() => {
-  return Number(getAccountHistoryPnl(fundedTradeHistory.value)) * SHARE_OF_PROFIT
+  return multiplyBigInt(getAccountHistoryPnl(fundedTradeHistory.value), toBigInt(SHARE_OF_PROFIT))
 })
 
 const currentWithdrawableProfit = computed(() => {
-  return totalPnl.value - payoutsInfo.value.withdrawnAmount
+  const available = totalPnl.value - withdrawnAmount.value
+  return available > 0n ? available : BigInt(0)
 })
 
 const tradeWinRateInfo = computed(() => {
@@ -95,7 +99,7 @@ const tradingWinRate = computed(() => {
 })
 
 const lifetimeProfitWithdrawn = computed(() => {
-  return payoutsInfo.value.withdrawnAmount + currentWithdrawableProfit.value
+  return withdrawnAmount.value + currentWithdrawableProfit.value
 })
 
 function onUpdateDropdownStatus(accountId: string, value: boolean) {
@@ -136,7 +140,7 @@ function onUpdatePublicProfileStatus(accountId: string, value: boolean) {
         </div>
         <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
           <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
-            {{ formatNumber(tradingWinRate, 2) }}%
+            {{ formatPercentage(tradingWinRate, 2) }}
           </p>
           <p class="text-sm leading-5 text-[var(--hp-text-color)]">Trading Win Rate</p>
         </div>

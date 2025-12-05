@@ -6,12 +6,13 @@ import { EvaluationPlan, EvaluationConfig } from '@/types/evaluation'
 import { useConnection, useSignTypedData } from '@wagmi/vue'
 import { TOKEN_PRICES, PaymentTokens } from '@/config/paymentTokens'
 import { useUserEvaluationsStorage } from '@/storages/heroPath'
-import { formatNumber, generateTimeBasedSixDigitId } from '@/utils/common'
+import { generateTimeBasedSixDigitId } from '@/utils/common'
 import { BaseIcon, LoadingIcon } from '@/components'
 import { usePaymentTokenPrices } from '@/use/usePaymentTokenPrices'
 import { EvaluationGlobalConfigInfo, EvaluationPlanConfig } from '@/config/evaluation'
 import { useUserQuestDiscountStatusStorage } from '@/storages/heroPath'
 import { QUEST_DISCOUNT_AMOUNT } from '@/constants'
+import { divideBigInt, formatNumber, fromBigInt, multiplyBigInt, toBigInt } from '@/utils/bigint'
 
 const requireSymbolIcon = (symbol: string) => {
   return new URL(`/src/assets/icons/tokens/${symbol}.svg`, import.meta.url).href
@@ -77,43 +78,37 @@ const selectedTokenPrice = computed(() => {
   return apiPrices.value[selectedToken.value.symbol] ?? TOKEN_PRICES[selectedToken.value.symbol] ?? 0
 })
 
+const selectedTokenPriceBigInt = computed(() => toBigInt(selectedTokenPrice.value))
+const selectedTokenBalanceBigInt = computed(() => toBigInt(selectedToken.value.balance ?? 0))
+
 const selectedTokenUsdBalance = computed(() => {
-  const balance = Number(selectedToken.value.balance ?? 0)
-  const price = selectedTokenPrice.value
-  return balance * price
+  return multiplyBigInt(selectedTokenBalanceBigInt.value, selectedTokenPriceBigInt.value)
 })
 
 const selectedAccount = computed(() => accountOptions.value[selectedAccountIndex.value])
 
-const basePrice = computed(() => (selectedAccount.value ? selectedAccount.value.fee : 0))
-const profitSplitFee = computed(() => (profitSplitChecked.value ? Number((basePrice.value * 0.1).toFixed(2)) : 0))
+const questDiscountBigInt = toBigInt(QUEST_DISCOUNT_AMOUNT)
+const basePrice = computed(() => (selectedAccount.value ? toBigInt(selectedAccount.value.fee) : BigInt(0)))
+const profitSplitFee = computed(() => (profitSplitChecked.value ? multiplyBigInt(basePrice.value, toBigInt(0.1)) : BigInt(0)))
 const purchaseTotal = computed(() => basePrice.value + profitSplitFee.value)
 const discountPurchaseTotal = computed(() => {
   if (unusedDiscounts.value.length > 0) {
-    return Math.max(0, Number(purchaseTotal.value) - QUEST_DISCOUNT_AMOUNT)
+    return purchaseTotal.value > questDiscountBigInt ? purchaseTotal.value - questDiscountBigInt : BigInt(0)
   }
   return purchaseTotal.value
 })
 
 const purchaseTotalTokenAmount = computed(() => {
-  const price = selectedTokenPrice.value
-  if (price > 0) {
-    return Number(purchaseTotal.value) / price
-  }
-  return null
+  return divideBigInt(purchaseTotal.value, selectedTokenPriceBigInt.value)
 })
 
 const discountPurchaseTotalTokenAmount = computed(() => {
-  const price = selectedTokenPrice.value
-  if (price > 0) {
-    return Number(discountPurchaseTotal.value) / price
-  }
-  return null
+  return divideBigInt(discountPurchaseTotal.value, selectedTokenPriceBigInt.value)
 })
 
 const productLabel = computed(() => {
   const size = selectedAccount.value?.accountSize ?? 0
-  return `$${size.toLocaleString()}`
+  return `$${formatNumber(toBigInt(size), 0)}`
 })
 
 const profitSplitLabel = computed(() => {
@@ -121,9 +116,8 @@ const profitSplitLabel = computed(() => {
   return `${split}/${100 - split} Profit Split`
 })
 
-function formatCurrency(value: number | string) {
-  const num = typeof value === 'string' ? Number(value) : value
-  return `$${num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+function formatCurrency(value: bigint) {
+  return `$${formatNumber(value, 2)}`
 }
 
 function selectAccount(index: number) {
@@ -190,7 +184,7 @@ function handleBack() {
 
 const isInsufficientBalance = computed(() => {
   const balanceUsd = selectedTokenUsdBalance.value
-  return balanceUsd < Number(discountPurchaseTotal.value)
+  return balanceUsd < discountPurchaseTotal.value
 })
 
 const confirmButtonDisabled = computed(() => {
@@ -210,7 +204,7 @@ async function handlePurchase() {
   }
 
   const evaluationId = generateTimeBasedSixDigitId()
-  const signMsg = `Purchase Evaluation Order\n\nEvaluation ID: ${evaluationId}\nProduct: ${productLabel.value}\nTotal: $${purchaseTotal.value}\n\n.`
+  const signMsg = `Purchase Evaluation Order\n\nEvaluation ID: ${evaluationId}\nProduct: ${productLabel.value}\nTotal: $${fromBigInt(purchaseTotal.value, 2)}\n\n.`
 
   try {
     const evaluationConfig = payload.account
@@ -393,7 +387,7 @@ async function handlePurchase() {
             <div class="border border-[var(--hp-line-light-color)] p-4 w-[calc(50%-6px)]">
               <div class="flex items-center justify-between text-sm text-[var(--hp-text-color)]">
                 <span>Pay <span class="text-[var(--hp-primary-green)]">*</span></span>
-                <span> Balance: {{ formatNumber(selectedToken.balance, selectedToken.formatDecimals) }} </span>
+                <span> Balance: {{ formatNumber(toBigInt(selectedToken.balance ?? 0), selectedToken.formatDecimals) }} </span>
               </div>
               <div class="relative">
                 <button
@@ -461,7 +455,7 @@ async function handlePurchase() {
               <span class="text-[var(--hp-text-color)]">Purchase</span>
               <span class="text-xl font-semibold text-[var(--hp-primary-green)]">
                 <template v-if="unusedDiscounts.length > 0">
-                  <template v-if="discountPurchaseTotal <= 0">Free</template>
+                  <template v-if="discountPurchaseTotal <= 0n">Free</template>
                   <template v-else>
                     <span class="opacity-70 line-through">{{
                       purchaseTotalTokenAmount

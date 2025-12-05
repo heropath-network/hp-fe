@@ -81,9 +81,7 @@
                 @click="setClosePercentage(percent)"
                 :class="[
                   'flex-1 h-8 flex items-center justify-center px-4 text-[14px] font-medium leading-[20px] transition-colors bg-[#373737]',
-                  selectedPercentage === percent
-                    ? ' text-[#6CE99E]'
-                    : ' text-[#9b9b9b] hover:bg-[#414141]'
+                  selectedPercentage === percent ? ' text-[#6CE99E]' : ' text-[#9b9b9b] hover:bg-[#414141]',
                 ]"
               >
                 {{ percent }}%
@@ -103,9 +101,12 @@
               >
                 <MarketIcon :symbol="selectedToken" :size="20" />
                 <span class="text-[14px] font-medium leading-[20px] text-white">{{ selectedToken }}</span>
-                <i class="iconfont icon-down text-white text-[16px] transition-transform" :class="{ 'rotate-180': showTokenSelector }"></i>
+                <i
+                  class="iconfont icon-down text-white text-[16px] transition-transform"
+                  :class="{ 'rotate-180': showTokenSelector }"
+                ></i>
               </button>
-              
+
               <!-- Dropdown Menu -->
               <div
                 v-if="showTokenSelector"
@@ -117,7 +118,7 @@
                   @click.stop="selectToken(token)"
                   :class="[
                     'w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-[#373737] transition-colors',
-                    selectedToken === token ? 'bg-[#373737]' : ''
+                    selectedToken === token ? 'bg-[#373737]' : '',
                   ]"
                 >
                   <MarketIcon :symbol="token" :size="16" />
@@ -160,19 +161,23 @@
           <span class="text-[14px] leading-[20px] text-[#9b9b9b]">Price Impact</span>
           <span class="text-[14px] leading-[20px] text-white text-right">{{ formatPercentage(priceImpact) }}%</span>
         </div>
-          <div class="flex items-center justify-between">
-            <span class="text-[14px] leading-[20px] text-[#9b9b9b]">Max. Position Slippage</span>
-            <div class="flex items-center gap-1">
-              <span class="text-[14px] leading-[20px] text-white text-right">≤ 1.000%</span>
-              <i class="iconfont icon-edit text-white text-[16px] cursor-pointer"></i>
-            </div>
+        <div class="flex items-center justify-between">
+          <span class="text-[14px] leading-[20px] text-[#9b9b9b]">Max. Position Slippage</span>
+          <div class="flex items-center gap-1">
+            <span class="text-[14px] leading-[20px] text-white text-right">≤ 1.000%</span>
+            <i class="iconfont icon-edit text-white text-[16px] cursor-pointer"></i>
           </div>
+        </div>
         <div class="flex items-center justify-between">
           <span class="text-[14px] leading-[20px] text-[#9b9b9b]">Size</span>
           <div class="flex items-center gap-1">
-            <span class="text-[14px] leading-[20px] text-[#9b9b9b]">{{ formatAmount(beforeSize) }} {{ position?.market }}</span>
+            <span class="text-[14px] leading-[20px] text-[#9b9b9b]"
+              >{{ formatAmount(beforeSize) }} {{ position?.market }}</span
+            >
             <span class="text-[14px] leading-[20px] text-[#9b9b9b]">→</span>
-            <span class="text-[14px] leading-[20px] text-white">{{ formatAmount(afterSize) }} {{ position?.market }}</span>
+            <span class="text-[14px] leading-[20px] text-white"
+              >{{ formatAmount(afterSize) }} {{ position?.market }}</span
+            >
           </div>
         </div>
         <div class="flex items-center justify-between">
@@ -201,12 +206,13 @@
         </div>
         <div class="flex items-center justify-between">
           <span class="text-[14px] leading-[20px] text-[#9b9b9b]">Current Total PNL</span>
-          <span :class="[
-            'text-[14px] leading-[20px] text-right',
-            currentPNL >= 0 ? 'text-[#10c8a8]' : 'text-[#ff6b6b]'
-          ]">
-            {{ currentPNL >= 0 ? '+' : '-' }}${{ formatPrice(Math.abs(currentPNL)) }} 
-            <span class="text-[#9b9b9b]">({{ currentPNL >= 0 ? '+' : '-' }}{{ formatPercentage(currentPNLPercentage) }}%)</span>
+          <span
+            :class="['text-[14px] leading-[20px] text-right', currentPNL >= 0 ? 'text-[#10c8a8]' : 'text-[#ff6b6b]']"
+          >
+            {{ currentPNL >= 0 ? '+' : '-' }}${{ formatPrice(Math.abs(currentPNL)) }}
+            <span class="text-[#9b9b9b]"
+              >({{ currentPNL >= 0 ? '+' : '-' }}{{ formatPercentage(currentPNLPercentage) }}%)</span
+            >
           </span>
         </div>
       </div>
@@ -217,31 +223,25 @@
       <!-- Close Cost and You Will Receive -->
       <div class="flex flex-col gap-1">
         <div class="flex items-center justify-between">
-          <span class="text-[14px] leading-[20px] text-[#9b9b9b] ">Close Cost</span>
-          <span class="text-[14px] leading-[20px] text-white text-right ">${{ formatPrice(closeCost) }}</span>
+          <span class="text-[14px] leading-[20px] text-[#9b9b9b]">Close Cost</span>
+          <span class="text-[14px] leading-[20px] text-white text-right">${{ formatPrice(closeCost) }}</span>
         </div>
         <div class="flex items-center justify-between">
           <span class="text-[14px] leading-[20px] text-[#9b9b9b]">You Will Receive</span>
-          <span class="text-[14px] leading-[20px] text-[#10c8a8] text-right ">
-            ${{ formatPrice(youWillReceive) }}
-          </span>
+          <span class="text-[14px] leading-[20px] text-[#10c8a8] text-right"> ${{ formatPrice(youWillReceive) }} </span>
         </div>
       </div>
 
       <!-- Checkbox and Close Button -->
       <div class="flex flex-col gap-3 mt-4">
         <div class="flex items-center gap-2">
-          <input
-            type="checkbox"
-            v-model="ignoreMaxSlippage"
-            class="w-4 h-4 border border-[#9b9b9b]  cursor-pointer"
-          />
+          <input type="checkbox" v-model="ignoreMaxSlippage" class="w-4 h-4 border border-[#9b9b9b] cursor-pointer" />
           <span class="text-[14px] leading-[20px] text-white">Ignore Max. Position Slippage</span>
         </div>
         <button
           @click="handleClosePosition"
           :disabled="!canClose"
-          class="w-full h-[52px] bg-[#6ce99e] text-[#000] text-[16px] font-medium leading-[24px]  transition-colors hover:bg-[#5dd88a] disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full h-[52px] bg-[#6ce99e] text-[#000] text-[16px] font-medium leading-[24px] transition-colors hover:bg-[#5dd88a] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Close
         </button>
@@ -255,9 +255,8 @@ import { computed, ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import Dialog from '@/components/Dialog.vue'
 import type { Position } from '@/storages/trading'
 import type { LiquiditySourceId } from '@/constants/liquiditySources'
-import { fromBigInt, toBigInt } from '@/utils/bigint'
+import { formatNumber, fromBigInt, toBigInt } from '@/utils/bigint'
 import { calculatePositionPnL } from '@/utils/pnl'
-import { formatNumber } from '@/utils/common'
 import MarketIcon from '@/components/common/MarketIcon.vue'
 
 interface Props {
@@ -326,7 +325,7 @@ const afterLeverage = computed(() => {
   if (!props.position) return 0
   const closeAmountBigInt = getCloseAmountBigInt()
   if (closeAmountBigInt >= props.position.size) return 0
-  
+
   // If closing proportionally, leverage typically stays the same
   // Leverage = Size / Collateral, so if we close proportionally:
   // remainingCollateral = remainingSize / leverage
@@ -368,13 +367,13 @@ const priceImpact = computed(() => {
 
 const maxROE = computed(() => {
   if (!props.position || props.position.leverage === 0) return 0
-  
+
   // Max ROE represents the maximum profit percentage relative to margin
   // Max profit is typically: (leverage - 1) * margin, but limited by pool capacity
   // For a simplified calculation: Max ROE ≈ (leverage - 1) * 100%
   // This represents the theoretical maximum return if price moves favorably
   const theoreticalMaxRoe = (props.position.leverage - 1) * 100
-  
+
   // Cap at reasonable maximum (900% as seen in mux-fe for some protocols)
   const cappedRoe = Math.min(theoreticalMaxRoe, 900)
   return cappedRoe
@@ -382,24 +381,24 @@ const maxROE = computed(() => {
 
 const currentPNL = computed(() => {
   if (!props.position) return 0
-  
+
   const closeAmountBigInt = getCloseAmountBigInt()
   if (closeAmountBigInt === BigInt(0)) return 0
-  
+
   const closeRatio = Number(closeAmountBigInt) / Number(props.position.size)
   const positionSizeUsd = parseFloat(fromBigInt(props.position.size, 18)) * currentMarketPrice.value
   const entryPriceValue = parseFloat(fromBigInt(props.position.entryPrice, 8))
-  
+
   const priceDiff = currentMarketPrice.value - entryPriceValue
   const multiplier = props.position.side === 'long' ? 1 : -1
   const pnl = (priceDiff / entryPriceValue) * positionSizeUsd * multiplier * closeRatio
-  
+
   return pnl
 })
 
 const currentPNLPercentage = computed(() => {
   if (!props.position) return 0
-  
+
   const currentPrice = toBigInt(currentMarketPrice.value.toString())
   const pnlBreakdown = calculatePositionPnL(
     props.position.entryPrice,
@@ -409,9 +408,9 @@ const currentPNLPercentage = computed(() => {
     props.position.leverage,
     props.position.collateral,
     props.position.timestamp,
-    true // Include fees
+    true, // Include fees
   )
-  
+
   // Return ROE (Return on Equity) - netPnlPercent
   return pnlBreakdown.netPnlPercent
 })
@@ -421,7 +420,7 @@ const closeCost = computed(() => {
   if (!props.position) return 0
   const closeAmountBigInt = getCloseAmountBigInt()
   if (closeAmountBigInt === BigInt(0)) return 0
-  
+
   const closeSizeUsd = parseFloat(fromBigInt(closeAmountBigInt, 18)) * currentMarketPrice.value
   return closeSizeUsd * 0.001 // 1% fee
 })
@@ -430,12 +429,12 @@ const youWillReceive = computed(() => {
   if (!props.position) return 0
   const closeAmountBigInt = getCloseAmountBigInt()
   if (closeAmountBigInt === BigInt(0)) return 0
-  
+
   const closeRatio = Number(closeAmountBigInt) / Number(props.position.size)
   const collateralToReceive = beforeCollateral.value * closeRatio
   const pnlToReceive = currentPNL.value
   const cost = closeCost.value
-  
+
   return collateralToReceive + pnlToReceive - cost
 })
 
@@ -450,7 +449,7 @@ function getCloseAmountBigInt(): bigint {
   try {
     const amount = parseFloat(closeAmount.value)
     if (isNaN(amount) || amount <= 0) return BigInt(0)
-    
+
     // Convert to BigInt with 18 decimals
     return toBigInt(amount.toString())
   } catch {
@@ -460,7 +459,7 @@ function getCloseAmountBigInt(): bigint {
 
 function setClosePercentage(percent: number) {
   if (!props.position) return
-  
+
   selectedPercentage.value = percent
   const maxAmount = parseFloat(fromBigInt(props.position.size, 18))
   const amount = (maxAmount * percent) / 100
@@ -470,14 +469,14 @@ function setClosePercentage(percent: number) {
 function handleAmountInput(event: Event) {
   const target = event.target as HTMLInputElement
   const value = target.value
-  
+
   // Validate input
   if (value === '' || value === '0') {
     closeAmount.value = ''
     selectedPercentage.value = null
     return
   }
-  
+
   // Update percentage if amount is set
   if (props.position) {
     const amount = parseFloat(value)
@@ -504,12 +503,14 @@ function formatPrice(value: number): string {
   if (value < 1) {
     return value.toFixed(4)
   }
-  return formatNumber(value, 2)
+  return formatNumber(toBigInt(value.toString()), 2)
 }
 
 function formatAmount(value: bigint): string {
   if (value === BigInt(0)) return '0'
-  return parseFloat(fromBigInt(value, 18)).toFixed(4).replace(/\.?0+$/, '')
+  return parseFloat(fromBigInt(value, 18))
+    .toFixed(4)
+    .replace(/\.?0+$/, '')
 }
 
 function formatLeverage(leverage: number): string {
@@ -549,26 +550,33 @@ function handleClosePosition() {
 }
 
 // Watch for position changes
-watch(() => props.position, (newPosition) => {
-  if (newPosition) {
-    // Set default to 100%
-    setClosePercentage(100)
-  }
-}, { immediate: true })
+watch(
+  () => props.position,
+  (newPosition) => {
+    if (newPosition) {
+      // Set default to 100%
+      setClosePercentage(100)
+    }
+  },
+  { immediate: true },
+)
 
 // Watch for dialog visibility to reset and recalculate when it opens
-watch(() => props.visible, (isVisible) => {
-  if (isVisible && props.position) {
-    // Reset form state
-    closeAmount.value = ''
-    selectedPercentage.value = null
-    // Set default to 100% when dialog opens
-    // Use nextTick to ensure reactive updates happen
-    nextTick(() => {
-      setClosePercentage(100)
-    })
-  }
-})
+watch(
+  () => props.visible,
+  (isVisible) => {
+    if (isVisible && props.position) {
+      // Reset form state
+      closeAmount.value = ''
+      selectedPercentage.value = null
+      // Set default to 100% when dialog opens
+      // Use nextTick to ensure reactive updates happen
+      nextTick(() => {
+        setClosePercentage(100)
+      })
+    }
+  },
+)
 
 // Close dropdown when clicking outside
 function handleClickOutside(event: MouseEvent) {
@@ -592,7 +600,7 @@ onUnmounted(() => {
 </style>
 
 <style>
-.close-position-dialog [class*="DialogPanel"] {
+.close-position-dialog [class*='DialogPanel'] {
   width: 400px !important;
   max-width: 90vw !important;
   background-color: #1d1d1d !important;

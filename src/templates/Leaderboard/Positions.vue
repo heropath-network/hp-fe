@@ -5,6 +5,7 @@ import BnbIcon from '@/assets/icons/tokens/BNB.svg'
 import EthIcon from '@/assets/icons/tokens/ETH.svg'
 import BtcIcon from '@/assets/icons/tokens/BTC.svg'
 import { ellipsisMiddle } from '@/utils/common'
+import { formatNumber as formatBigNumber, toBigInt } from '@/utils/bigint'
 
 type MarketKey = 'BNB' | 'ETH' | 'BTC'
 type PositionRow = {
@@ -38,9 +39,9 @@ const formattedRows = computed(() =>
   positions.value.map((row) => ({
     ...row,
     leverageLabel: `${row.leverage.toFixed(1)}x`,
-    sizeLabel: `$${formatNumber(row.size)}`,
-    entryLabel: `$${formatNumber(row.entryPrice, 1)}`,
-    pnlLabel: `${row.pnl >= 0 ? '+' : '-'} $${formatNumber(Math.abs(row.pnl))}`,
+    sizeLabel: `$${formatBigNumber(toBigInt(row.size), 0)}`,
+    entryLabel: `$${formatBigNumber(toBigInt(row.entryPrice), 1)}`,
+    pnlLabel: `${row.pnl >= 0 ? '+' : '-'} $${formatBigNumber(toBigInt(Math.abs(row.pnl)), 0)}`,
     isPositive: row.pnl >= 0,
     marketIcon: marketIcons[row.market],
   })),
@@ -97,13 +98,6 @@ function randomAddress(): string {
 
 function randomNumber(min: number, max: number) {
   return Math.random() * (max - min) + min
-}
-
-function formatNumber(value: number, decimals = 0) {
-  return value.toLocaleString('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  })
 }
 
 const SortIcon = defineComponent({
