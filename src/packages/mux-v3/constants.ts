@@ -12,5 +12,5 @@ export const MUX3_MQTT_SERVICE_USERNAME = import.meta.env.PROD ? 'muxoracle' : '
 export const MUX3_MQTT_SERVICE_PASSWORD = import.meta.env.PROD ? 'muxoracle' : 'mux3oracle'
 export const MUX3_MQTT_SERVICE_USE_SSL = true
 
-export const MUX_V3_SUPPORTED_MARKETS = new Set<string>(['BTC/USD', 'ETH/USD']) 
+export const MUX_V3_SUPPORTED_MARKETS = new Set<string>(['BTC/USD', 'ETH/USD', 'BNB/USD']) 
 
