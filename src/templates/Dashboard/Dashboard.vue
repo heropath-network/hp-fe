@@ -15,6 +15,7 @@ import { formatNumber, multiplyBigInt, toBigInt, absBigInt } from '@/utils/bigin
 import type { EvaluationPlanBaseConfig } from '@/types/evaluation'
 import { inferPlanFromConfig } from '@/utils/evaluationPlan'
 import AboutAccountDialog from '@/templates/Evaluation/AboutAccountDialog.vue'
+import HeroPrizeDescDialog from '@/templates/Evaluation/HeroPrizeDescDialog.vue'
 
 const { remainingText: dayCountDown } = useDayCountDown()
 
@@ -28,6 +29,7 @@ const route = useRoute()
 const { evaluationList, selectedEvaluationId, selectedEvaluation, selectEvaluation } = useEvaluationAccount()
 
 const showAboutAccountDialog = ref(false)
+const showHeroPrizeDescDialog = ref(false)
 
 const accountTradeHistory = computed(() => {
   if (!selectedEvaluation.value) {
@@ -119,8 +121,6 @@ const selectedPlanBase = computed<EvaluationPlanBaseConfig | null>(() => {
 
   return matchedPlan?.base ?? null
 })
-
-const profitSplit = computed(() => selectedPlanBase.value?.profitSplit ?? 0)
 
 const maxDrawdownEquityLimit = computed(() => {
   if (!selectedPlanBase.value) {
@@ -317,8 +317,13 @@ function openTradeTerminal() {
           <template v-if="selectedEvaluation?.accountType === 'funded'">
             <article class="flex h-[100px] flex-col justify-center gap-2 bg-[var(--hp-bg-light)] px-6 py-5">
               <div>
-                <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">{{ profitSplit }}%</p>
-                <p class="text-sm leading-5 text-[var(--hp-text-color)]">Profit Share</p>
+                <p
+                  class="text-xl font-semibold leading-7 text-[var(--hp-primary-green)] underline cursor-pointer"
+                  @click="showHeroPrizeDescDialog = true"
+                >
+                  Hero Prize
+                </p>
+                <p class="text-sm leading-5 text-[var(--hp-text-color)]">Account Prize</p>
               </div>
             </article>
           </template>
@@ -364,4 +369,5 @@ function openTradeTerminal() {
     </div>
   </section>
   <AboutAccountDialog v-if="showAboutAccountDialog" @close="showAboutAccountDialog = false" />
+  <HeroPrizeDescDialog v-if="showHeroPrizeDescDialog" @close="showHeroPrizeDescDialog = false" />
 </template>

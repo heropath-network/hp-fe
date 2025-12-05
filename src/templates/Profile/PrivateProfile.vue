@@ -5,11 +5,16 @@ import { useAccountShowInLeaderboard, useUserEvaluationsStorage } from '@/storag
 import { useConnection } from '@wagmi/vue'
 import { formatDate, getAccountTypeLabel, getAccountStatusLabel } from '@/utils/common'
 import { useUserTradeHistoryStorage } from '@/storages/trading'
-import { useUserPrizesStorage } from '@/storages/heroPath'
-import { countTradesWinRate, getAccountHistoryPnl, getAccountTotalVolume } from '@/utils/evaluation'
+import { useUserWithdrawalHistoryStorage } from '@/storages/heroPath'
+import {
+  countTradesWinRate,
+  getAccountHistoryPnl,
+  getAccountTotalVolume,
+  getPrizeWithdrawalAmount,
+} from '@/utils/evaluation'
 import { SHARE_OF_PROFIT } from '@/constants'
 import * as _ from 'lodash-es'
-import { formatNumber, formatPercentage, multiplyBigInt, toBigInt } from '@/utils/bigint'
+import { formatNumber, multiplyBigInt, toBigInt } from '@/utils/bigint'
 
 const { address } = useConnection()
 
@@ -20,7 +25,7 @@ const {
 } = useUserEvaluationsStorage(address)
 
 const { data: userTradeHistory } = useUserTradeHistoryStorage(address)
-const { data: prizesInfo } = useUserPrizesStorage(address)
+const { data: withdrawalHistory } = useUserWithdrawalHistoryStorage(address)
 
 const evaluationTradeHistory = computed(() => {
   if (!userEvaluations.value || !userTradeHistory.value) {
@@ -61,7 +66,9 @@ const filteredUserEvaluations = computed(() => {
 
 const leaderboardVisible = useAccountShowInLeaderboard(address)
 
-const withdrawnAmount = computed(() => toBigInt(prizesInfo.value.withdrawnAmount))
+const withdrawnAmount = computed(() => {
+  return toBigInt(getPrizeWithdrawalAmount(withdrawalHistory.value.filter((item) => item.status === 'success')))
+})
 
 const evaluationTradingVolume = computed(() => {
   return getAccountTotalVolume(evaluationTradeHistory.value)
@@ -126,7 +133,7 @@ function onUpdatePublicProfileStatus(accountId: string, value: boolean) {
           <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
             ${{ formatNumber(fundedTradingVolume, 2) }}
           </p>
-          <p class="text-sm leading-5 text-[var(--hp-text-color)]">Funded Trading Volume</p>
+          <p class="text-sm leading-5 text-[var(--hp-text-color)]">Hero Trading Volume</p>
         </div>
         <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
           <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">

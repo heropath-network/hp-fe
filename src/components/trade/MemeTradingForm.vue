@@ -3,12 +3,12 @@
     <!-- Main Content Container -->
     <div class="relative left-[16px] pt-4 w-[311px] pb-4">
       <!-- Time Period Tabs (Buy / Long) -->
-      <div class="bg-[#272727] flex ">
+      <div class="bg-[#272727] flex">
         <button
           @click="selectedPeriod = '1m'"
           :class="[
             'flex-1 flex flex-col gap-[4px] items-center justify-center px-0 py-[10px] text-[13px] text-center font-medium leading-[18px] transition',
-            selectedPeriod === '1m' ? 'bg-[#373737]' : ''
+            selectedPeriod === '1m' ? 'bg-[#373737]' : '',
           ]"
         >
           <div :class="selectedPeriod === '1m' ? 'text-white' : 'text-gray-400'">1m</div>
@@ -18,7 +18,7 @@
           @click="selectedPeriod = '5m'"
           :class="[
             'flex-1 flex flex-col gap-[4px] items-center justify-center px-0 py-[10px] text-[13px] text-center font-medium leading-[18px] transition',
-            selectedPeriod === '5m' ? 'bg-[#373737]' : ''
+            selectedPeriod === '5m' ? 'bg-[#373737]' : '',
           ]"
         >
           <div :class="selectedPeriod === '5m' ? 'text-white' : 'text-gray-400'">5m</div>
@@ -28,7 +28,7 @@
           @click="selectedPeriod = '1h'"
           :class="[
             'flex-1 flex flex-col gap-[4px] items-center justify-center px-0 py-[10px] text-[13px] text-center font-medium leading-[18px] transition',
-            selectedPeriod === '1h' ? 'bg-[#373737]' : ''
+            selectedPeriod === '1h' ? 'bg-[#373737]' : '',
           ]"
         >
           <div :class="selectedPeriod === '1h' ? 'text-white' : 'text-gray-400'">1h</div>
@@ -38,7 +38,7 @@
           @click="selectedPeriod = '24h'"
           :class="[
             'flex-1 flex flex-col gap-[4px] items-center justify-center px-0 py-[10px] text-[13px] text-center font-medium leading-[18px] transition',
-            selectedPeriod === '24h' ? 'bg-[#373737]' : ''
+            selectedPeriod === '24h' ? 'bg-[#373737]' : '',
           ]"
         >
           <div :class="selectedPeriod === '24h' ? 'text-white' : 'text-gray-400'">24h</div>
@@ -47,7 +47,7 @@
       </div>
 
       <!-- Divider -->
-      <div class="bg-[#272727] h-px "></div>
+      <div class="bg-[#272727] h-px"></div>
 
       <!-- Market Stats Row -->
       <div class="flex items-center gap-0 mt-[16px] mb-[16px]">
@@ -88,9 +88,7 @@
             @click="tradeSide = 'buy'"
             :class="[
               'flex-1 items-center justify-center px-0 py-2 text-sm text-center font-medium transition',
-              tradeSide === 'buy'
-                ? 'bg-green-success text-gray-1000'
-                : 'text-gray-400'
+              tradeSide === 'buy' ? 'bg-green-success text-gray-1000' : 'text-gray-400',
             ]"
           >
             Buy
@@ -99,9 +97,7 @@
             @click="tradeSide = 'sell'"
             :class="[
               'flex-1 items-center justify-center px-0 py-2 text-sm text-center font-medium transition',
-              tradeSide === 'sell'
-                ? 'bg-red-error text-gray-1000'
-                : 'text-gray-400'
+              tradeSide === 'sell' ? 'bg-red-error text-gray-1000' : 'text-gray-400',
             ]"
           >
             Sell
@@ -118,14 +114,13 @@
                   <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Market Price</span>
                 </div>
                 <div class="flex items-center gap-1">
-                  <span class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold">${{ selectedMarketPrice }}</span>
+                  <span class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold"
+                    >${{ selectedMarketPrice }}</span
+                  >
                 </div>
               </div>
               <!-- Chain Label -->
-              <SourceLiquidityLabel
-                :oracle-name="selectedOracleName"
-                class="top-0 right-0"
-                />
+              <SourceLiquidityLabel :oracle-name="selectedOracleName" class="top-0 right-0" />
             </div>
 
             <!-- Order Type Dropdown -->
@@ -139,17 +134,32 @@
                     <span class="text-[13px] leading-[18px] text-[#9b9b9b] text-right">Order Type</span>
                   </div>
                   <div class="flex items-center justify-end gap-1">
-                    <span class="text-[16px] leading-[24px] text-white font-medium text-right">{{ orderType.charAt(0).toUpperCase() + orderType.slice(1) }}</span>
+                    <span class="text-[16px] leading-[24px] text-white font-medium text-right">{{
+                      orderType.charAt(0).toUpperCase() + orderType.slice(1)
+                    }}</span>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M4 6L8 10L12 6" stroke="#9b9b9b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path
+                        d="M4 6L8 10L12 6"
+                        stroke="#9b9b9b"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
                     </svg>
                   </div>
                 </button>
-                <div v-if="showOrderTypeMenu" class="absolute top-full mt-1 w-full bg-[#272727] z-50 border border-[#373737]">
+                <div
+                  v-if="showOrderTypeMenu"
+                  class="absolute top-full mt-1 w-full bg-[#272727] z-50 border border-[#373737]"
+                >
                   <button
                     v-for="type in ['market', 'limit', 'stop']"
                     :key="type"
-                    @click.stop="orderType = type as any; showOrderTypeMenu = false"
+                    @click.stop=" () => {
+                      orderType = type as any
+                      showOrderTypeMenu = false
+                    }
+                    "
                     class="w-full px-3 py-2 text-left text-[16px] leading-[24px] text-white font-medium hover:bg-[#373737] transition"
                   >
                     {{ type.charAt(0).toUpperCase() + type.slice(1) }}
@@ -164,9 +174,13 @@
             <div class="bg-[#272727] p-3 flex flex-col gap-2">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1">
-                  <span class="text-[13px] leading-[18px] text-[#9b9b9b]">{{ tradeSide === 'buy' ? 'Buy' : 'Sell' }}</span>
+                  <span class="text-[13px] leading-[18px] text-[#9b9b9b]">{{
+                    tradeSide === 'buy' ? 'Buy' : 'Sell'
+                  }}</span>
                 </div>
-                <span class="text-[13px] leading-[18px] text-[#9b9b9b] text-right">Balance: {{ tradeSide === 'buy' ? '1.88' : '0' }}</span>
+                <span class="text-[13px] leading-[18px] text-[#9b9b9b] text-right"
+                  >Balance: {{ tradeSide === 'buy' ? '1.88' : '0' }}</span
+                >
               </div>
               <div class="flex items-center justify-between gap-2">
                 <div class="flex-1 flex items-center">
@@ -179,69 +193,83 @@
                   />
                 </div>
                 <div v-if="tradeSide === 'buy'" class="flex items-center gap-1 justify-end cursor-pointer">
-                  <MarketIcon :symbol="'BNB/USD'" :size="20"/>
+                  <MarketIcon :symbol="'BNB/USD'" :size="20" />
                   <span class="text-[16px] leading-[24px] text-white font-medium text-right">BNB</span>
                 </div>
                 <div v-else class="flex items-center gap-1 justify-end cursor-pointer">
-                  <MarketIcon :symbol="selectedMarket" :size="20"/>
-                  <span class="text-[16px] leading-[24px] text-white font-medium text-right">{{selectedMarketName}}</span>
+                  <MarketIcon :symbol="selectedMarket" :size="20" />
+                  <span class="text-[16px] leading-[24px] text-white font-medium text-right">{{
+                    selectedMarketName
+                  }}</span>
                 </div>
               </div>
               <!-- Quick Selection Buttons -->
-              <div class="flex gap-2 h-8 ">
+              <div class="flex gap-2 h-8">
                 <button
                   @click="selectQuickAmount('0.01')"
                   :class="[
                     'quick-selection-btn flex-1 flex h-8 items-center justify-center px-4 py-0 cursor-pointer transition',
-                    selectedQuickAmount === '0.01' ? 'quick-selection-btn-selected' : 'quick-selection-btn-default'
+                    selectedQuickAmount === '0.01' ? 'quick-selection-btn-selected' : 'quick-selection-btn-default',
                   ]"
                 >
-                  <span :class="[
-                    'text-[14px] leading-[20px] font-medium transition',
-                    selectedQuickAmount === '0.01' ? 'text-green-success' : 'text-[#9b9b9b]'
-                  ]">0.01</span>
+                  <span
+                    :class="[
+                      'text-[14px] leading-[20px] font-medium transition',
+                      selectedQuickAmount === '0.01' ? 'text-green-success' : 'text-[#9b9b9b]',
+                    ]"
+                    >0.01</span
+                  >
                 </button>
                 <button
                   @click="selectQuickAmount('0.02')"
                   :class="[
                     'quick-selection-btn flex-1 flex h-8 items-center justify-center px-4 py-0 cursor-pointer transition',
-                    selectedQuickAmount === '0.02' ? 'quick-selection-btn-selected' : 'quick-selection-btn-default'
+                    selectedQuickAmount === '0.02' ? 'quick-selection-btn-selected' : 'quick-selection-btn-default',
                   ]"
                 >
-                  <span :class="[
-                    'text-[14px] leading-[20px] font-medium transition',
-                    selectedQuickAmount === '0.02' ? 'text-green-success' : 'text-[#9b9b9b]'
-                  ]">0.02</span>
+                  <span
+                    :class="[
+                      'text-[14px] leading-[20px] font-medium transition',
+                      selectedQuickAmount === '0.02' ? 'text-green-success' : 'text-[#9b9b9b]',
+                    ]"
+                    >0.02</span
+                  >
                 </button>
                 <button
                   @click="selectQuickAmount('0.05')"
                   :class="[
                     'quick-selection-btn flex-1 flex h-8 items-center justify-center px-4 py-0 cursor-pointer transition',
-                    selectedQuickAmount === '0.05' ? 'quick-selection-btn-selected' : 'quick-selection-btn-default'
+                    selectedQuickAmount === '0.05' ? 'quick-selection-btn-selected' : 'quick-selection-btn-default',
                   ]"
                 >
-                  <span :class="[
-                    'text-[14px] leading-[20px] font-medium transition',
-                    selectedQuickAmount === '0.05' ? 'text-green-success' : 'text-[#9b9b9b]'
-                  ]">0.05</span>
+                  <span
+                    :class="[
+                      'text-[14px] leading-[20px] font-medium transition',
+                      selectedQuickAmount === '0.05' ? 'text-green-success' : 'text-[#9b9b9b]',
+                    ]"
+                    >0.05</span
+                  >
                 </button>
                 <button
                   @click="selectQuickAmount('1')"
                   :class="[
                     'quick-selection-btn flex-1 flex h-8 items-center justify-center px-4 py-0 cursor-pointer transition',
-                    selectedQuickAmount === '1' ? 'quick-selection-btn-selected' : 'quick-selection-btn-default'
+                    selectedQuickAmount === '1' ? 'quick-selection-btn-selected' : 'quick-selection-btn-default',
                   ]"
                 >
-                  <span :class="[
-                    'text-[14px] leading-[20px] font-medium transition',
-                    selectedQuickAmount === '1' ? 'text-green-success' : 'text-[#9b9b9b]'
-                  ]">1</span>
+                  <span
+                    :class="[
+                      'text-[14px] leading-[20px] font-medium transition',
+                      selectedQuickAmount === '1' ? 'text-green-success' : 'text-[#9b9b9b]',
+                    ]"
+                    >1</span
+                  >
                 </button>
                 <button
                   @click="handleEditClick"
                   class="quick-selection-btn bg-[#373737] flex h-8 items-center justify-center px-2 py-0 cursor-pointer transition hover:bg-[#404040]"
                 >
-                <img :src="editIcon" alt="Edit" class="w-4 h-4" />
+                  <img :src="editIcon" alt="Edit" class="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -249,7 +277,7 @@
         </div>
 
         <!-- Exchange Rate -->
-        <div class="flex items-center justify-between ">
+        <div class="flex items-center justify-between">
           <span class="text-[13px] leading-[18px] text-[#9b9b9b]">
             1 BNB ≈ {{ formattedAmountInOneBnb }} {{ selectedMarketName }}
           </span>
@@ -257,8 +285,8 @@
         </div>
 
         <!-- Advanced Trading Strategy -->
-        <div class="flex flex-col gap-[12px] ">
-          <div class="flex items-center ">
+        <div class="flex flex-col gap-[12px]">
+          <div class="flex items-center">
             <button
               @click="advancedTradingStrategyEnabled = !advancedTradingStrategyEnabled"
               class="flex gap-[8px] items-center cursor-pointer"
@@ -267,13 +295,10 @@
                 <div
                   :class="[
                     'absolute inset-0 transition flex justify-center items-center',
-                    advancedTradingStrategyEnabled ? 'bg-green-success' : 'bg-[#373737] border border-[#545454]'
+                    advancedTradingStrategyEnabled ? 'bg-green-success' : 'bg-[#373737] border border-[#545454]',
                   ]"
                 ></div>
-                <div
-                  v-if="advancedTradingStrategyEnabled"
-                  class="flex justify-center items-center relative w-4 h-4"
-                >
+                <div v-if="advancedTradingStrategyEnabled" class="flex justify-center items-center relative w-4 h-4">
                   <img :src="checkIcon" alt="Check" class="w-3 h-3" />
                 </div>
               </div>
@@ -282,13 +307,9 @@
               </div>
             </button>
           </div>
-          <div v-if="advancedTradingStrategyEnabled" class="flex flex-col gap-[8px] ">
+          <div v-if="advancedTradingStrategyEnabled" class="flex flex-col gap-[8px]">
             <!-- TP/SL Rows -->
-            <div
-              v-for="(entry, index) in tpSlEntries"
-              :key="index"
-              class="flex gap-[8px] items-center "
-            >
+            <div v-for="(entry, index) in tpSlEntries" :key="index" class="flex gap-[8px] items-center">
               <div class="bg-[#272727] flex-1 flex gap-[4px] items-center px-[8px] py-[7px] text-[13px]">
                 <div class="text-[#9b9b9b] text-[13px] leading-[18px]">TP</div>
                 <input
@@ -342,48 +363,59 @@
         </div>
 
         <!-- Enter Amount Button -->
-        <div 
-            class="bg-green-success flex items-center justify-center px-0 py-[14px]" 
-            :class="buyAmount ? 'cursor-pointer' : 'opacity-50'"
+        <div
+          class="bg-green-success flex items-center justify-center px-0 py-[14px]"
+          :class="buyAmount ? 'cursor-pointer' : 'opacity-50'"
         >
-          <span v-if="!buyAmount"  class="text-gray-1000 text-sm text-center font-medium leading-5">Enter an amount</span>
-          <span v-else class="text-gray-1000 text-sm text-center font-medium leading-5">{{ tradeSide === 'buy' ? 'Buy' : 'Sell' }}</span>
+          <span v-if="!buyAmount" class="text-gray-1000 text-sm text-center font-medium leading-5"
+            >Enter an amount</span
+          >
+          <span v-else class="text-gray-1000 text-sm text-center font-medium leading-5">{{
+            tradeSide === 'buy' ? 'Buy' : 'Sell'
+          }}</span>
         </div>
 
         <!-- Settings Section -->
-        <div class="flex flex-col gap-[12px] ">
-          <div class="flex items-center justify-between ">
+        <div class="flex flex-col gap-[12px]">
+          <div class="flex items-center justify-between">
             <div class="flex gap-[8px] items-center">
               <div class="flex gap-[4px] items-center">
                 <img :src="slippageIcon" alt="Gas" class="w-[16px] h-[16px]" />
-                <div class="text-[#9b9b9b] text-[13px] leading-[18px]">{{slippageCustom ? slippageCustom : 'Auto'}}</div>
+                <div class="text-[#9b9b9b] text-[13px] leading-[18px]">
+                  {{ slippageCustom ? slippageCustom : 'Auto' }}
+                </div>
               </div>
               <div class="flex gap-[4px] items-center">
                 <img :src="gasIcon" alt="Gas" class="w-[16px] h-[16px]" />
-                <div class="text-[#9b9b9b] text-[13px] leading-[18px]">{{maxAutoGas ? maxAutoGas : '0.12'}}</div>
+                <div class="text-[#9b9b9b] text-[13px] leading-[18px]">{{ maxAutoGas ? maxAutoGas : '0.12' }}</div>
               </div>
               <div class="flex gap-[4px] items-center">
                 <img :src="burgerIcon" alt="On" class="w-[16px] h-[16px]" />
                 <div class="text-[#9b9b9b] text-[13px] leading-[18px]">ON</div>
               </div>
             </div>
-            <i 
+            <i
               @click="showSettings = !showSettings"
               :class="[
                 'iconfont icon-down text-[#9b9b9b] text-[16px] transform transition-transform cursor-pointer',
-                showSettings ? 'rotate-180' : ''
+                showSettings ? 'rotate-180' : '',
               ]"
             ></i>
           </div>
           <div v-if="showSettings" class="flex flex-col gap-[8px] outline-none" tabindex="-1">
             <!-- Slippage -->
-            <div class="flex items-center justify-between ">
+            <div class="flex items-center justify-between">
               <div class="flex flex-col">
                 <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Slippage</div>
               </div>
               <div class="flex gap-[8px] w-[168px]">
                 <div class="bg-[#272727] flex-1 flex items-center justify-center px-[8px] py-[7px]">
-                  <div class="flex-1  text-[13px] text-center font-medium leading-[18px]" :class="!!slippageCustom ? 'text-[#545454]' : 'text-[#6CE99E]'">Auto 7.5%</div>
+                  <div
+                    class="flex-1 text-[13px] text-center font-medium leading-[18px]"
+                    :class="!!slippageCustom ? 'text-[#545454]' : 'text-[#6CE99E]'"
+                  >
+                    Auto 7.5%
+                  </div>
                 </div>
                 <div class="bg-[#272727] flex-1 flex gap-[4px] items-center px-[8px] py-[7px] text-[13px]">
                   <input
@@ -398,13 +430,18 @@
               </div>
             </div>
             <!-- Max Auto Gas -->
-            <div class="flex items-center justify-between ">
+            <div class="flex items-center justify-between">
               <div class="flex flex-col">
                 <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Max Auto Gas</div>
               </div>
               <div class="flex gap-[8px] w-[168px]">
                 <div class="bg-[#272727] flex-1 flex items-center justify-center px-[8px] py-[7px]">
-                  <div class="flex-1  text-[13px] text-center font-medium leading-[18px]" :class="!!maxAutoGas ? 'text-[#545454]' : 'text-[#6CE99E]'">Avg 0.12</div>
+                  <div
+                    class="flex-1 text-[13px] text-center font-medium leading-[18px]"
+                    :class="!!maxAutoGas ? 'text-[#545454]' : 'text-[#6CE99E]'"
+                  >
+                    Avg 0.12
+                  </div>
                 </div>
                 <div class="bg-[#272727] flex-1 flex items-center px-[8px] py-[7px]">
                   <input
@@ -418,28 +455,32 @@
               </div>
             </div>
             <!-- Max Auto Gas (Gwei) -->
-            <div class="flex items-center justify-between ">
+            <div class="flex items-center justify-between">
               <div class="flex flex-col">
-                <div class="text-[#9b9b9b] text-[13px] leading-[18px] border-b border-dotted border-[#9b9b9b] border-opacity-30">Max Auto Gas</div>
+                <div
+                  class="text-[#9b9b9b] text-[13px] leading-[18px] border-b border-dotted border-[#9b9b9b] border-opacity-30"
+                >
+                  Max Auto Gas
+                </div>
               </div>
               <div class="bg-[#272727] flex items-center justify-end gap-[4px] px-[8px] py-[7px] w-[168px]">
                 <input
                   v-model="maxAutoGasGwei"
                   type="text"
                   inputmode="decimal"
-                  class="flex-1 text-white text-[13px] leading-[18px] font-medium bg-transparent outline-none border-none text-right placeholder:text-[#545454] "
+                  class="flex-1 text-white text-[13px] leading-[18px] font-medium bg-transparent outline-none border-none text-right placeholder:text-[#545454]"
                   placeholder="0"
                 />
                 <div class="text-[#545454] text-[13px] text-right font-medium leading-[18px]">Gwei</div>
               </div>
             </div>
             <!-- Anti-MEV RPC -->
-            <div class="flex items-center justify-between ">
+            <div class="flex items-center justify-between">
               <div class="text-[#9b9b9b] text-[13px] leading-[18px] text-right">Anti-MEV RPC</div>
               <Switch v-model:enabled="antiMevRpcEnabled" />
             </div>
             <!-- Auto Approval -->
-            <div class="flex items-center justify-between ">
+            <div class="flex items-center justify-between">
               <div class="flex flex-col">
                 <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Auto Approval</div>
               </div>
@@ -450,11 +491,11 @@
       </div>
 
       <!-- Divider -->
-      <div class="bg-[#272727] h-px  mt-[16px]"></div>
+      <div class="bg-[#272727] h-px mt-[16px]"></div>
 
       <!-- Token Information Section -->
       <div class="flex flex-col gap-[8px] mt-[16px]">
-        <div class="flex items-center relative ">
+        <div class="flex items-center relative">
           <div class="flex flex-col gap-[4px] w-[74px]">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Top 10</div>
             <div class="flex gap-[4px] items-center">
@@ -477,12 +518,12 @@
           <div class="flex-1 flex flex-col gap-[4px] items-end">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Snipers</div>
             <div class="flex gap-[4px] items-center">
-                <img :src="goalIcon" class="w-[16px] h-[16px]" />
+              <img :src="goalIcon" class="w-[16px] h-[16px]" />
               <div class="text-green-success text-[13px] leading-[18px] font-medium">0%</div>
             </div>
           </div>
         </div>
-        <div class="flex items-center relative ">
+        <div class="flex items-center relative">
           <div class="flex flex-col gap-[4px] w-[74px]">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Insiders</div>
             <div class="text-green-success text-[13px] leading-[18px] font-medium">0%</div>
@@ -503,23 +544,23 @@
             </div>
           </div>
         </div>
-        <div class="flex items-center relative ">
+        <div class="flex items-center relative">
           <div class="flex flex-col gap-[4px] w-[74px]">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">NoHoneypot</div>
             <div class="flex h-[18px] items-center">
-                <img :src="acceptedIcon" class="w-[16px] h-[16px]" />
+              <img :src="acceptedIcon" class="w-[16px] h-[16px]" />
             </div>
           </div>
           <div class="flex flex-col gap-[4px] items-center justify-center w-[90px]">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Verified</div>
             <div class="flex h-[18px] items-center">
-                <img :src="acceptedIcon" class="w-[16px] h-[16px]" />
+              <img :src="acceptedIcon" class="w-[16px] h-[16px]" />
             </div>
           </div>
           <div class="flex flex-col gap-[4px] items-center justify-center w-[80px]">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Renounced</div>
             <div class="flex h-[18px] items-center">
-                <img :src="acceptedIcon" class="w-[16px] h-[16px]" />
+              <img :src="acceptedIcon" class="w-[16px] h-[16px]" />
             </div>
           </div>
           <div class="flex-1 flex flex-col gap-[4px] items-end">
@@ -530,24 +571,26 @@
       </div>
 
       <!-- Divider -->
-      <div class="bg-[#272727] h-px  mt-[16px]"></div>
+      <div class="bg-[#272727] h-px mt-[16px]"></div>
 
       <!-- Pool Info Section -->
       <div class="flex flex-col gap-[16px] mt-[16px]">
-        <div class="flex flex-col gap-[12px] ">
-          <div class="flex items-center justify-between ">
+        <div class="flex flex-col gap-[12px]">
+          <div class="flex items-center justify-between">
             <div class="flex gap-[4px] items-center">
-              <div class="text-white text-[14px] leading-[20px] font-semibold">{{ selectedMarketName }}/WBNB Pool Info</div>
+              <div class="text-white text-[14px] leading-[20px] font-semibold">
+                {{ selectedMarketName }}/WBNB Pool Info
+              </div>
               <i class="iconfont icon-down text-[#9b9b9b] text-[16px] transform rotate-180"></i>
             </div>
             <img :src="scanIcon" alt="Scan" class="w-[16px] h-[16px]" />
           </div>
-          <div class="flex flex-col gap-[8px] ">
-            <div class="flex justify-between ">
+          <div class="flex flex-col gap-[8px]">
+            <div class="flex justify-between">
               <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Total liq</div>
               <div class="text-white text-[13px] leading-[18px]">$1.6M (928.42 WBNB) 🔥</div>
             </div>
-            <div class="flex items-center ">
+            <div class="flex items-center">
               <div class="flex-1 flex flex-col gap-[4px]">
                 <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Pair</div>
                 <div class="flex flex-col text-white text-[13px] leading-[18px] font-medium">
@@ -582,23 +625,22 @@
         </div>
 
         <!-- Divider -->
-        <div class="bg-[#272727] h-px "></div>
+        <div class="bg-[#272727] h-px"></div>
 
         <!-- DEV and Funding -->
-        <div class="flex flex-col gap-[8px] ">
-          <div class="flex justify-between ">
+        <div class="flex flex-col gap-[8px]">
+          <div class="flex justify-between">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">DEV</div>
             <div class="flex gap-[8px] items-center">
               <div class="flex gap-[4px] items-center">
                 <div class="text-white text-[13px] leading-[18px] underline">0x32...2866 (0BNB)</div>
-                <img :src="copyIcon" class="w-[16px] h-[16px] cursor-pointer" />
+                <BaseIcon name="copy" size="14" class="cursor-pointer text-[var(--hp-text-color)]" />
               </div>
-              <img :src="notCookIcon" class="w-[16px] h-[16px] cursor-pointer" />
               <img :src="searchIcon" class="w-[16px] h-[16px] cursor-pointer" />
               <img :src="scanIcon" class="w-[14px] h-[14px] cursor-pointer" />
             </div>
           </div>
-          <div class="flex justify-between ">
+          <div class="flex justify-between">
             <div class="flex flex-col">
               <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Funding</div>
             </div>
@@ -617,30 +659,30 @@
         </div>
 
         <!-- Divider -->
-        <div class="bg-[#272727] h-px "></div>
+        <div class="bg-[#272727] h-px"></div>
 
         <!-- Market Cap, Holders, etc. -->
-        <div class="flex flex-col gap-[8px] ">
-          <div class="flex justify-between ">
+        <div class="flex flex-col gap-[8px]">
+          <div class="flex justify-between">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Market Cap</div>
             <div class="text-white text-[13px] leading-[18px] text-right">$119.11M</div>
           </div>
-          <div class="flex justify-between ">
+          <div class="flex justify-between">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Holders</div>
             <div class="text-white text-[13px] leading-[18px] text-right">20778</div>
           </div>
-          <div class="flex justify-between ">
+          <div class="flex justify-between">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Total Supply</div>
             <div class="text-white text-[13px] leading-[18px] text-right">1M</div>
           </div>
-          <div class="flex justify-between ">
+          <div class="flex justify-between">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Pair</div>
             <div class="flex gap-[4px] items-center">
               <div class="text-white text-[13px] leading-[18px] text-right">0xd6..1d57</div>
-              <img :src="copyIcon" class="w-[16px] h-[16px] cursor-pointer" />
+              <BaseIcon name="copy" size="14" class="cursor-pointer text-[var(--hp-text-color)]" />
             </div>
           </div>
-          <div class="flex justify-between ">
+          <div class="flex justify-between">
             <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Pool Created</div>
             <div class="text-white text-[13px] leading-[18px] text-right">09/22/2025 00:15:59</div>
           </div>
@@ -653,6 +695,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
+import { BaseIcon } from '@/components'
 import Switch from '@/components/Switch.vue'
 import SourceLiquidityLabel from '@/components/common/SourceLiquidityLabel.vue'
 import { useTradeStore } from '@/stores/tradeStore'
@@ -678,9 +721,6 @@ import notCookIcon from '@/assets/icons/not-cook.svg'
 import scanIcon from '@/assets/icons/scan.svg'
 import searchIcon from '@/assets/icons/search.svg'
 
-
-
-
 const tradeStore = useTradeStore()
 const selectedOracleName = computed(() => tradeStore.currentOracleName)
 const selectedMarket = computed(() => tradeStore.selectedMarket)
@@ -694,28 +734,28 @@ const { price: bnbUsdPrice } = useBnbUsdPrice()
 const amountInOneBnb = computed(() => {
   const bnbPrice = bnbUsdPrice.value
   const marketPriceBigInt = tradeStore.currentMarketPrice
-  
+
   if (!bnbPrice || bnbPrice <= 0 || !marketPriceBigInt || marketPriceBigInt === BigInt(0)) {
     return null
   }
-  
+
   // Convert market price from bigint (18 decimals) to number
   const marketPriceUsd = parseFloat(fromBigInt(marketPriceBigInt, 18))
-  
+
   if (marketPriceUsd <= 0) {
     return null
   }
-  
+
   // Calculate: 1 BNB = (BNB price in USD) / (market price in USD) units of the selected market
   const amount = bnbPrice / marketPriceUsd
   return amount
 })
 
 const formattedAmountInOneBnb = computed(() => {
-    if (amountInOneBnb.value && amountInOneBnb.value > 1000) {
-        return (amountInOneBnb.value / 1000).toFixed(2) + 'K'
-    }
-    return amountInOneBnb.value?.toFixed(2) || '--'
+  if (amountInOneBnb.value && amountInOneBnb.value > 1000) {
+    return (amountInOneBnb.value / 1000).toFixed(2) + 'K'
+  }
+  return amountInOneBnb.value?.toFixed(2) || '--'
 })
 
 // Time period selection
@@ -759,9 +799,7 @@ interface TpSlEntry {
   sl: number | null
 }
 
-const tpSlEntries = ref<TpSlEntry[]>([
-  { tp: null, sl: null }
-])
+const tpSlEntries = ref<TpSlEntry[]>([{ tp: null, sl: null }])
 
 // Add new TP/SL entry
 function addTpSlEntry() {
@@ -782,7 +820,7 @@ function removeTpSlEntry(index: number) {
 // Quick selection buttons - saved to localStorage
 const selectedQuickAmount = useLocalStorage<'0.01' | '0.02' | '0.05' | '1' | null>(
   'meme-trade:selected-quick-amount',
-  null
+  null,
 )
 
 // Track if update is from button click to avoid clearing selection
@@ -806,14 +844,13 @@ function handleEditClick() {
   selectedQuickAmount.value = null
 }
 
-
 // Watch for manual input changes - clear selection if user types a different value
 watch(buyAmount, (newValue) => {
   if (isUpdatingFromButton) {
     isUpdatingFromButton = false
     return
   }
-  
+
   // If user manually changes the input and it doesn't match the selected quick amount, clear selection
   if (selectedQuickAmount.value && newValue !== selectedQuickAmount.value) {
     selectedQuickAmount.value = null
@@ -829,18 +866,18 @@ function handleClickOutside(event: MouseEvent) {
 }
 
 onMounted(() => {
-    selectedQuickAmount.value = null
-    document.addEventListener('click', handleClickOutside)
+  selectedQuickAmount.value = null
+  document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
-    selectedQuickAmount.value = null
-    document.removeEventListener('click', handleClickOutside)
+  selectedQuickAmount.value = null
+  document.removeEventListener('click', handleClickOutside)
 })
 
 watch(tradeSide, () => {
-    buyAmount.value = ''
-    selectedQuickAmount.value = null
+  buyAmount.value = ''
+  selectedQuickAmount.value = null
 })
 </script>
 
@@ -851,7 +888,8 @@ watch(tradeSide, () => {
 }
 
 .quick-selection-btn-default:hover {
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%), linear-gradient(90deg, rgba(55, 55, 55, 1) 0%, rgba(55, 55, 55, 1) 100%);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%),
+    linear-gradient(90deg, rgba(55, 55, 55, 1) 0%, rgba(55, 55, 55, 1) 100%);
 }
 
 .quick-selection-btn-default:hover span {
@@ -860,7 +898,8 @@ watch(tradeSide, () => {
 
 /* Selected state for quick selection buttons */
 .quick-selection-btn-selected {
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%), linear-gradient(90deg, rgba(55, 55, 55, 1) 0%, rgba(55, 55, 55, 1) 100%);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%),
+    linear-gradient(90deg, rgba(55, 55, 55, 1) 0%, rgba(55, 55, 55, 1) 100%);
 }
 
 .quick-selection-btn-selected span {

@@ -14,6 +14,7 @@ export interface UserEvaluation {
 }
 
 export interface UserWithdrawalHistory {
+  id: string
   timestamp: number
   amount: number
   address: string

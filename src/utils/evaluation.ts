@@ -1,19 +1,17 @@
 import { TradeHistory, Position } from '@/storages/trading'
 import * as _ from 'lodash-es'
 import { multiplyBigInt, toBigInt } from './bigint'
+import { UserWithdrawalHistory } from '@/types/heroPath'
 
 export function getAccountHistoryPnl(history: TradeHistory[]): bigint {
   return history.reduce((acc, trade) => acc + (!!trade.closeTimestamp ? trade.pnl : BigInt(0)), BigInt(0))
 }
 
 export function getAccountTotalVolume(history: TradeHistory[]): bigint {
-  return history.reduce(
-    (acc, trade) => {
-      const price = !!trade.closeTimestamp ? trade.exitPrice : trade.entryPrice
-      return acc + multiplyBigInt(price, trade.size)
-    },
-    BigInt(0),
-  )
+  return history.reduce((acc, trade) => {
+    const price = !!trade.closeTimestamp ? trade.exitPrice : trade.entryPrice
+    return acc + multiplyBigInt(price, trade.size)
+  }, BigInt(0))
 }
 
 export function countTradesWinRate(history: TradeHistory[]): {
@@ -49,9 +47,14 @@ export function getPositionsUnrealizedPnl(positions: Position[], price: Record<s
     }
 
     const marketPriceBigInt = toBigInt(marketPrice)
-    const priceDiff = position.side === 'long' ? marketPriceBigInt - position.entryPrice : position.entryPrice - marketPriceBigInt
+    const priceDiff =
+      position.side === 'long' ? marketPriceBigInt - position.entryPrice : position.entryPrice - marketPriceBigInt
     const pnl = multiplyBigInt(priceDiff, position.size)
 
     return acc + pnl
   }, BigInt(0))
+}
+
+export function getPrizeWithdrawalAmount(history: UserWithdrawalHistory[]): number {
+  return history.reduce((acc, item) => acc + item.amount, 0)
 }

@@ -21,7 +21,7 @@ tryOnMounted(() => {
 
 <template>
   <HpDialog :show="visible" @close="onCloseDialog">
-    <template #title>About Hero Account</template>
+    <template #title>About Hero Prize</template>
     <template #default>
       <div class="mt-4 text-[14px] leading-[22px] text-[var(--hp-text-color)] space-y-2">
         <div>
@@ -29,12 +29,9 @@ tryOnMounted(() => {
           independent trading strategy.
         </div>
         <div>
-          The protocol never mirrors or duplicates any individual hero account’s trades, never manages user funds, and
-          never provides personalized investment advice. All data is blended and anonymized so no single user’s actions
-        </div>
-        <div>
-          can be identified.Participation is optional, and users always retain full control over their own hero
-          accounts.
+          After contributing trading signals/insights to the protocol’s own independent trading strategy, the protocol
+          will distribute hero prizes to hero account owners every 7 days. The prizes for each hero account are
+          calculated based on the contribution to the protocol’s trading strategy.
         </div>
       </div>
     </template>

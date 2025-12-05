@@ -59,16 +59,16 @@ const menuItems = [
     routeName: ROUTE_NAMES.TradingEducation,
   },
   {
-    id: MenuItem.Leaderboard,
-    label: 'Leaderboard',
-    icon: 'menu-leaderboard',
-    routeName: ROUTE_NAMES.Leaderboard,
-  },
-  {
     id: MenuItem.Ecosystem,
     label: 'Ecosystem Dashboard',
     icon: 'menu-ecosystem',
     routeName: ROUTE_NAMES.Ecosystem,
+  },
+  {
+    id: MenuItem.Leaderboard,
+    label: 'Leaderboard',
+    icon: 'menu-leaderboard',
+    routeName: ROUTE_NAMES.Leaderboard,
   },
 ]
 

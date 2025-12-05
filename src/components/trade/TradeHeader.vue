@@ -26,7 +26,7 @@
         <button
           type="button"
           class="flex items-center gap-1 px-2 py-[6px] text-[14px] font-medium leading-[20px] bg-[#6CE99E] text-gray-950 transition-colors hover:bg-[#76FFAD] focus:outline-none"
-          @click="router.push({ name: ROUTE_NAMES.Evaluation })"
+          @click="openNewEvaluation"
         >
           New Evaluation
         </button>
@@ -273,5 +273,9 @@ async function switchChain(targetChainId: number) {
   } catch (error) {
     console.error('Failed to switch chain:', error)
   }
+}
+
+function openNewEvaluation() {
+  window.open(router.resolve({ name: ROUTE_NAMES.Evaluation }).href, '_blank')
 }
 </script>

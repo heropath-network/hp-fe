@@ -3,14 +3,13 @@ import { useLocalStorage } from '@vueuse/core'
 import {
   UserEvaluationsKey,
   AccountShowInLeaderboardKey,
-  UserPrizesKey,
   UserWithdrawalHistoryKey,
   UserQuestDiscountStatusKey,
   UserQuestTaskStatusKey,
   SelectedEvaluationAccountKey,
 } from './keys'
 import { EMPTY_ADDRESS } from '@/constants'
-import { UserEvaluation, UserPrizes, UserWithdrawalHistory, QuestDiscount, QuestTaskId } from '@/types/heroPath'
+import { UserEvaluation, UserWithdrawalHistory, QuestDiscount, QuestTaskId } from '@/types/heroPath'
 import { inferPlanFromConfig } from '@/utils/evaluationPlan'
 
 export function useAccountShowInLeaderboard(address: Ref<string | undefined>) {
@@ -100,33 +99,6 @@ export function useUserEvaluationsStorage(address: Ref<string | undefined>) {
     addEvaluation,
     updateDisplayDrawdownStatus,
     updateDisplayPublicStatus,
-  }
-}
-
-export function useUserPrizesStorage(address: Ref<string | undefined>) {
-  const key = computed(() => {
-    return UserPrizesKey.replace('{addr}', address.value?.toLowerCase() ?? EMPTY_ADDRESS)
-  })
-
-  const defaultPrizes: UserPrizes = { withdrawnAmount: 0 }
-
-  const storage = useLocalStorage<UserPrizes>(key, defaultPrizes)
-
-  function clear() {
-    storage.value = defaultPrizes
-  }
-
-  function updateWithdrawnAmount(amount: number) {
-    storage.value = {
-      ...storage.value,
-      withdrawnAmount: amount,
-    }
-  }
-
-  return {
-    data: readonly(storage),
-    clear,
-    updateWithdrawnAmount,
   }
 }
 

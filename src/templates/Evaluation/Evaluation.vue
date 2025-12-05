@@ -12,6 +12,7 @@ import { TOKEN_PRICES } from '@/config/tokensPrices'
 import HeroIcon from '@/assets/icons/tokens/HERO.svg'
 import { formatNumber, toBigInt } from '@/utils/bigint'
 import AboutAccountDialog from './AboutAccountDialog.vue'
+import HeroPrizeDescDialog from './HeroPrizeDescDialog.vue'
 
 const planTabs = [
   { label: 'Champion Plan', value: EvaluationPlan.ChampionPlan },
@@ -23,6 +24,7 @@ const { address } = useConnection()
 
 const { data: discountData } = useUserQuestDiscountStatusStorage(address)
 const showAboutAccountDialog = ref(false)
+const showHeroPrizeDescDialog = ref(false)
 
 const unusedDiscounts = computed(() => discountData.value?.filter((item) => !item.isUsed) ?? [])
 
@@ -32,7 +34,6 @@ const router = useRouter()
 const formatCurrency = (value: number) => `$${value.toLocaleString()}`
 const formatFee = (value: number) => `$${value.toFixed(2)}`
 const formatPercent = (value: number) => `${value}%`
-const formatSplit = (value: number) => `Up to ${formatPercent(value)}`
 const formatLeverage = (value: number) => `Up to ${value}x`
 
 const activePlanConfig = computed(() => EvaluationPlanConfig[activePlan.value])
@@ -41,10 +42,6 @@ const tableData = computed(() => activePlanConfig.value.levels)
 const highlights = computed(() => {
   const baseConfig = activePlanConfig.value.base
   return [
-    {
-      label: 'Profit Split',
-      value: formatSplit(baseConfig.profitSplit),
-    },
     {
       label: 'Max. Daily Loss',
       value: formatPercent(baseConfig.maxDailyLoss),
@@ -143,6 +140,18 @@ const usdToHeroToken = (usdAmount: number) => {
           <BaseIcon name="question" size="16" class="opacity-60 text-[var(--hp-text-color)]" />
         </div>
       </div>
+      <div class="flex flex-col gap-1">
+        <p
+          class="text-[20px] font-semibold leading-[28px] text-[var(--hp-primary-green)] underline cursor-pointer"
+          @click="showHeroPrizeDescDialog = true"
+        >
+          Hero Prize
+        </p>
+        <div class="flex items-center gap-1 text-sm leading-5 text-[var(--hp-text-color)]">
+          <span>Account Prize</span>
+          <BaseIcon name="question" size="16" class="opacity-60 text-[var(--hp-text-color)]" />
+        </div>
+      </div>
     </div>
 
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -210,6 +219,7 @@ const usdToHeroToken = (usdAmount: number) => {
     </div>
   </section>
   <AboutAccountDialog v-if="showAboutAccountDialog" @close="showAboutAccountDialog = false" />
+  <HeroPrizeDescDialog v-if="showHeroPrizeDescDialog" @close="showHeroPrizeDescDialog = false" />
 </template>
 
 <style scoped lang="scss">

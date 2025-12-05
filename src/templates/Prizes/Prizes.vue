@@ -2,11 +2,11 @@
 import { ellipsisMiddle, formatDate, getWithdrawalStatusLabel } from '@/utils/common'
 import { computed, ref } from 'vue'
 import { useConnection, useSignTypedData } from '@wagmi/vue'
-import { useUserPrizesStorage, useUserWithdrawalHistoryStorage, useUserEvaluationsStorage } from '@/storages/heroPath'
+import { useUserWithdrawalHistoryStorage, useUserEvaluationsStorage } from '@/storages/heroPath'
 import { LoadingIcon, BaseIcon } from '@/components'
 import { UserWithdrawalHistory } from '@/types/heroPath'
 import { useUserTradeHistoryStorage } from '@/storages/trading'
-import { getAccountHistoryPnl } from '@/utils/evaluation'
+import { getAccountHistoryPnl, getPrizeWithdrawalAmount } from '@/utils/evaluation'
 import { SHARE_OF_PROFIT } from '@/constants'
 import { formatNumber, fromBigInt, multiplyBigInt, toBigInt } from '@/utils/bigint'
 import { PrizeTokens } from '@/config/prizeTokens'
@@ -23,7 +23,6 @@ const requireSymbolIcon = (symbol: string) => {
 }
 
 const { data: evaluations } = useUserEvaluationsStorage(address)
-const { data: prizesInfo, updateWithdrawnAmount } = useUserPrizesStorage(address)
 const { data: withdrawalHistory, addWithdrawalHistory } = useUserWithdrawalHistoryStorage(address)
 const { data: allTradeHistory } = useUserTradeHistoryStorage(address)
 
@@ -63,13 +62,17 @@ const totalPnl = computed(() => {
   return multiplyBigInt(getAccountHistoryPnl(fundedTradeHistory.value), toBigInt(SHARE_OF_PROFIT))
 })
 
+const withdrawnAmount = computed(() => {
+  return toBigInt(getPrizeWithdrawalAmount(withdrawalHistory.value.filter((item) => item.status === 'success')))
+})
+
 const profitAvailable = computed(() => {
-  const available = totalPnl.value - toBigInt(prizesInfo.value.withdrawnAmount)
+  const available = totalPnl.value - withdrawnAmount.value
   return available > 0n ? available : BigInt(0)
 })
 
 const totalAccountProfit = computed(() => {
-  return toBigInt(prizesInfo.value.withdrawnAmount) + profitAvailable.value
+  return withdrawnAmount.value + profitAvailable.value
 })
 
 const isValidAmount = computed(() => {
@@ -90,6 +93,7 @@ async function handleWithdraw() {
   const historyAmount = parseFloat(fromBigInt(parsedAmount, 6))
 
   const historyData: UserWithdrawalHistory = {
+    id: crypto.randomUUID(),
     timestamp: Math.floor(Date.now() / 1000),
     address: USDC_TOKEN_ADDRESS,
     amount: historyAmount,
@@ -120,8 +124,6 @@ async function handleWithdraw() {
       },
     } as any)
     addWithdrawalHistory(historyData)
-    const newWithdrawnAmount = toBigInt(prizesInfo.value.withdrawnAmount) + parsedAmount
-    updateWithdrawnAmount(parseFloat(fromBigInt(newWithdrawnAmount, 6)))
     amount.value = ''
   } catch (error) {
     console.error('Withdrawal failed:', error)
@@ -138,7 +140,7 @@ async function handleWithdraw() {
       <div class="text-[14px] mt-2 leading-[20px] text-[var(--hp-text-color)]">
         After contributing trading signals/insights to the protocol’s own independent trading strategy, the protocol
         will distribute hero prizes every 7 days.The prizes for each hero account are calculated based on the
-        contribution to the protocol’s trading strategy. Learn More
+        contribution to the protocol’s trading strategy. <span class="underline">Learn More</span>
       </div>
     </div>
 
