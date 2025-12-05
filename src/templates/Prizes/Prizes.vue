@@ -11,7 +11,6 @@ import { SHARE_OF_PROFIT } from '@/constants'
 import { formatNumber, fromBigInt, multiplyBigInt, toBigInt } from '@/utils/bigint'
 import { PrizeTokens } from '@/config/prizeTokens'
 
-const USDC_TOKEN_ADDRESS = '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d'
 const PAYOUT_NETWORK = 'BEP20'
 
 const { isConnected, address } = useConnection()
@@ -95,7 +94,7 @@ async function handleWithdraw() {
   const historyData: UserWithdrawalHistory = {
     id: crypto.randomUUID(),
     timestamp: Math.floor(Date.now() / 1000),
-    address: address.value!,
+    address: address.value!.toLowerCase(),
     amount: historyAmount,
     tokenSymbol: selectedToken.value.symbol,
     status: 'success',
@@ -258,7 +257,7 @@ async function handleWithdraw() {
           :disabled="confirmIsDisabled"
           @click="handleWithdraw"
         >
-          {{ selectedToken.symbol }} Prizes<LoadingIcon v-if="withdrawing" :is-black="true" class="ml-2" />
+          Claim {{ selectedToken.symbol }} Prizes<LoadingIcon v-if="withdrawing" :is-black="true" class="ml-2" />
         </button>
       </div>
     </div>
