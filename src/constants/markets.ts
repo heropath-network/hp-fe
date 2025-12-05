@@ -17,7 +17,7 @@ export const CRYPTO_MARKETS = [
   'AAVE/USD',
 ] as const
 
-export const PERP_MARKETS = ['ARB/USD', 'AVAX/USD', 'MATIC/USD', 'OP/USD'] as const
+export const PERP_MARKETS = CRYPTO_MARKETS
 
 export const FOUR_MEME_MARKETS = FOUR_MEME_MARKETS_CONST.map((market) => market.symbol)
 
