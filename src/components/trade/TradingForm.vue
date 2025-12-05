@@ -766,6 +766,7 @@ async function requestTradeSignature(actionLabel: 'Open Position' | 'Place Order
 
   const { entryPrice, triggerPrice } = getSignaturePrices()
   const baseAsset = selectedMarket.value.split('/')[0] || ''
+
   const messageLines = [
     'Trade Confirmation',
     `Action: ${actionLabel}`,
@@ -773,7 +774,7 @@ async function requestTradeSignature(actionLabel: 'Open Position' | 'Place Order
     `Market: ${selectedMarket.value}`,
     `Side: ${tradeSide.value}`,
     `Order Type: ${orderType.value}`,
-    `Size: ${size.value || '0'} ${baseAsset}`,
+    `Size: ${size.value} ${baseAsset}`,
     `Price: $${entryPrice}`,
     `Leverage: ${leverage.value}x`,
   ]
@@ -814,9 +815,9 @@ async function requestTradeSignature(actionLabel: 'Open Position' | 'Place Order
       market: selectedMarket.value,
       side: tradeSide.value,
       orderType: orderType.value,
-      size: size.value || '0',
+      size: size.value ? (parseFloat(size.value) * Math.pow(10, 18)).toString() : '0',
       price: entryPrice,
-      triggerPrice,
+      triggerPrice: triggerPrice ? (parseFloat(triggerPrice) * Math.pow(10, 18)).toString() : '0',
       leverage: leverageValue, // Pass as number, not BigInt
       contents,
     },
@@ -1188,12 +1189,6 @@ Additional costs from spread and/or price impact will also be applied.
 
 Funding fee for each position will be tracked every 1 hour and settled as funding fees when you add changes to your positions.`
     },
-    {
-      key: 'maxROE',
-      label: 'Max. ROE',
-      value: maxROE.value,
-      tooltip: 'Max. ROE (Return on Equity) represents the maximum profit percentage you can achieve relative to your margin. When the Max. ROE is reached, the position may be automatically closed by the pool\'s Auto-Deleveraging (ADL) setup.'
-    }
   ]
 })
 
