@@ -357,9 +357,15 @@
                 <div class="text-[#9b9b9b] text-[13px] leading-[18px]">ON</div>
               </div>
             </div>
-            <i class="iconfont icon-down text-[#9b9b9b] text-[16px] transform rotate-180"></i>
+            <i 
+              @click="showSettings = !showSettings"
+              :class="[
+                'iconfont icon-down text-[#9b9b9b] text-[16px] transform transition-transform cursor-pointer',
+                showSettings ? 'rotate-180' : ''
+              ]"
+            ></i>
           </div>
-          <div class="flex flex-col gap-[8px] ">
+          <div v-if="showSettings" class="flex flex-col gap-[8px] ">
             <!-- Slippage -->
             <div class="flex items-center justify-between ">
               <div class="flex flex-col">
@@ -367,11 +373,17 @@
               </div>
               <div class="flex gap-[8px] w-[168px]">
                 <div class="bg-[#272727] flex-1 flex items-center justify-center px-[8px] py-[7px]">
-                  <div class="flex-1 text-green-success text-[13px] text-center font-medium leading-[18px]">Auto 7.5%</div>
+                  <div class="flex-1 text-[#6CE99E] text-[13px] text-center font-medium leading-[18px]">Auto 7.5%</div>
                 </div>
                 <div class="bg-[#272727] flex-1 flex gap-[4px] items-center px-[8px] py-[7px] text-[13px]">
-                  <div class="flex-1 text-[#545454] text-[13px] leading-[18px] font-medium">Custom</div>
-                  <div class="text-gray-400 text-right text-[13px] leading-[18px]">%</div>
+                  <input
+                    v-model="slippageCustom"
+                    type="text"
+                    inputmode="decimal"
+                    class="flex-1 text-white text-[13px] leading-[18px] font-medium bg-transparent outline-none border-none placeholder:text-[#545454] max-w-[49px]"
+                    placeholder="Custom"
+                  />
+                  <div class="text-[#9b9b9b] text-right text-[13px] leading-[18px]">%</div>
                 </div>
               </div>
             </div>
@@ -382,20 +394,33 @@
               </div>
               <div class="flex gap-[8px] w-[168px]">
                 <div class="bg-[#272727] flex-1 flex items-center justify-center px-[8px] py-[7px]">
-                  <div class="flex-1 text-green-success text-[13px] text-center font-medium leading-[18px]">Avg 0.12</div>
+                  <div class="flex-1 text-[#6CE99E] text-[13px] text-center font-medium leading-[18px]">Avg 0.12</div>
                 </div>
                 <div class="bg-[#272727] flex-1 flex items-center px-[8px] py-[7px]">
-                  <div class="flex-1 text-white text-[13px] leading-[18px] font-medium">2</div>
+                  <input
+                    v-model="maxAutoGas"
+                    type="text"
+                    inputmode="decimal"
+                    class="flex-1 text-white text-[13px] leading-[18px] font-medium bg-transparent outline-none border-none placeholder:text-[#545454] max-w-[64px]"
+                    placeholder="0"
+                  />
                 </div>
               </div>
             </div>
             <!-- Max Auto Gas (Gwei) -->
             <div class="flex items-center justify-between ">
               <div class="flex flex-col">
-                <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Max Auto Gas</div>
+                <div class="text-[#9b9b9b] text-[13px] leading-[18px] border-b border-dotted border-[#9b9b9b] border-opacity-30">Max Auto Gas</div>
               </div>
-              <div class="bg-[#272727] flex items-center justify-end px-[8px] py-[7px] w-[168px]">
-                <div class="flex-1 text-[#545454] text-[13px] text-right font-medium leading-[18px]">Gwei</div>
+              <div class="bg-[#272727] flex items-center justify-end gap-[4px] px-[8px] py-[7px] w-[168px]">
+                <input
+                  v-model="maxAutoGasGwei"
+                  type="text"
+                  inputmode="decimal"
+                  class="flex-1 text-white text-[13px] leading-[18px] font-medium bg-transparent outline-none border-none text-right placeholder:text-[#545454] "
+                  placeholder="0"
+                />
+                <div class="text-[#545454] text-[13px] text-right font-medium leading-[18px]">Gwei</div>
               </div>
             </div>
             <!-- Anti-MEV RPC -->
@@ -650,6 +675,14 @@ const showOrderTypeMenu = ref(false)
 // Switch states
 const antiMevRpcEnabled = ref(true)
 const autoApprovalEnabled = ref(false)
+
+// Settings section visibility
+const showSettings = ref(false)
+
+// Settings input values
+const slippageCustom = ref('')
+const maxAutoGas = ref('2')
+const maxAutoGasGwei = ref('')
 
 // Advanced Trading Strategy checkbox
 const advancedTradingStrategyEnabled = ref(false)
