@@ -1,71 +1,55 @@
 <template>
   <tr class="transition hover:bg-gray-700/50">
-    <!-- Market Column -->
-    <td class="px-4 py-6 relative">
+    <!-- Market & Side Column -->
+    <td class="px-4 py-6 relative flex flex-col gap-1">
       <div class="flex items-center gap-2">
         <MarketIcon :symbol="order.market" :size="24" />
         <div class="flex flex-col gap-1">
-          <div class="text-[13px] leading-[18px] text-white font-normal">
+          <div class="text-[13px] leading-[18px] text-white">
             {{ order.market }}
           </div>
           <div class="flex items-center gap-2">
-            <div class="text-[13px] leading-[18px] text-[#9b9b9b] font-normal">
-              {{ getTimeframe() }}
-            </div>
+            <span :class="['inline-block text-[13px]',  order.side === 'long' ? 'text-green-success' : 'text-red-error']">
+              {{ order.side.charAt(0).toUpperCase() + order.side.slice(1) }}
+            </span> 
             <ChainLabel :chain-id="order.chainId" :liquidity-source="order.liquiditySource" />
           </div>
         </div>
       </div>
     </td>
     
-    <!-- Type Column -->
+    <!-- Operation & Type Column -->
     <td class="px-4 py-6">
-      <span
-        class="inline-block bg-blue-500/20 px-2 py-0.5 text-xs font-semibold text-blue-500"
-      >
-        {{ order.orderType.toUpperCase() }}
-      </span>
-    </td>
-    
-    <!-- Side Column -->
-    <td class="px-4 py-6">
-      <span
-        :class="[
-          'inline-block px-2 py-0.5 text-xs font-semibold',
-          order.side === 'long'
-            ? 'bg-green-success/20 text-green-success'
-            : 'bg-red-error/20 text-red-error'
-        ]"
-      >
-        {{ order.side.toUpperCase() }}
-      </span>
-    </td>
-    
-    <!-- Size Column -->
-    <td class="px-4 py-6 text-right">
-      <div class="text-[13px] leading-[18px] text-white font-normal">
-        {{ formatNumber(order.size, 4) }}
+      <div class="flex flex-col gap-1">
+      <span>Open Position</span>
+        <span class="inline-block text-[13px] text-[#9B9B9B]">
+          {{ order.orderType === 'limit' ? 'Limit Order' : 'Open Market' }}
+        </span>
       </div>
     </td>
     
-    <!-- Trigger Price Column -->
-    <td class="px-4 py-6 text-right">
-      <div class="text-[13px] leading-[18px] text-white font-normal">
+
+    <!-- Est. Fill Price Column -->
+    <td class="px-4 py-6 text-left">
+      <div class="text-[13px] leading-[18px] text-white">
+        {{ order.orderType === 'limit' && order.side === 'long' ? '≤' : '≥' }}
         ${{ formatNumber(order.triggerPrice, 2) }}
       </div>
     </td>
     
-    <!-- Mark Price Column -->
-    <td class="px-4 py-6 text-right">
-      <div class="text-[13px] leading-[18px] text-white font-normal">
-        ${{ getMarkPrice(order.market) }}
+    <!-- Amount Column -->
+    <td class="px-4 py-6 text-left">
+      <div class="text-[13px] leading-[18px] text-white">
+        {{ formatNumber(order.size, 4) }} {{ order.market.split('/')[0] }}
       </div>
     </td>
     
-    <!-- Created Column -->
-    <td class="px-4 py-6">
-      <div class="text-[13px] leading-[18px] text-[#9b9b9b] font-normal">
-        {{ formatTimestamp(order.timestamp) }}
+    
+    <!-- Margin Column -->
+    <td class="px-4 py-6 text-left">
+      <div class="text-[13px] leading-[18px] text-white flex flex-col gap-1">
+        <span>--</span>
+        <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Cross</span>
       </div>
     </td>
     
@@ -79,7 +63,7 @@
           signing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#333333]'
         ]"
       >
-        <span class="text-[12px] leading-[16px] text-[#ff4e59] font-medium text-center whitespace-nowrap">
+        <span class="text-[12px] leading-[16px] text-white font-medium text-center whitespace-nowrap">
           {{ signing ? 'Signing...' : 'Cancel' }}
         </span>
         <LoadingIcon v-if="signing" class="ml-1" :is-black="false" />

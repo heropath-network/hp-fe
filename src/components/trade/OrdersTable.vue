@@ -4,13 +4,11 @@
       <table class="w-full text-sm"> 
         <thead class="border-b border-gray-800">
           <tr class="text-xs text-gray-400">
-            <th class="px-4 py-3 text-left font-medium">Market</th>
-            <th class="px-4 py-3 text-left font-medium">Type</th>
-            <th class="px-4 py-3 text-left font-medium">Side</th>
-            <th class="px-4 py-3 text-right font-medium">Size</th>
-            <th class="px-4 py-3 text-right font-medium">Trigger Price</th>
-            <th class="px-4 py-3 text-right font-medium">Mark Price</th>
-            <th class="px-4 py-3 text-left font-medium">Created</th>
+            <th class="px-4 py-3 text-left font-medium">Market & Side</th>
+            <th class="px-4 py-3 text-left font-medium">Operation & Type</th>
+            <th class="px-4 py-3 text-left font-medium">Est. Fill Price</th>
+            <th class="px-4 py-3 text-left font-medium">Amount</th>
+            <th class="px-4 py-3 text-left font-medium">Margin</th>
             <th class="px-4 py-3 text-center font-medium">Actions</th>
           </tr>
         </thead>
