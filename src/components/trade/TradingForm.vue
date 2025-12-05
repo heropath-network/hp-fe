@@ -185,18 +185,18 @@
               <!-- Slider -->
               <div class="relative h-4 w-[217px] px-2">
                 <div class="absolute inset-0 flex items-center">
-                  <div class="w-full h-1 bg-[#323232] rounded-full relative">
+                  <div class="w-full h-[5px] bg-[#323232] rounded-full relative">
                     <div 
                       class="absolute left-0 top-0 h-full bg-[#10c8a8] rounded-full"
                       :style="{ width: `${sizePercentage}%` }"
                     ></div>
                     <!-- Slider markers -->
                     <div class="absolute inset-0 flex justify-between items-center pointer-events-none">
-                      <div class="w-1 h-1 rounded-full bg-[#9b9b9b]"></div>
-                      <div class="w-1 h-1 rounded-full bg-[#9b9b9b]"></div>
-                      <div class="w-1 h-1 rounded-full bg-[#9b9b9b]"></div>
-                      <div class="w-1 h-1 rounded-full bg-[#9b9b9b]"></div>
-                      <div class="w-1 h-1 rounded-full bg-[#9b9b9b]"></div>
+                      <div :class="sizePercentage >= 20 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'" class="ml-[1.5px] w-[3px] h-[3px] rounded-full"></div>
+                      <div :class="sizePercentage >= 40 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'" class="w-[3px] h-[3px] rounded-full"></div>
+                      <div :class="sizePercentage >= 60 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'" class="w-[3px] h-[3px] rounded-full"></div>
+                      <div :class="sizePercentage >= 80 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'" class="w-[3px] h-[3px] rounded-full"></div>
+                      <div :class="sizePercentage >= 100 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'" class="mr-[1.5px] w-[3px] h-[3px] rounded-full"></div>
                     </div>
                   </div>
                 </div>
