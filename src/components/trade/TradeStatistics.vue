@@ -55,15 +55,16 @@
               ({{ priceChange24h >= 0 ? '+' : '' }}{{ priceChange24h.toFixed(2) }}%)
             </div>
             <div
-              v-else-if="!isMarketClosed && isLoadingPriceChange"
-              class="ml-2 h-4 w-16 animate-pulse rounded bg-gray-700"
+              v-else-if="!isMarketClosed && isLoadingPriceChange "
+              class="ml-2 h-4 w-[200px] animate-pulse rounded bg-gray-700"
             ></div>
           </div>
         </div>
 
         <div class="h-5 w-px bg-gray-800"></div>
 
-        <!-- Est. 1H Funding (L/S) -->
+        <div v-if="!isMemeMarket" class="flex items-center flex-1 overflow-x-auto gap-4">
+          <!-- Est. 1H Funding (L/S) -->
         <div class="flex flex-col min-w-[100px]">
           <div class="text-xs text-gray-400 mb-1">Est. 1H Funding (L/S)</div>
           <div class="text-xs text-white">
@@ -109,8 +110,43 @@
             </span>
           </div>
         </div>
+        </div>
+
+
+        <div v-if="isMemeMarket" class="flex flex-row items-center gap-4">
+          <div class="flex flex-col gap-[4px] flex-1">
+            <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Liq</div>
+            <div class="text-white text-[13px] leading-[18px] font-medium">$1.6M</div>
+          </div>
+          <div class="h-5 w-px bg-gray-800"></div>
+          <div class="flex flex-col gap-[4px] flex-1">
+            <div class="text-[#9b9b9b] text-[13px] leading-[18px]">24h Vol</div>
+            <div class="text-white text-[13px] leading-[18px] font-medium">$627.1K</div>
+          </div>
+          <div class="h-5 w-px bg-gray-800"></div>
+          <div class="flex flex-col gap-[4px] flex-1">
+            <div class="text-[#9b9b9b] text-[13px] leading-[18px] whitespace-nowrap">Total Fees</div>
+            <div class="flex items-center gap-1">
+              <MarketIcon :symbol="'BNB'" :size="15" />
+              <div class="text-white text-[13px] leading-[18px] font-medium">2.53</div>
+            </div>
+          </div>
+          <div class="h-5 w-px bg-gray-800"></div>
+          <div class="flex flex-col gap-[4px] flex-1">
+            <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Supply</div>
+            <div class="text-white text-[13px] leading-[18px] font-medium">1M</div>
+          </div>
+          <div class="h-5 w-px bg-gray-800"></div>
+          <div class="flex flex-col gap-[4px] flex-1">
+            <div class="text-[#9b9b9b] text-[13px] leading-[18px]  whitespace-nowrap">Taxes B/S</div>
+            <div class="text-[#ffb110] text-[13px] leading-[18px] font-medium">5% / 5%</div>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Trading Statistics Row -->
+    
 
     <!-- Chart Source Selector -->
     <div class="flex items-center">
@@ -204,7 +240,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useTradeStore } from '@/stores/tradeStore'
 import { formatSmallPrice } from '@/utils/bigint'
 import { useMarket24hRates } from '@/composables/useMarket24hRates'
@@ -216,6 +252,7 @@ import SourceLiquidityLabel from '@/components/common/SourceLiquidityLabel.vue'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 import { getAvailableOraclesForMarket, isMarketAvailableInFourMeme } from '@/utils/oracleMatching'
 import { ORACLE_NAMES } from '@/constants'
+import { getFourMemeMarket } from '@/packages/four-meme'
 
 const tradeStore = useTradeStore()
 const marketStatus = useMarketStatus()
@@ -328,4 +365,3 @@ function getChartSourceIcon(oracleName: string): string {
 
 defineEmits(['openMarketSelect'])
 </script>
-
