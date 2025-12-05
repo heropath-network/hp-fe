@@ -4,7 +4,7 @@ export enum EvaluationPlan {
   LegendPlan = 'LegendPlan',
 }
 
-export interface EvaluationGlobalConfig {
+export interface EvaluationPlanBaseConfig {
   profitSplit: number
   maxDailyLoss: number
   maxDrawdown: number

@@ -7,7 +7,7 @@ import BaseIcon from '@/components/BaseIcon.vue'
 import { useUserQuestDiscountStatusStorage } from '@/storages/heroPath'
 import { useConnection } from '@wagmi/vue'
 import { QUEST_DISCOUNT_AMOUNT } from '@/constants'
-import { EvaluationGlobalConfigInfo, EvaluationPlanConfig } from '@/config/evaluation'
+import { EvaluationPlanConfig } from '@/config/evaluation'
 import { TOKEN_PRICES } from '@/config/paymentTokens'
 import HeroIcon from '@/assets/icons/tokens/HERO.svg'
 import { formatNumber, toBigInt } from '@/utils/bigint'
@@ -35,26 +35,30 @@ const formatPercent = (value: number) => `${value}%`
 const formatSplit = (value: number) => `Up to ${formatPercent(value)}`
 const formatLeverage = (value: number) => `Up to ${value}x`
 
-const tableData = computed(() => EvaluationPlanConfig[activePlan.value])
+const activePlanConfig = computed(() => EvaluationPlanConfig[activePlan.value])
+const tableData = computed(() => activePlanConfig.value.levels)
 
-const highlights = computed(() => [
-  {
-    label: 'Profit Split',
-    value: formatSplit(EvaluationGlobalConfigInfo.profitSplit),
-  },
-  {
-    label: 'Max. Daily Loss',
-    value: formatPercent(EvaluationGlobalConfigInfo.maxDailyLoss),
-  },
-  {
-    label: 'Max. Drawdown',
-    value: formatPercent(EvaluationGlobalConfigInfo.maxDrawdown),
-  },
-  {
-    label: 'Leverage',
-    value: formatLeverage(EvaluationGlobalConfigInfo.leverage),
-  },
-])
+const highlights = computed(() => {
+  const baseConfig = activePlanConfig.value.base
+  return [
+    {
+      label: 'Profit Split',
+      value: formatSplit(baseConfig.profitSplit),
+    },
+    {
+      label: 'Max. Daily Loss',
+      value: formatPercent(baseConfig.maxDailyLoss),
+    },
+    {
+      label: 'Max. Drawdown',
+      value: formatPercent(baseConfig.maxDrawdown),
+    },
+    {
+      label: 'Leverage',
+      value: formatLeverage(baseConfig.leverage),
+    },
+  ]
+})
 
 const hasDiscount = computed(() => unusedDiscounts.value.length > 0)
 

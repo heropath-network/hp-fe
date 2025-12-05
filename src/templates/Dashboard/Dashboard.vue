@@ -8,10 +8,11 @@ import router, { ROUTE_NAMES } from '@/router'
 import { useUserTradeHistoryStorage, useUserPositionsStorage } from '@/storages/trading'
 import { getAccountHistoryPnl, getAccountTotalVolume, getPositionsUnrealizedPnl } from '@/utils/evaluation'
 import { useAllTokenPrices } from '@/use/useTokenPrices'
-import { EvaluationGlobalConfigInfo } from '@/config/evaluation'
+import { EvaluationPlanConfig } from '@/config/evaluation'
 import { useEvaluationAccount } from '@/composables/useEvaluationAccount'
 import { useRoute } from 'vue-router'
 import { formatNumber, multiplyBigInt, toBigInt, absBigInt } from '@/utils/bigint'
+import type { EvaluationPlanBaseConfig } from '@/types/evaluation'
 
 const { remainingText: dayCountDown } = useDayCountDown()
 
@@ -103,13 +104,40 @@ const targetEquity = computed(() => {
   return accountSize.value + toBigInt(selectedEvaluation.value.evaluationConfig.profitGoal)
 })
 
+const selectedPlanBase = computed<EvaluationPlanBaseConfig | null>(() => {
+  if (!selectedEvaluation.value) {
+    return null
+  }
+
+  const { evaluationConfig } = selectedEvaluation.value
+  const matchedPlan = Object.values(EvaluationPlanConfig).find((plan) =>
+    plan.levels.some(
+      (level) =>
+        level.level === evaluationConfig.level &&
+        level.accountSize === evaluationConfig.accountSize &&
+        level.profitGoal === evaluationConfig.profitGoal &&
+        level.fee === evaluationConfig.fee,
+    ),
+  )
+
+  return matchedPlan?.base ?? null
+})
+
+const profitSplit = computed(() => selectedPlanBase.value?.profitSplit ?? 0)
+
 const maxDrawdownEquityLimit = computed(() => {
-  const maxDrawdownMultiplier = toBigInt(1 - EvaluationGlobalConfigInfo.maxDrawdown / 100)
+  if (!selectedPlanBase.value) {
+    return BigInt(0)
+  }
+  const maxDrawdownMultiplier = toBigInt(1 - selectedPlanBase.value.maxDrawdown / 100)
   return multiplyBigInt(accountSize.value, maxDrawdownMultiplier)
 })
 
 const maxDailyLossEquityLimit = computed(() => {
-  const maxDailyLossMultiplier = toBigInt(1 - EvaluationGlobalConfigInfo.maxDailyLoss / 100)
+  if (!selectedPlanBase.value) {
+    return BigInt(0)
+  }
+  const maxDailyLossMultiplier = toBigInt(1 - selectedPlanBase.value.maxDailyLoss / 100)
   return multiplyBigInt(priorDayBalance.value, maxDailyLossMultiplier)
 })
 
@@ -276,7 +304,7 @@ function openTradeTerminal() {
             <article class="flex h-[100px] flex-col justify-center gap-2 bg-[var(--hp-bg-light)] px-6 py-5">
               <div>
                 <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
-                  {{ EvaluationGlobalConfigInfo.profitSplit }}%
+                  {{ profitSplit }}%
                 </p>
                 <p class="text-sm leading-5 text-[var(--hp-text-color)]">Profit Share</p>
               </div>

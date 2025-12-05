@@ -62,7 +62,7 @@ const agreeRefund = ref(true)
 const pendingLevel = ref<number | null>(null)
 
 const accountOptions = computed<EvaluationConfig[]>(() => {
-  return EvaluationPlanConfig[activePlan.value]
+  return EvaluationPlanConfig[activePlan.value].levels
 })
 
 watch(
@@ -127,11 +127,6 @@ const productLabel = computed(() => {
   const size = selectedAccount.value?.accountSize ?? 0
   return `$${formatNumber(toBigInt(size), 0)} - ${planTabs.find((tab) => tab.value === activePlan.value)?.label || ''}`
 })
-
-// const profitSplitLabel = computed(() => {
-//   const split = EvaluationGlobalConfigInfo.profitSplit
-//   return `${split}/${100 - split} Profit Split`
-// })
 
 function formatCurrency(value: bigint) {
   return `$${formatNumber(value, 2)}`

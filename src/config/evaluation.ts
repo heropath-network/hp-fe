@@ -1,10 +1,22 @@
-import { EvaluationGlobalConfig } from './../types/evaluation'
+import { EvaluationPlanBaseConfig } from './../types/evaluation'
 import { EvaluationPlan, EvaluationConfig } from '@/types/evaluation'
 
-export const EvaluationGlobalConfigInfo: EvaluationGlobalConfig = {
+const ChampionPlanBaseConfig: EvaluationPlanBaseConfig = {
   profitSplit: 90,
   maxDailyLoss: 5,
   maxDrawdown: 10,
+  leverage: 5,
+}
+const WarriorPlanBaseConfig: EvaluationPlanBaseConfig = {
+  profitSplit: 90,
+  maxDailyLoss: 3,
+  maxDrawdown: 5,
+  leverage: 5,
+}
+const LegendPlanBaseConfig: EvaluationPlanBaseConfig = {
+  profitSplit: 90,
+  maxDailyLoss: 3,
+  maxDrawdown: 3,
   leverage: 5,
 }
 
@@ -119,8 +131,22 @@ const LegendPlan: EvaluationConfig[] = [
   },
 ]
 
-export const EvaluationPlanConfig: { [key in EvaluationPlan]: EvaluationConfig[] } = {
-  [EvaluationPlan.ChampionPlan]: ChampionPlan,
-  [EvaluationPlan.WarriorPlan]: WarriorPlan,
-  [EvaluationPlan.LegendPlan]: LegendPlan,
+export const EvaluationPlanConfig: {
+  [key in EvaluationPlan]: {
+    levels: EvaluationConfig[]
+    base: EvaluationPlanBaseConfig
+  }
+} = {
+  [EvaluationPlan.ChampionPlan]: {
+    levels: ChampionPlan,
+    base: ChampionPlanBaseConfig,
+  },
+  [EvaluationPlan.WarriorPlan]: {
+    levels: WarriorPlan,
+    base: WarriorPlanBaseConfig,
+  },
+  [EvaluationPlan.LegendPlan]: {
+    levels: LegendPlan,
+    base: LegendPlanBaseConfig,
+  },
 }
