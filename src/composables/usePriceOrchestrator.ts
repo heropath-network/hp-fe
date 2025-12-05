@@ -37,8 +37,7 @@ export function usePriceOrchestrator() {
     const prices = gainsPrices.getCurrentWebSocketPrices()
 
     prices.forEach((priceData, symbol) => {
-      // support BNB/USD in MuxV3 with gTrade real-time update
-      if (isMarketAvailableInMuxV3(symbol) && symbol !== 'BNB/USD' && tradeStore.selectedOracle === ProjectId.MUX_V3) {
+      if (isMarketAvailableInMuxV3(symbol) && tradeStore.selectedOracle === ProjectId.MUX_V3) {
         return
       }
 
