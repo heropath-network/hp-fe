@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useConnection } from '@wagmi/vue'
 import { ellipsisMiddle, formatNumber, getAccountTypeLabel } from '@/utils/common'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useDayCountDown } from '@/use/useDayCountDown'
 import BaseIcon from '@/components/BaseIcon.vue'
 import router, { ROUTE_NAMES } from '@/router'
@@ -10,6 +10,7 @@ import { getAccountHistoryPnl, getAccountTotalVolume, getPositionsUnrealizedPnl 
 import { useAllTokenPrices } from '@/use/useTokenPrices'
 import { EvaluationGlobalConfigInfo } from '@/config/evaluation'
 import { useEvaluationAccount } from '@/composables/useEvaluationAccount'
+import { useRoute } from 'vue-router'
 
 const { remainingText: dayCountDown } = useDayCountDown()
 
@@ -18,6 +19,7 @@ const { data: allTradeHistory } = useUserTradeHistoryStorage(address)
 const { data: allPositions } = useUserPositionsStorage(address)
 
 const { prices: allTokenPrices } = useAllTokenPrices()
+const route = useRoute()
 
 const {
   evaluationList,
@@ -127,8 +129,34 @@ const maxDailyLossEquityLimit = computed(() => {
 
 const showEvaluationDropdown = ref(false)
 
+const routeAccountId = computed(() => {
+  const id = route.query.id
+  return Array.isArray(id) ? id[0] : id
+})
+
+watch(
+  [routeAccountId, dashboardEvaluationList],
+  ([routeId, list]) => {
+    if (!list.length) {
+      return
+    }
+    const matchedAccountId = routeId && list.find((item) => item.accountId === routeId)?.accountId
+    const targetId = matchedAccountId || list[0].accountId
+
+    if (selectedEvaluationId.value !== targetId) {
+      selectEvaluation(targetId)
+    }
+
+    if (routeId !== targetId) {
+      router.replace({ name: ROUTE_NAMES.Dashboard, query: { ...route.query, id: targetId } })
+    }
+  },
+  { immediate: true },
+)
+
 function handleSelectEvaluation(id: string) {
   selectEvaluation(id)
+  router.replace({ name: ROUTE_NAMES.Dashboard, query: { ...route.query, id } })
   showEvaluationDropdown.value = false
 }
 </script>
