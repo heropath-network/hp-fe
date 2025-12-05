@@ -200,10 +200,6 @@
           </div>
         </div>
         <div class="flex items-center justify-between">
-          <span class="text-[14px] leading-[20px] text-[#9b9b9b]">Max. ROE</span>
-          <span class="text-[14px] leading-[20px] text-[#ffb110] text-right">{{ formatPercentage(maxROE) }}%</span>
-        </div>
-        <div class="flex items-center justify-between">
           <span class="text-[14px] leading-[20px] text-[#9b9b9b]">Current Total PNL</span>
           <span :class="[
             'text-[14px] leading-[20px] text-right',

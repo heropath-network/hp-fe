@@ -144,15 +144,6 @@
             <div class="h-px w-full bg-[#272727] mt-0.5"></div>
           </div>
         </div>
-
-        <!-- Max. ROE -->
-        <div class="flex items-center justify-between">
-          <div class="flex flex-col">
-            <span class="text-[14px] leading-[20px] text-[#9b9b9b] font-normal">Max. ROE</span>
-            <div class="h-px w-full bg-[#272727] mt-0.5"></div>
-          </div>
-          <span class="text-[14px] leading-[20px] text-[#ffb110] font-normal text-right">{{ maxROE }}%</span>
-        </div>
       </div>
 
       <!-- Confirm Button -->
