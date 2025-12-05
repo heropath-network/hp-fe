@@ -150,5 +150,37 @@ export default class Widget {
       custom_css_url: 'chart.v6.css',
     }
   }
-}
 
+  updatePricePrecision(decimals: number, symbol?: string) {
+    const normalizedDecimals = Math.max(0, Math.floor(decimals || 0))
+    if (this.datafeed.decimals === normalizedDecimals) {
+      return
+    }
+
+    this.datafeed.decimals = normalizedDecimals
+
+    if (!this.tvWidget) {
+      return
+    }
+
+    const applyPrecision = () => {
+      const symbolInterval = this.tvWidget?.symbolInterval ? this.tvWidget.symbolInterval() : undefined
+      const currentSymbol = symbol || symbolInterval?.symbol || symbol
+      const currentResolution =
+        (this.tvWidget?.activeChart && this.tvWidget.activeChart().resolution()) ||
+        symbolInterval?.interval ||
+        '5'
+
+      if (currentSymbol && currentResolution) {
+        this.tvWidget.setSymbol(currentSymbol, currentResolution, () => {})
+      }
+    }
+
+    if (!this.isTvWidgetChartReady) {
+      this.tvWidget.onChartReady(() => applyPrecision())
+      return
+    }
+
+    applyPrecision()
+  }
+}

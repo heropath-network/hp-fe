@@ -30,6 +30,38 @@ const tradeStore = useTradeStore()
 const selectedMarket = computed(() => tradeStore.selectedMarket)
 const selectedOracle = computed(() => tradeStore.selectedOracle)
 
+const DEFAULT_PRICE_PRECISION = 2
+
+function derivePrecisionFromPrice(price?: number | null) {
+  if (price === null || price === undefined || !isFinite(price) || price <= 0) {
+    return DEFAULT_PRICE_PRECISION
+  }
+
+  if (price < 1) {
+    return 6
+  }
+
+  if (price < 100) {
+    return 4
+  }
+
+  return 2
+}
+
+function getStoredMarketPrice(market: string) {
+  const marketPrice =
+    (tradeStore.marketPrices as any)?.[market]?.price ??
+    (tradeStore.marketPrices as any)?.value?.[market]?.price
+  if (!marketPrice) {
+    return null
+  }
+
+  const priceNumber = Number.parseFloat(marketPrice.toString()) / 1e18
+  return Number.isFinite(priceNumber) ? priceNumber : null
+}
+
+const pricePrecision = ref(derivePrecisionFromPrice(getStoredMarketPrice(selectedMarket.value)))
+
 const gainsPrice24h = useGainsPrice24h()
 const muxV3Price24h = useMuxV3Price24h()
 const fourMemePrice24h = useFourMemePrice24h()
@@ -75,8 +107,17 @@ function clearUpdateRealtimePriceTimer() {
   }
 }
 
+function maybeUpdatePrecisionFromPrice(price: number) {
+  const newPrecision = derivePrecisionFromPrice(price)
+  if (newPrecision !== pricePrecision.value) {
+    pricePrecision.value = newPrecision
+    widget.value?.updatePricePrecision(newPrecision, selectedMarket.value)
+  }
+}
+
 function initChartWidget() {
   showChart.value = false
+  pricePrecision.value = derivePrecisionFromPrice(getStoredMarketPrice(selectedMarket.value))
   
   try {
     if (widget.value) {
@@ -90,10 +131,10 @@ function initChartWidget() {
       chartSymbol: undefined,
       bar: undefined,
       isFetching: false,
-      fetchCount: 0,
+        fetchCount: 0,
     }
 
-    widget.value = markRaw(new Widget(2))
+    widget.value = markRaw(new Widget(pricePrecision.value))
     
 
     widget.value.setCandlesGetter(
@@ -149,6 +190,7 @@ function initChartWidget() {
               change24hRate = muxV3Price24h.calculate24hChangeRate(latestBar.close, symbolName)
             }
 
+            maybeUpdatePrecisionFromPrice(latestBar.close)
             tradeStore.setCurrentPrice(latestBar.close, change24hRate)
           }
           
@@ -328,6 +370,7 @@ function useMuxV3RealtimePrices(chartSymbol: string) {
       
       const priceNum = parseFloat(newPrice)
       const change24hRate = muxV3Price24h.calculate24hChangeRate(priceNum, marketSymbol)
+      maybeUpdatePrecisionFromPrice(priceNum)
       tradeStore.setCurrentPrice(priceNum, change24hRate)
     }
   }, 300)
@@ -355,6 +398,7 @@ function useGainsRealtimePrices(chartSymbol: string) {
       
       const priceNum = typeof price.value === 'number' ? price.value : parseFloat(priceStr)
       const change24hRate = gainsPrice24h.calculate24hChangeRate(priceNum, chartSymbol)
+      maybeUpdatePrecisionFromPrice(priceNum)
       tradeStore.setCurrentPrice(priceNum, change24hRate)
     }
   }, 300)
@@ -380,6 +424,7 @@ function useFourMemeRealtimePrices(chartSymbol: string) {
       
       const priceNum = typeof price.value === 'number' ? price.value : parseFloat(priceStr)
       const change24hRate = fourMemePrice24h.calculate24hChangeRate(priceNum, market.tokenId)
+      maybeUpdatePrecisionFromPrice(priceNum)
       tradeStore.setCurrentPrice(priceNum, change24hRate)
     }
   }, 300)
@@ -395,6 +440,7 @@ function updateRealtimePrice(
   if (!widget.value || !widget.value.tvWidget || !!latestBarData.value?.isFetching) {
     return
   }
+
   
   const bar = buildCandle(Number(price), resolution, chartSymbol, timestamp)
   
@@ -421,11 +467,11 @@ function startRealtimePriceUpdates(projectId: ProjectId, chartSymbol: string) {
   if (realtimePricesScope.scope) {
     realtimePricesScope.scope.run(() => {
       if (projectId === ProjectId.FOUR_MEME) {
-        // useFourMemeRealtimePrices(chartSymbol)
+        useFourMemeRealtimePrices(chartSymbol)
       } else if (projectId === ProjectId.MUX_V3) {
         useMuxV3RealtimePrices(chartSymbol)
       } else if (projectId === ProjectId.GAINS) {
-        // useGainsRealtimePrices(chartSymbol)
+        useGainsRealtimePrices(chartSymbol)
       }
     })
   } else {
@@ -443,6 +489,9 @@ function stopRealtimePriceUpdates() {
 
 watch(selectedMarket, (newMarket, oldMarket) => {
   if (newMarket !== oldMarket && widget.value?.tvWidget) {
+    pricePrecision.value = derivePrecisionFromPrice(getStoredMarketPrice(newMarket))
+    widget.value?.updatePricePrecision(pricePrecision.value, newMarket)
+
     widget.value.onMarketChanged(newMarket, () => {
       latestBarData.value = {
         chartSymbol: undefined,
@@ -529,6 +578,9 @@ watch(selectedMarket, (newMarket) => {
 
 watch(selectedOracle, (newOracle, oldOracle) => {
   if (newOracle !== oldOracle) {
+    pricePrecision.value = derivePrecisionFromPrice(getStoredMarketPrice(selectedMarket.value))
+    widget.value?.updatePricePrecision(pricePrecision.value, selectedMarket.value)
+
     if (oldOracle === ProjectId.GAINS) {
       gainsPrice24h.stopAutoRefresh()
     } else if (oldOracle === ProjectId.MUX_V3) {

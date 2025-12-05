@@ -55,9 +55,8 @@ export default class Datafeed implements TradingView.IDatafeedChartApi {
       timezone: 'Etc/UTC',
       ticker: symbolName,
       minmov: 1,
-      // Set pricescale to 1 for whole numbers (no decimals, rounded)
-      // This will display prices like 60,001 instead of 60,000.56
-      pricescale: 1,
+      // Use a dynamic price scale so small prices keep enough precision on the y-axis
+      pricescale: this.getPriceScale(),
       has_seconds: false,
       has_intraday: true,
       intraday_multipliers: ['1', '3', '5', '15', '30', '60', '240'],
@@ -165,5 +164,9 @@ export default class Datafeed implements TradingView.IDatafeedChartApi {
   getServerTime(callback: TradingView.ServerTimeCallback) {
     // Not implemented
   }
-}
 
+  private getPriceScale() {
+    const decimals = Math.max(0, this.decimals || 0)
+    return Math.pow(10, decimals || 0)
+  }
+}
