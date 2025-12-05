@@ -140,7 +140,7 @@ function onUpdatePublicProfileStatus(accountId: string, value: boolean) {
         </div>
         <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
           <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
-            {{ formatPercentage(tradingWinRate, 2) }}
+            {{ formatNumber(toBigInt(tradingWinRate), 2) }}%
           </p>
           <p class="text-sm leading-5 text-[var(--hp-text-color)]">Trading Win Rate</p>
         </div>

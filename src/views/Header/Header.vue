@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import ConnectWalletButton from './ConnectWalletButton.vue'
 import { ROUTE_NAMES } from '@/router'
 import LogoIcon from '@/assets/HeroPath.svg'
+import BSCIcon from '@/assets/img/BSC.svg'
 
 const router = useRouter()
 
@@ -26,6 +27,11 @@ function goNewEvaluation() {
       >
         New Evaluation
       </button>
+      <div class="bg-[var(--hp-line-color)] w-[1px] h-[20px]"></div>
+      <div class="flex items-center cursor-pointer">
+        <img :src="BSCIcon" alt="BSC" class="w-[20px] h-[20px]" />
+        <span class="ml-1 font-[500] leading-[20px] text-[14px]">BNB Chain</span>
+      </div>
       <div class="bg-[var(--hp-line-color)] w-[1px] h-[20px]"></div>
       <ConnectWalletButton />
     </div>

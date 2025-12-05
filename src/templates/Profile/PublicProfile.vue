@@ -14,7 +14,7 @@ import { useUserPayoutsStorage } from '@/storages/heroPath'
 import { countTradesWinRate, getAccountHistoryPnl, getAccountTotalVolume } from '@/utils/evaluation'
 import { SHARE_OF_PROFIT } from '@/constants'
 import * as _ from 'lodash-es'
-import { formatNumber, formatPercentage, multiplyBigInt, toBigInt } from '@/utils/bigint'
+import { formatNumber, multiplyBigInt, toBigInt } from '@/utils/bigint'
 
 const router = useRouter()
 
@@ -158,7 +158,7 @@ const lifetimeProfitWithdrawn = computed(() => {
           </div>
           <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
             <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
-              {{ formatPercentage(tradingWinRate, 2) }}
+              {{ formatNumber(toBigInt(tradingWinRate), 2) }}%
             </p>
             <p class="text-sm leading-5 text-[var(--hp-text-color)]">Trading Win Rate</p>
           </div>

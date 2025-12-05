@@ -11,7 +11,7 @@ import { EvaluationGlobalConfigInfo, EvaluationPlanConfig } from '@/config/evalu
 
 const planTabs = [
   { label: 'Champion Plan', value: EvaluationPlan.ChampionPlan },
-  { label: 'Hero Plan', value: EvaluationPlan.HeroPlan },
+  { label: 'Warrior Plan', value: EvaluationPlan.WarriorPlan },
   { label: 'Legend Plan', value: EvaluationPlan.LegendPlan },
 ]
 

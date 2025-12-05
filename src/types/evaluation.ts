@@ -1,6 +1,6 @@
 export enum EvaluationPlan {
   ChampionPlan = 'ChampionPlan',
-  HeroPlan = 'HeroPlan',
+  WarriorPlan = 'WarriorPlan',
   LegendPlan = 'LegendPlan',
 }
 

@@ -57,7 +57,7 @@ watch(containerDom, (newVal) => {
 const { isConnected, address } = useConnection()
 
 const { data: taskStatus, updateTaskStatus, clear: clearTaskStatus } = useUserQuestTaskStatusStorage(address)
-const { addDiscountStatus } = useUserQuestDiscountStatusStorage(address)
+const { addDiscountStatus, clear: clearDiscountStatus } = useUserQuestDiscountStatusStorage(address)
 
 const tasks = ref<QuestTask[]>([
   {
@@ -133,6 +133,7 @@ function resetAllTasksCompleted() {
     updateTaskStatus(task.id, true)
   })
   clearTaskStatus()
+  clearDiscountStatus()
 }
 
 function initialTaskStatus() {
