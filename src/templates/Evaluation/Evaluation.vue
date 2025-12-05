@@ -185,7 +185,17 @@ const usdToHeroToken = (usdAmount: number) => {
           </template>
           <template v-else>
             <span class="text-base font-medium leading-[24px]">Pay</span>
-            <span class="text-[20px] font-semibold leading-[20px]">{{ formatFee(item.fee) }}</span>
+            <div
+              class="flex items-center leading-none text-[var(--hp-primary-green)] group-hover:text-[var(--hp-black-color)]"
+            >
+              <div class="mr-1">
+                <div class="font-[600] text-[20px] leading-[20px]">
+                  {{ formatNumber(toBigInt(usdToHeroToken(item.fee)), 0) }}
+                </div>
+              </div>
+              <img class="mr-1 h-[22px] w-[22px]" :src="HeroIcon" alt="HERO" />
+              <span class="font-[500] text-[16px] leading-[16px]">({{ formatFee(item.fee) }})</span>
+            </div>
           </template>
         </button>
       </div>
