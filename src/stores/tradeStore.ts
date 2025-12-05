@@ -210,12 +210,6 @@ export const useTradeStore = defineStore('trade', () => {
 
   function updateMarketPrice(symbol: string, price: bigint, change24h: number) {
     const timestamp = Date.now()
-    let priceFormatted = parseFloat(fromBigInt(price, 18))
-
-    // if (symbol === 'BNB/USD') {
-    //   priceFormatted = parseFloat(priceFormatted.toFixed(2))
-    // }
-
     marketPrices.value[symbol] = {
       symbol,
       price,
