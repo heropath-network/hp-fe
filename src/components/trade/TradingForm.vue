@@ -151,7 +151,15 @@
               <div class="flex items-center gap-1">
                 <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Size</span>
               </div>
-              <span class="text-[13px] leading-[18px] text-[#9b9b9b] text-right">Up to: {{ maxSize }}</span>
+              <span class="text-[13px] leading-[18px] text-[#9b9b9b] text-right">
+                Up to: 
+                <button
+                  @click="handleMaxSizeClick"
+                  class="text-white hover:text-[#10c8a8] cursor-pointer transition-colors"
+                >
+                  {{ maxSize }}
+                </button>
+              </span>
             </div>
             <div class="flex items-center justify-between gap-2">
               <div class="flex-1 flex items-center">
@@ -843,6 +851,14 @@ function handleSizeInput() {
   
   const percentage = (currentSize / maxSizeNum) * 100
   sizePercentage.value = Math.min(100, Math.max(0, Math.round(percentage)))
+}
+
+function handleMaxSizeClick() {
+  const maxSizeNum = parseFloat(maxSize.value) || 0
+  if (maxSizeNum === 0) return
+  
+  size.value = maxSize.value
+  sizePercentage.value = 100
 }
 
 watch([maxSize, leverage, displayPrice], () => {
