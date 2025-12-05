@@ -19,6 +19,7 @@ import {
 } from '@/storages/trading'
 import { useUserEvaluationsStorage } from '@/storages/heroPath'
 import { calculateTradeHistoryPnL, calculatePositionPnL } from '@/utils/pnl'
+import { fromBigInt } from '@/utils/bigint'
 
 export interface MarketPrice {
   symbol: string
@@ -208,11 +209,18 @@ export const useTradeStore = defineStore('trade', () => {
   const activeLiquiditySources = computed(() => liquiditySources.value.filter((source) => source.enabled))
 
   function updateMarketPrice(symbol: string, price: bigint, change24h: number) {
+    const timestamp = Date.now()
+    let priceFormatted = parseFloat(fromBigInt(price, 18))
+
+    if (symbol === 'BNB/USD') {
+      priceFormatted = parseFloat(priceFormatted.toFixed(4))
+    }
+
     marketPrices.value[symbol] = {
       symbol,
       price,
       change24h,
-      timestamp: Date.now(),
+      timestamp,
     }
   }
 
