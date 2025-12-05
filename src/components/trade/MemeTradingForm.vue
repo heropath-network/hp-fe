@@ -42,7 +42,7 @@
           ]"
         >
           <div :class="selectedPeriod === '24h' ? 'text-white' : 'text-gray-400'">24h</div>
-          <div class="text-red-error">- 1.85%</div>
+          <div class="text-red-error">-1.85%</div>
         </button>
       </div>
 
@@ -73,7 +73,7 @@
         </div>
         <div class="flex-1 flex flex-col gap-[4px] items-end">
           <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Net Buy</div>
-          <div class="text-red-error text-[13px] leading-[18px] font-medium">- $229</div>
+          <div class="text-red-error text-[13px] leading-[18px] font-medium">-$229</div>
         </div>
       </div>
 
@@ -118,7 +118,7 @@
                   <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Market Price</span>
                 </div>
                 <div class="flex items-center gap-1">
-                  <span class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold">$117.722</span>
+                  <span class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold">${{ selectedMarketPrice }}</span>
                 </div>
               </div>
               <!-- Chain Label -->
@@ -246,7 +246,9 @@
 
         <!-- Exchange Rate -->
         <div class="flex items-center justify-between ">
-          <span class="text-[13px] leading-[18px] text-[#9b9b9b]">1 BNB ≈ 7.33 {{ selectedMarketName }}</span>
+          <span class="text-[13px] leading-[18px] text-[#9b9b9b]">
+            1 BNB ≈ {{ formattedAmountInOneBnb }} {{ selectedMarketName }}
+          </span>
           <img :src="bnbSettingIcon" alt="Copy" class="w-[16px] h-[16px]" />
         </div>
 
@@ -350,7 +352,7 @@
             <div class="flex gap-[8px] items-center">
               <div class="flex gap-[4px] items-center">
                 <img :src="slippageIcon" alt="Gas" class="w-[16px] h-[16px]" />
-                <div class="text-[#9b9b9b] text-[13px] leading-[18px]">Auto</div>
+                <div class="text-[#9b9b9b] text-[13px] leading-[18px]">{{slippageCustom ? slippageCustom : 'Auto'}}</div>
               </div>
               <div class="flex gap-[4px] items-center">
                 <img :src="gasIcon" alt="Gas" class="w-[16px] h-[16px]" />
@@ -377,7 +379,7 @@
               </div>
               <div class="flex gap-[8px] w-[168px]">
                 <div class="bg-[#272727] flex-1 flex items-center justify-center px-[8px] py-[7px]">
-                  <div class="flex-1 text-[#6CE99E] text-[13px] text-center font-medium leading-[18px]">Auto 7.5%</div>
+                  <div class="flex-1 text-[#6CE99E] text-[13px] text-center font-medium leading-[18px]" :class="!!slippageCustom ? '' : 'text-[#6CE99E]'">Auto 7.5%</div>
                 </div>
                 <div class="bg-[#272727] flex-1 flex gap-[4px] items-center px-[8px] py-[7px] text-[13px]">
                   <input
@@ -650,6 +652,8 @@ import { useLocalStorage } from '@vueuse/core'
 import Switch from '@/components/Switch.vue'
 import SourceLiquidityLabel from '@/components/common/SourceLiquidityLabel.vue'
 import { useTradeStore } from '@/stores/tradeStore'
+import { useBnbUsdPrice } from '@/packages/gains'
+import { fromBigInt } from '@/utils/bigint'
 import editIcon from '@/assets/icons/edit.svg'
 import MarketIcon from '@/components/common/MarketIcon.vue'
 import bnbSettingIcon from '@/assets/icons/bnb-settings.svg'
@@ -677,6 +681,38 @@ const tradeStore = useTradeStore()
 const selectedOracleName = computed(() => tradeStore.currentOracleName)
 const selectedMarket = computed(() => tradeStore.selectedMarket)
 const selectedMarketName = computed(() => selectedMarket.value.split('/')[0] || 'GIGGLE')
+const selectedMarketPrice = computed(() => parseFloat(fromBigInt(tradeStore.currentMarketPrice, 8)).toFixed(8))
+
+// BNB price in USD
+const { price: bnbUsdPrice } = useBnbUsdPrice()
+
+// Calculate amount of selected market in 1 BNB
+const amountInOneBnb = computed(() => {
+  const bnbPrice = bnbUsdPrice.value
+  const marketPriceBigInt = tradeStore.currentMarketPrice
+  
+  if (!bnbPrice || bnbPrice <= 0 || !marketPriceBigInt || marketPriceBigInt === BigInt(0)) {
+    return null
+  }
+  
+  // Convert market price from bigint (18 decimals) to number
+  const marketPriceUsd = parseFloat(fromBigInt(marketPriceBigInt, 18))
+  
+  if (marketPriceUsd <= 0) {
+    return null
+  }
+  
+  // Calculate: 1 BNB = (BNB price in USD) / (market price in USD) units of the selected market
+  const amount = bnbPrice / marketPriceUsd
+  return amount
+})
+
+const formattedAmountInOneBnb = computed(() => {
+    if (amountInOneBnb.value && amountInOneBnb.value > 1000) {
+        return (amountInOneBnb.value / 1000).toFixed(2) + 'K'
+    }
+    return amountInOneBnb.value?.toFixed(2) || '--'
+})
 
 // Time period selection
 const selectedPeriod = ref<'1m' | '5m' | '1h' | '24h'>('1m')
@@ -766,6 +802,7 @@ function handleEditClick() {
   selectedQuickAmount.value = null
 }
 
+
 // Watch for manual input changes - clear selection if user types a different value
 watch(buyAmount, (newValue) => {
   if (isUpdatingFromButton) {
@@ -788,11 +825,13 @@ function handleClickOutside(event: MouseEvent) {
 }
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
+    selectedQuickAmount.value = null
+    document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
+    selectedQuickAmount.value = null
+    document.removeEventListener('click', handleClickOutside)
 })
 </script>
 
