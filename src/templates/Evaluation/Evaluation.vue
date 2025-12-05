@@ -8,7 +8,7 @@ import { useUserQuestDiscountStatusStorage } from '@/storages/heroPath'
 import { useConnection } from '@wagmi/vue'
 import { QUEST_DISCOUNT_AMOUNT } from '@/constants'
 import { EvaluationPlanConfig } from '@/config/evaluation'
-import { TOKEN_PRICES } from '@/config/paymentTokens'
+import { TOKEN_PRICES } from '@/config/tokensPrices'
 import HeroIcon from '@/assets/icons/tokens/HERO.svg'
 import { formatNumber, toBigInt } from '@/utils/bigint'
 import AboutAccountDialog from './AboutAccountDialog.vue'
@@ -90,7 +90,17 @@ const usdToHeroToken = (usdAmount: number) => {
     <header class="flex flex-col gap-4">
       <div class="mb-6">
         <div class="flex flex-wrap items-center justify-between gap-4">
-          <h1 class="text-2xl font-semibold leading-[32px]">Evaluation</h1>
+          <div>
+            <h1 class="text-2xl font-semibold leading-[32px]">Evaluation</h1>
+            <div class="text-[14px] leading-[20px] text-[var(--hp-text-color)] mt-2">
+              Take an evaluation to acquire a hero account after proving your trading skills.
+              <span
+                class="cursor-pointer underline text-[var(--hp-primary-green)]"
+                @click="showAboutAccountDialog = true"
+                >About Hero Account</span
+              >
+            </div>
+          </div>
           <button
             type="button"
             class="evaluation-discount-btn flex h-[40px] items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--hp-primary-green)] transition-colors"
@@ -104,12 +114,6 @@ const usdToHeroToken = (usdAmount: number) => {
             <span>Discount: {{ unusedDiscounts.length }}</span>
             <BaseIcon name="arrow" size="16" class="rotate-[-90deg]" />
           </button>
-        </div>
-        <div class="text-[14px] leading-[20px] text-[var(--hp-text-color)] mt-2">
-          Take an evaluation to acquire a hero account after proving your trading skills.
-          <span class="cursor-pointer underline text-[var(--hp-primary-green)]" @click="showAboutAccountDialog = true"
-            >About Hero Account</span
-          >
         </div>
       </div>
 
