@@ -8,6 +8,9 @@ import { useUserQuestDiscountStatusStorage } from '@/storages/heroPath'
 import { useConnection } from '@wagmi/vue'
 import { QUEST_DISCOUNT_AMOUNT } from '@/constants'
 import { EvaluationGlobalConfigInfo, EvaluationPlanConfig } from '@/config/evaluation'
+import { TOKEN_PRICES } from '@/config/paymentTokens'
+import HeroIcon from '@/assets/icons/tokens/HERO.svg'
+import { formatNumber, toBigInt } from '@/utils/bigint'
 
 const planTabs = [
   { label: 'Champion Plan', value: EvaluationPlan.ChampionPlan },
@@ -68,6 +71,12 @@ function handleFeeClick(index: number) {
 }
 
 const getDiscountedFee = (fee: number) => Math.max(0, fee - QUEST_DISCOUNT_AMOUNT)
+
+const usdToHeroToken = (usdAmount: number) => {
+  const heroTokenPrice = TOKEN_PRICES['HERO'] || 0
+  if (heroTokenPrice === 0) return 0
+  return usdAmount / heroTokenPrice
+}
 </script>
 
 <template>
@@ -149,14 +158,18 @@ const getDiscountedFee = (fee: number) => Math.max(0, fee - QUEST_DISCOUNT_AMOUN
             <template v-else>
               <span class="text-base font-medium leading-[24px]">Pay</span>
               <div
-                class="flex flex-col leading-none text-[var(--hp-primary-green)] group-hover:text-[var(--hp-black-color)]"
+                class="flex items-center leading-none text-[var(--hp-primary-green)] group-hover:text-[var(--hp-black-color)]"
               >
-                <span class="text-[20px] font-semibold leading-[20px]">{{
-                  formatFee(getDiscountedFee(item.fee))
-                }}</span>
-                <span class="text-sm font-medium leading-[16px] opacity-60 line-through">{{
-                  formatFee(item.fee)
-                }}</span>
+                <div class="mr-1">
+                  <div class="font-[600] text-[20px] leading-[20px]">
+                    {{ formatNumber(toBigInt(usdToHeroToken(getDiscountedFee(item.fee))), 0) }}
+                  </div>
+                  <div class="font-[500] text-[16px] leading-[16px] opacity-60 line-through">
+                    {{ formatNumber(toBigInt(usdToHeroToken(item.fee)), 0) }}
+                  </div>
+                </div>
+                <img class="mr-1 h-[22px] w-[22px]" :src="HeroIcon" alt="HERO" />
+                <span class="font-[500] text-[16px] leading-[16px]">({{ formatFee(getDiscountedFee(item.fee)) }})</span>
               </div>
             </template>
           </template>
