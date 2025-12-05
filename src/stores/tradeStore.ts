@@ -212,9 +212,9 @@ export const useTradeStore = defineStore('trade', () => {
     const timestamp = Date.now()
     let priceFormatted = parseFloat(fromBigInt(price, 18))
 
-    if (symbol === 'BNB/USD') {
-      priceFormatted = parseFloat(priceFormatted.toFixed(4))
-    }
+    // if (symbol === 'BNB/USD') {
+    //   priceFormatted = parseFloat(priceFormatted.toFixed(2))
+    // }
 
     marketPrices.value[symbol] = {
       symbol,
