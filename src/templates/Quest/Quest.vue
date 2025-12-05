@@ -94,7 +94,7 @@ const allTasksIsCompleted = computed(() => {
   return tasks.value.every((task) => task.status === 'completed')
 })
 
-const openTasks = ref<Set<QuestTaskId>>(new Set([QuestTaskId.TradeMeme]))
+const openTasks = ref<Set<QuestTaskId>>(new Set([]))
 
 function toggleTask(id: QuestTaskId) {
   const next = new Set(openTasks.value)

@@ -10,7 +10,7 @@ enum MenuItem {
   Evaluation = 'Evaluation',
   Quest = 'Quest',
   Prizes = 'Prizes',
-  TradingEducation = 'TradingEducation',
+  TrainingEducation = 'TrainingEducation',
   Leaderboard = 'Leaderboard',
   Ecosystem = 'Ecosystem',
 }
@@ -53,10 +53,10 @@ const menuItems = [
     routeName: ROUTE_NAMES.Profile,
   },
   {
-    id: MenuItem.TradingEducation,
-    label: 'Trading & Education',
+    id: MenuItem.TrainingEducation,
+    label: 'Training & Education',
     icon: 'menu-tradingEdu',
-    routeName: ROUTE_NAMES.TradingEducation,
+    routeName: ROUTE_NAMES.TrainingEducation,
   },
   {
     id: MenuItem.Ecosystem,

@@ -8,7 +8,7 @@ export enum ROUTE_NAMES {
   PurchaseEvaluation = 'purchase-evaluation',
   Quest = 'quest',
   Prizes = 'prizes',
-  TradingEducation = 'trading-education',
+  TrainingEducation = 'trading-education',
   Leaderboard = 'leaderboard',
   Ecosystem = 'ecosystem',
   Trade = 'trade',
@@ -53,9 +53,9 @@ const ROUTER_LIST: RouteRecordRaw[] = [
     component: () => import('@/templates/Prizes/Prizes.vue'),
   },
   {
-    path: '/trading-education',
-    name: ROUTE_NAMES.TradingEducation,
-    component: () => import('@/templates/TradingEducation/TradingEducation.vue'),
+    path: '/training-education',
+    name: ROUTE_NAMES.TrainingEducation,
+    component: () => import('@/templates/TrainingEducation/TrainingEducation.vue'),
   },
   {
     path: '/leaderboard',

@@ -173,7 +173,7 @@ async function handleWithdraw() {
       <div class="flex flex-col gap-4 bg-[var(--hp-bg-light)] p-4">
         <div class="grid gap-3 md:grid-cols-2 h-[86px]">
           <div
-            class="flex flex-col gap-2 border border-[var(--hp-line-light-color)] bg-[var(--hp-bg-normal)] px-4 py-3"
+            class="flex flex-col gap-2 border border-[var(--hp-line-normal-color)] bg-[var(--hp-bg-light)] px-4 py-3"
           >
             <div class="flex items-center gap-1 text-sm leading-5 text-[var(--hp-text-color)]">
               <span>To Claim</span>
@@ -238,7 +238,7 @@ async function handleWithdraw() {
           </div>
 
           <div
-            class="flex flex-col gap-2 border border-[var(--hp-line-light-color)] bg-[var(--hp-bg-normal)] px-4 py-3"
+            class="flex flex-col gap-2 border border-[var(--hp-line-normal-color)] bg-[var(--hp-bg-light)] px-4 py-3"
           >
             <p class="text-sm leading-5 text-[var(--hp-text-color)]">Network</p>
             <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">{{ PAYOUT_NETWORK }}</p>

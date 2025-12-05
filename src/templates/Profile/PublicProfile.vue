@@ -151,7 +151,7 @@ const lifetimeProfitWithdrawn = computed(() => {
             <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
               ${{ formatNumber(fundedTradingVolume, 2) }}
             </p>
-            <p class="text-sm leading-5 text-[var(--hp-text-color)]">Hero Trading Volume</p>
+            <p class="text-sm leading-5 text-[var(--hp-text-color)]">Hero Account Volume</p>
           </div>
           <div class="flex flex-col gap-1 bg-[var(--hp-bg-light)] p-6">
             <p class="text-xl font-semibold leading-7 text-[var(--hp-white-color)]">
