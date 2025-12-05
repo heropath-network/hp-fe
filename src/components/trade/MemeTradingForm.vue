@@ -166,7 +166,7 @@
                 <div class="flex items-center gap-1">
                   <span class="text-[13px] leading-[18px] text-[#9b9b9b]">{{ tradeSide === 'buy' ? 'Buy' : 'Sell' }}</span>
                 </div>
-                <span class="text-[13px] leading-[18px] text-[#9b9b9b] text-right">Balance: 1.88</span>
+                <span class="text-[13px] leading-[18px] text-[#9b9b9b] text-right">Balance: {{ tradeSide === 'buy' ? '1.88' : '0' }}</span>
               </div>
               <div class="flex items-center justify-between gap-2">
                 <div class="flex-1 flex items-center">
@@ -178,9 +178,13 @@
                     placeholder="0.0"
                   />
                 </div>
-                <div class="flex items-center gap-1 justify-end cursor-pointer">
+                <div v-if="tradeSide === 'buy'" class="flex items-center gap-1 justify-end cursor-pointer">
                   <MarketIcon :symbol="'BNB/USD'" :size="20"/>
                   <span class="text-[16px] leading-[24px] text-white font-medium text-right">BNB</span>
+                </div>
+                <div v-else class="flex items-center gap-1 justify-end cursor-pointer">
+                  <MarketIcon :symbol="selectedMarket" :size="20"/>
+                  <span class="text-[16px] leading-[24px] text-white font-medium text-right">{{selectedMarketName}}</span>
                 </div>
               </div>
               <!-- Quick Selection Buttons -->
@@ -356,7 +360,7 @@
               </div>
               <div class="flex gap-[4px] items-center">
                 <img :src="gasIcon" alt="Gas" class="w-[16px] h-[16px]" />
-                <div class="text-[#9b9b9b] text-[13px] leading-[18px]">0.12</div>
+                <div class="text-[#9b9b9b] text-[13px] leading-[18px]">{{maxAutoGas ? maxAutoGas : '0.12'}}</div>
               </div>
               <div class="flex gap-[4px] items-center">
                 <img :src="burgerIcon" alt="On" class="w-[16px] h-[16px]" />
@@ -379,7 +383,7 @@
               </div>
               <div class="flex gap-[8px] w-[168px]">
                 <div class="bg-[#272727] flex-1 flex items-center justify-center px-[8px] py-[7px]">
-                  <div class="flex-1 text-[#6CE99E] text-[13px] text-center font-medium leading-[18px]" :class="!!slippageCustom ? '' : 'text-[#6CE99E]'">Auto 7.5%</div>
+                  <div class="flex-1  text-[13px] text-center font-medium leading-[18px]" :class="!!slippageCustom ? 'text-[#545454]' : 'text-[#6CE99E]'">Auto 7.5%</div>
                 </div>
                 <div class="bg-[#272727] flex-1 flex gap-[4px] items-center px-[8px] py-[7px] text-[13px]">
                   <input
@@ -400,7 +404,7 @@
               </div>
               <div class="flex gap-[8px] w-[168px]">
                 <div class="bg-[#272727] flex-1 flex items-center justify-center px-[8px] py-[7px]">
-                  <div class="flex-1 text-[#6CE99E] text-[13px] text-center font-medium leading-[18px]">Avg 0.12</div>
+                  <div class="flex-1  text-[13px] text-center font-medium leading-[18px]" :class="!!maxAutoGas ? 'text-[#545454]' : 'text-[#6CE99E]'">Avg 0.12</div>
                 </div>
                 <div class="bg-[#272727] flex-1 flex items-center px-[8px] py-[7px]">
                   <input
@@ -832,6 +836,11 @@ onMounted(() => {
 onUnmounted(() => {
     selectedQuickAmount.value = null
     document.removeEventListener('click', handleClickOutside)
+})
+
+watch(tradeSide, () => {
+    buyAmount.value = ''
+    selectedQuickAmount.value = null
 })
 </script>
 
