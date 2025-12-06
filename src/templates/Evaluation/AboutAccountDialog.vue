@@ -30,11 +30,11 @@ tryOnMounted(() => {
         </div>
         <div>
           The protocol never mirrors or duplicates any individual hero account’s trades, never manages user funds, and
-          never provides personalized investment advice. All data is blended and anonymized so no single user’s actions
+          never provides personalized investment advice.
         </div>
         <div>
-          can be identified.Participation is optional, and users always retain full control over their own hero
-          accounts.
+          All data is blended and anonymized so no single user’s actions can be identified.Participation is optional,
+          and users always retain full control over their own hero accounts.
         </div>
       </div>
     </template>
