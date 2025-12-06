@@ -11,7 +11,7 @@
               'flex-1 px-0 py-2 text-sm font-medium transition w-[83px]',
               tradeSide === 'long'
                 ? 'bg-green-success text-gray-1000 hover:bg-green-hover'
-                : 'text-gray-400'
+                : 'text-gray-400 hover:text-[#10C8A8]'
             ]"
           >
             Buy / Long
@@ -22,7 +22,7 @@
               'flex-1 px-0 py-2 text-sm font-medium transition w-[83px]',
               tradeSide === 'short'
                 ? 'bg-red-error text-gray-1000 hover:bg-red-hover'
-                : 'text-gray-400'
+                : 'text-gray-400 hover:text-[#FF4E59]'
             ]"
           >
             Sell / Short
@@ -32,7 +32,7 @@
         <!-- Cross Leverage Display (Clickable Button) -->
         <button
           @click="showMarginModeDialog = true"
-          class="flex items-center justify-center text-sm font-medium text-white w-20 hover:opacity-80 transition"
+          class="flex items-center justify-center text-sm font-medium text-white w-20 hover:opacity-80 transition hover:text-[#6CE99E]"
         >
           {{ marginModeLabel }}
         </button>
