@@ -11,7 +11,7 @@
               'flex-1 px-0 py-2 text-sm font-medium transition w-[83px]',
               tradeSide === 'long'
                 ? 'bg-green-success text-gray-1000 hover:bg-green-hover'
-                : 'text-gray-400 hover:text-[#10C8A8]'
+                : 'text-gray-400 hover:text-[#10C8A8]',
             ]"
           >
             Buy / Long
@@ -22,13 +22,13 @@
               'flex-1 px-0 py-2 text-sm font-medium transition w-[83px]',
               tradeSide === 'short'
                 ? 'bg-red-error text-gray-1000 hover:bg-red-hover'
-                : 'text-gray-400 hover:text-[#FF4E59]'
+                : 'text-gray-400 hover:text-[#FF4E59]',
             ]"
           >
             Sell / Short
           </button>
         </div>
-        
+
         <!-- Cross Leverage Display (Clickable Button) -->
         <button
           @click="showMarginModeDialog = true"
@@ -36,10 +36,10 @@
         >
           {{ marginModeLabel }}
         </button>
-        
+
         <!-- Divider -->
         <div class="h-5 w-px bg-[#272727]"></div>
-        
+
         <!-- Settings Icon -->
         <button
           @click="showLiquiditySourcesDialog = true"
@@ -54,7 +54,7 @@
     <div class="h-px w-full bg-[#272727]"></div>
 
     <!-- Main Content -->
-    <div class="flex-1  px-4 pt-4 flex flex-col gap-4">
+    <div class="flex-1 px-4 pt-4 flex flex-col gap-4">
       <!-- Market Price and Order Type Row -->
       <div class="flex flex-col gap-2">
         <div class="flex gap-2">
@@ -65,7 +65,7 @@
                 <span class="text-[13px] leading-[18px] text-[#9b9b9b]">
                   {{ orderType === 'market' ? 'Market Price' : 'Limit Price' }}
                 </span>
-                <i 
+                <i
                   v-if="orderType !== 'market'"
                   class="iconfont icon-question text-[#9b9b9b] text-[12px] cursor-help"
                   title="Limit order price"
@@ -73,14 +73,14 @@
               </div>
               <div class="flex items-center gap-1">
                 <!-- Price mark for limit orders -->
-                <span 
+                <span
                   v-if="orderType === 'limit'"
                   class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold price-mark"
                 >
                   {{ tradeSide === 'long' ? '≤' : '≥' }}
                 </span>
                 <!-- Price mark for stop orders -->
-                <span 
+                <span
                   v-if="orderType === 'stop'"
                   class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold price-mark"
                 >
@@ -97,18 +97,13 @@
                   class="max-w-[95px] flex-1 bg-transparent text-[18px] leading-[24px] text-white font-semibold outline-none placeholder:text-[#545454]"
                 />
                 <!-- Display for market orders -->
-                <span 
-                  v-else
-                  class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold"
-                >
+                <span v-else class="text-[18px] leading-[24px] text-[#9b9b9b] font-semibold">
                   {{ formatPrice(displayPrice) }}
                 </span>
               </div>
             </div>
             <!-- Source Liquidity Label -->
-            <SourceLiquidityLabel
-              class="top-0 right-0"
-            />
+            <SourceLiquidityLabel class="top-0 right-0" />
           </div>
 
           <!-- Order Type Dropdown -->
@@ -122,17 +117,31 @@
                   <span class="text-[13px] leading-[18px] text-[#9b9b9b] text-right">Order Type</span>
                 </div>
                 <div class="flex items-center justify-end gap-1">
-                  <span class="text-[16px] leading-[24px] text-white font-medium text-right">{{ orderType.charAt(0).toUpperCase() + orderType.slice(1) }}</span>
+                  <span class="text-[16px] leading-[24px] text-white font-medium text-right">{{
+                    orderType.charAt(0).toUpperCase() + orderType.slice(1)
+                  }}</span>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4 6L8 10L12 6" stroke="#9b9b9b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path
+                      d="M4 6L8 10L12 6"
+                      stroke="#9b9b9b"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
                   </svg>
                 </div>
               </button>
-              <div v-if="showOrderTypeMenu" class="absolute top-full mt-1 w-full bg-[#272727]  z-50 border border-[#373737]">
+              <div
+                v-if="showOrderTypeMenu"
+                class="absolute top-full mt-1 w-full bg-[#272727] z-50 border border-[#373737]"
+              >
                 <button
                   v-for="type in ['market', 'limit', 'stop']"
                   :key="type"
-                  @click.stop="orderType = type as any; showOrderTypeMenu = false"
+                  @click.stop="() => {
+                    orderType = type as any
+                    showOrderTypeMenu = false
+                  }"
                   class="w-full px-3 py-2 text-left text-[16px] leading-[24px] text-white font-medium hover:bg-[#373737] transition"
                 >
                   {{ type.charAt(0).toUpperCase() + type.slice(1) }}
@@ -147,44 +156,52 @@
           <!-- Leverage Slider Container -->
           <div class="bg-[#373737] h-[134px] relative w-[311px]">
             <div class="bg-[#272727] p-3 flex flex-col gap-2 w-[311px]">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-1">
-                <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Size</span>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1">
+                  <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Size</span>
+                </div>
+                <span class="text-[13px] leading-[18px] text-[#9b9b9b] text-right">
+                  Up to:
+                  <button
+                    @click="handleMaxSizeClick"
+                    class="text-white hover:text-[#10c8a8] cursor-pointer transition-colors"
+                  >
+                    {{ maxSize }}
+                  </button>
+                </span>
               </div>
-              <span class="text-[13px] leading-[18px] text-[#9b9b9b] text-right">
-                Up to: 
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex-1 flex items-center">
+                  <input
+                    v-model="size"
+                    type="number"
+                    step="0.001"
+                    @input="handleSizeInput"
+                    class="w-full bg-transparent text-[18px] leading-[24px] text-white font-semibold outline-none placeholder:text-[#545454]"
+                    placeholder="0.0"
+                  />
+                </div>
                 <button
-                  @click="handleMaxSizeClick"
-                  class="text-white hover:text-[#10c8a8] cursor-pointer transition-colors"
+                  @click="showMarketSelect = true"
+                  class="flex items-center gap-1 justify-end cursor-pointer hover:opacity-80 transition"
                 >
-                  {{ maxSize }}
+                  <span class="text-[16px] leading-[24px] text-white font-medium text-right">{{
+                    selectedMarket.split('/')[0]
+                  }}</span>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M4 6L8 10L12 6"
+                      stroke="#9b9b9b"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
                 </button>
-              </span>
-            </div>
-            <div class="flex items-center justify-between gap-2">
-              <div class="flex-1 flex items-center">
-                <input
-                  v-model="size"
-                  type="number"
-                  step="0.001"
-                  @input="handleSizeInput"
-                  class="w-full bg-transparent text-[18px] leading-[24px] text-white font-semibold outline-none placeholder:text-[#545454]"
-                  placeholder="0.0"
-                />
               </div>
-              <button
-                @click="showMarketSelect = true"
-                class="flex items-center gap-1 justify-end cursor-pointer hover:opacity-80 transition"
-              >
-                <span class="text-[16px] leading-[24px] text-white font-medium text-right">{{ selectedMarket.split('/')[0] }}</span>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 6L8 10L12 6" stroke="#9b9b9b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
             </div>
-          </div>
 
-            <div class="absolute bottom-3 left-3 flex items-center gap-3" style="width: calc(100% - 24px);">
+            <div class="absolute bottom-3 left-3 flex items-center gap-3" style="width: calc(100% - 24px)">
               <!-- Percentage Display -->
               <div class="bg-[#272727] h-9 px-2 flex items-center gap-1 w-[58px]">
                 <span class="text-[14px] leading-[20px] text-white font-semibold flex-1">{{ sizePercentage }}</span>
@@ -194,17 +211,32 @@
               <div class="relative h-4 w-[217px] px-2">
                 <div class="absolute inset-0 flex items-center">
                   <div class="w-full h-[5px] bg-[#323232] rounded-full relative">
-                    <div 
+                    <div
                       class="absolute left-0 top-0 h-full bg-[#10c8a8] rounded-full"
                       :style="{ width: `${sizePercentage}%` }"
                     ></div>
                     <!-- Slider markers -->
                     <div class="absolute inset-0 flex justify-between items-center pointer-events-none">
-                      <div :class="sizePercentage >= 20 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'" class="ml-[1.5px] w-[3px] h-[3px] rounded-full"></div>
-                      <div :class="sizePercentage >= 40 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'" class="w-[3px] h-[3px] rounded-full"></div>
-                      <div :class="sizePercentage >= 60 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'" class="w-[3px] h-[3px] rounded-full"></div>
-                      <div :class="sizePercentage >= 80 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'" class="w-[3px] h-[3px] rounded-full"></div>
-                      <div :class="sizePercentage >= 100 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'" class="mr-[1.5px] w-[3px] h-[3px] rounded-full"></div>
+                      <div
+                        :class="sizePercentage >= 20 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"
+                        class="ml-[1.5px] w-[3px] h-[3px] rounded-full"
+                      ></div>
+                      <div
+                        :class="sizePercentage >= 40 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"
+                        class="w-[3px] h-[3px] rounded-full"
+                      ></div>
+                      <div
+                        :class="sizePercentage >= 60 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"
+                        class="w-[3px] h-[3px] rounded-full"
+                      ></div>
+                      <div
+                        :class="sizePercentage >= 80 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"
+                        class="w-[3px] h-[3px] rounded-full"
+                      ></div>
+                      <div
+                        :class="sizePercentage >= 100 ? 'bg-gray-1000' : 'bg-[#9b9b9b]'"
+                        class="mr-[1.5px] w-[3px] h-[3px] rounded-full"
+                      ></div>
                     </div>
                   </div>
                 </div>
@@ -217,32 +249,31 @@
                   class="absolute inset-0 w-full h-4 opacity-0 cursor-pointer z-10"
                   @input="handlePercentageChange"
                 />
-                <div 
+                <div
                   class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg pointer-events-none z-20"
-                  :style="{ left: sizePercentage > 50 ? `calc(${sizePercentage}% - 16px)` : `calc(${sizePercentage}%)` }"
+                  :style="{
+                    left: sizePercentage > 50 ? `calc(${sizePercentage}% - 16px)` : `calc(${sizePercentage}%)`,
+                  }"
                 >
-                  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-[#323232] rounded-full"></div>
+                  <div
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-[#323232] rounded-full"
+                  ></div>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Size Input Box -->
-          
         </div>
       </div>
 
       <!-- Take Profit / Stop Loss Checkbox -->
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-2">
-          <input
-            type="checkbox"
-            v-model="takeProfitStopLoss"
-            class="w-4 h-4 border border-[#9b9b9b] bg-transparent"
-          />
+          <input type="checkbox" v-model="takeProfitStopLoss" class="w-4 h-4 border border-[#9b9b9b] bg-transparent" />
           <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Take Profit / Stop Loss</span>
         </div>
-        
+
         <!-- Take Profit / Stop Loss Inputs -->
         <div v-if="takeProfitStopLoss" class="flex gap-2 min-w-0 max-w-full">
           <!-- Take Profit Input -->
@@ -258,7 +289,7 @@
               class="max-w-[80px] flex flex-1 bg-transparent text-[13px] leading-[18px] text-[#9b9b9b] outline-none placeholder:text-[#9b9b9b]"
             />
           </div>
-          
+
           <!-- Stop Loss Input -->
           <div class="flex-1 bg-[#272727] h-[32px] px-3 flex items-center gap-1">
             <span class="text-[13px] leading-[18px] text-[#9b9b9b]">SL:</span>
@@ -281,8 +312,10 @@
         :disabled="isActionDisabled"
         :class="[
           'w-full py-[14px] text-[14px] font-medium text-center transition flex items-center justify-center',
-          tradeSide === 'long' ? 'bg-green-success text-gray-1000 hover:bg-green-hover' : 'bg-red-error text-gray-1000 hover:bg-red-hover',
-          isActionDisabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100'
+          tradeSide === 'long'
+            ? 'bg-green-success text-gray-1000 hover:bg-green-hover'
+            : 'bg-red-error text-gray-1000 hover:bg-red-hover',
+          isActionDisabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100',
         ]"
       >
         <span>{{ submitButtonLabel }}</span>
@@ -291,14 +324,12 @@
 
       <!-- Trade Details Section -->
       <div class="flex flex-col gap-[8px]">
-        <div
-          v-for="(item, index) in tradeDetails"
-          :key="index"
-          class="flex items-start justify-between"
-        >
+        <div v-for="(item, index) in tradeDetails" :key="index" class="flex items-start justify-between">
           <div class="flex flex-col">
             <Tooltip :width="300" v-if="item.tooltip" :content="item.tooltip">
-              <span class="text-[13px] leading-[18px] text-[#9b9b9b] underline decoration-dotted decoration-[#9b9b9b] underline-offset-[2px]">
+              <span
+                class="text-[13px] leading-[18px] text-[#9b9b9b] underline decoration-dotted decoration-[#9b9b9b] underline-offset-[2px]"
+              >
                 {{ item.label }}
               </span>
             </Tooltip>
@@ -306,7 +337,9 @@
               {{ item.label }}
             </span>
             <div v-if="item.tooltip" class="h-0 relative w-full mt-0.5">
-              <div class="absolute bottom-[-0.5px] left-0 right-0 top-[-0.5px] border-b border-dotted border-[#272727]"></div>
+              <div
+                class="absolute bottom-[-0.5px] left-0 right-0 top-[-0.5px] border-b border-dotted border-[#272727]"
+              ></div>
             </div>
           </div>
           <!-- Liquidity Source with icon -->
@@ -349,16 +382,22 @@
                 <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Account Equity</span>
                 <div class="h-px w-full bg-[#272727] mt-0.5"></div>
               </div>
-              <svg 
-                width="16" 
-                height="16" 
-                viewBox="0 0 16 16" 
-                fill="none" 
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
                 xmlns="http://www.w3.org/2000/svg"
                 class="transition-transform duration-200"
                 :class="showAccountBreakdown ? 'rotate-180' : ''"
               >
-                <path d="M4 6L8 10L12 6" stroke="#9b9b9b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  d="M4 6L8 10L12 6"
+                  stroke="#9b9b9b"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </div>
             <span class="text-[13px] leading-[18px] text-white">{{ formatCurrency(accountValueUsd) }}</span>
@@ -379,10 +418,7 @@
               <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Unrealized PnL</span>
               <div class="h-px w-full bg-[#272727] mt-0.5"></div>
             </div>
-            <span 
-              class="text-[13px] leading-[18px]"
-              :class="totalPnL >= 0n ? 'text-green-500' : 'text-red-500'"
-            >
+            <span class="text-[13px] leading-[18px]" :class="totalPnL >= 0n ? 'text-green-500' : 'text-red-500'">
               {{ formatCurrency(totalPnL) }}
             </span>
           </div>
@@ -412,16 +448,22 @@
                 <span class="text-[13px] leading-[18px] text-[#9b9b9b]">Margin Ratio</span>
                 <div class="h-px w-full bg-[#272727] mt-0.5"></div>
               </div>
-              <svg 
-                width="16" 
-                height="16" 
-                viewBox="0 0 16 16" 
-                fill="none" 
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
                 xmlns="http://www.w3.org/2000/svg"
                 class="transition-transform duration-200"
                 :class="showCrossBreakdown ? 'rotate-180' : ''"
               >
-                <path d="M4 6L8 10L12 6" stroke="#9b9b9b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  d="M4 6L8 10L12 6"
+                  stroke="#9b9b9b"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </div>
             <MarginRatioStatus :value="marginRatioPercent" :show-value="true" />
@@ -517,9 +559,8 @@ const {
   liquiditySources,
   activeLiquiditySources,
   positions,
-  totalPnL
+  totalPnL,
 } = storeToRefs(tradeStore)
-
 
 const tradeSide = ref<'long' | 'short'>('long')
 const orderType = ref<'market' | 'limit' | 'stop'>('market')
@@ -570,7 +611,7 @@ function getLiquiditySourceIcon(sourceId: LiquiditySourceId | undefined): string
 function handleMarginModeConfirm(data: { marginMode: 'isolated' | 'cross'; leverage: number }) {
   const setting = {
     mode: data.marginMode,
-    leverage: data.leverage
+    leverage: data.leverage,
   }
 
   tradeStore.setMarginSetting(selectedMarket.value, setting)
@@ -627,16 +668,16 @@ const SAFE_MARGIN = 0.01 // 1% safety margin to account for price changes when u
 
 const liquidationPrice = computed(() => {
   const entryPrice = parseFloat(displayPrice.value) || 0
-  
+
   if (entryPrice === 0 || leverage.value === 0) {
     return '--'
   }
-  
+
   // Liquidation price calculation
   // Formula: liqPrice = entryPrice ± (entryPrice / leverage) * (1 - maintenanceMarginRate)
   // For long: price decreases, for short: price increases
   const priceAdjustment = (entryPrice / leverage.value) * (1 - MAINTENANCE_MARGIN_RATE)
-  
+
   if (tradeSide.value === 'long') {
     const liqPrice = entryPrice - priceAdjustment
     return liqPrice > 0 ? `$${liqPrice.toFixed(2)}` : '--'
@@ -649,11 +690,11 @@ const liquidationPrice = computed(() => {
 const marginRequired = computed(() => {
   const sizeNum = parseFloat(size.value) || 0
   const priceNum = parseFloat(displayPrice.value) || 0
-  
+
   if (sizeNum === 0 || priceNum === 0 || leverage.value === 0) {
     return '--'
   }
-  
+
   // Margin Required = Position Size * Price / Leverage
   const margin = (sizeNum * priceNum) / leverage.value
   return `$${margin.toFixed(2)}`
@@ -662,17 +703,17 @@ const marginRequired = computed(() => {
 const openCost = computed(() => {
   const sizeNum = parseFloat(size.value) || 0
   const priceNum = parseFloat(displayPrice.value) || 0
-  
+
   if (sizeNum === 0 || priceNum === 0) {
     return '--'
   }
-  
+
   // Position fee = Asset Price * Amount * Position Fee Rate
   const positionFee = sizeNum * priceNum * POSITION_FEE_RATE
-  
+
   // Estimated spread/price impact cost
   const spreadCost = sizeNum * priceNum * SPREAD_ESTIMATE_RATE
-  
+
   // Total open cost
   const totalCost = positionFee + spreadCost
   return `$${totalCost.toFixed(2)}`
@@ -681,17 +722,17 @@ const openCost = computed(() => {
 const maxROE = computed(() => {
   const sizeNum = parseFloat(size.value) || 0
   const priceNum = parseFloat(displayPrice.value) || 0
-  
+
   if (sizeNum === 0 || priceNum === 0 || leverage.value === 0) {
     return '--'
   }
-  
+
   // Max ROE represents the maximum profit percentage relative to margin
   // Max profit is typically: (leverage - 1) * margin, but limited by pool capacity
   // For a simplified calculation: Max ROE ≈ (leverage - 1) * 100%
   // This represents the theoretical maximum return if price moves favorably
   const theoreticalMaxRoe = (leverage.value - 1) * 100
-  
+
   // Cap at reasonable maximum (900% as seen in mux-fe for some protocols)
   const cappedRoe = Math.min(theoreticalMaxRoe, 900)
   return `${cappedRoe.toFixed(0)}%`
@@ -706,7 +747,7 @@ const calculatedCollateral = computed(() => {
   const sizeNum = parseFloat(size.value) || 0
   const priceNum = parseFloat(displayPrice.value) || 0
   if (sizeNum === 0 || priceNum === 0) return BigInt(0)
-  
+
   // Collateral = (Size * Price) / Leverage
   const positionValue = sizeNum * priceNum
   const collateralAmount = positionValue / leverage.value
@@ -716,7 +757,7 @@ const calculatedCollateral = computed(() => {
 const maxSize = computed(() => {
   const priceNum = parseFloat(displayPrice.value) || 0
   if (priceNum === 0) return '0.0'
-  
+
   // Max size = (Available Balance * (1 - SAFE_MARGIN) * Leverage) / Price
   // SAFE_MARGIN is applied to account for price changes when using 100%
   const availableBalance = parseFloat(fromBigInt(accountBalance.value, 18))
@@ -737,7 +778,7 @@ const isFormValid = computed(() => {
   const hasPrice = orderType.value === 'market' || parseFloat(price.value) > 0
   // const sufficientBalance = calculatedCollateral.value <= accountBalance.value
 
-  return hasSize && hasPrice 
+  return hasSize && hasPrice
 })
 
 const isActionDisabled = computed(() => !isFormValid.value || signing.value || !isConnected.value)
@@ -797,7 +838,7 @@ async function requestTradeSignature(actionLabel: 'Open Position' | 'Place Order
   if (!Number.isSafeInteger(leverageValue)) {
     throw new Error(`Leverage value ${leverageValue} is not a safe integer`)
   }
-  
+
   await signTypedDataAsync({
     types: {
       Person: [{ name: 'wallet', type: 'address' }],
@@ -835,7 +876,7 @@ async function requestTradeSignature(actionLabel: 'Open Position' | 'Place Order
 function handlePercentageChange() {
   const maxSizeNum = parseFloat(maxSize.value) || 0
   if (maxSizeNum === 0) return
-  
+
   const newSize = (maxSizeNum * sizePercentage.value) / 100
   size.value = newSize.toFixed(4)
 }
@@ -843,12 +884,12 @@ function handlePercentageChange() {
 function handleSizeInput() {
   const maxSizeNum = parseFloat(maxSize.value) || 0
   const currentSize = parseFloat(size.value) || 0
-  
+
   if (maxSizeNum === 0) {
     sizePercentage.value = 0
     return
   }
-  
+
   const percentage = (currentSize / maxSizeNum) * 100
   sizePercentage.value = Math.min(100, Math.max(0, Math.round(percentage)))
 }
@@ -856,7 +897,7 @@ function handleSizeInput() {
 function handleMaxSizeClick() {
   const maxSizeNum = parseFloat(maxSize.value) || 0
   if (maxSizeNum === 0) return
-  
+
   size.value = maxSize.value
   sizePercentage.value = 100
 }
@@ -881,11 +922,11 @@ watch(orderType, (newType, oldType) => {
 
 /**
  * Handles trade execution
- * 
+ *
  * Note: All positions and orders are automatically saved to LocalStorage
  * through the tradeStore methods (openPosition, placeOrder).
  * Storage is keyed by wallet address and persists across page reloads.
- * 
+ *
  * Storage management methods available via tradeStore:
  * - clearPositions(), removePosition(id), removePositionsByMarket(market), etc.
  * - clearOrders(), removeOrder(id), removeOrdersByMarket(market), etc.
@@ -915,7 +956,7 @@ async function handleConfirmOrder() {
 
     if (orderType.value === 'market') {
       const currentLiquiditySource = tradeStore.getLiquiditySourceFromOracle(tradeStore.selectedOracle)
-      
+
       // Store position data before creating it for the popup
       const positionData = {
         market: selectedMarket.value,
@@ -924,23 +965,22 @@ async function handleConfirmOrder() {
         entryPrice: currentMarketPrice.value,
         leverage: leverage.value,
         collateral: collateralValue,
-        chainId: chainId.value,
+        chainId: 56, // Binance Smart Chain ID
         liquiditySource: currentLiquiditySource,
         accountId: selectedEvaluationId.value ?? tradeStore.currentAccountId ?? '',
         timestamp: Date.now(),
       }
-      
-      
 
       // Create position object for notification
       // We construct it manually since the store function doesn't return the created position
       // Calculate liquidation price: entry * (1 - 1/leverage) for long, entry * (1 + 1/leverage) for short
       const leverageBig = BigInt(positionData.leverage)
       const adjustmentFactor = positionData.entryPrice / leverageBig
-      const liquidationPrice = positionData.side === 'long'
-        ? positionData.entryPrice - adjustmentFactor
-        : positionData.entryPrice + adjustmentFactor
-      
+      const liquidationPrice =
+        positionData.side === 'long'
+          ? positionData.entryPrice - adjustmentFactor
+          : positionData.entryPrice + adjustmentFactor
+
       const newPosition: PositionType = {
         id: `pos-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         accountId: positionData.accountId,
@@ -955,7 +995,7 @@ async function handleConfirmOrder() {
         chainId: positionData.chainId,
         liquiditySource: positionData.liquiditySource,
       }
-      
+
       // Show notification with fill Promise
       const notificationInstance = notification.create({
         content: PositionFilledNotification,
@@ -981,7 +1021,7 @@ async function handleConfirmOrder() {
                 positionData.collateral,
                 positionData.chainId,
                 positionData.liquiditySource,
-                positionData.accountId
+                positionData.accountId,
               )
             }, DURATION_SUCCESS_NOTIFICATION)
           }),
@@ -989,7 +1029,7 @@ async function handleConfirmOrder() {
             notificationInstance.destroy()
           },
         },
-        duration: DURATION_CLOSE_NOTIFICATION, 
+        duration: DURATION_CLOSE_NOTIFICATION,
       })
 
       size.value = ''
@@ -997,7 +1037,7 @@ async function handleConfirmOrder() {
     } else {
       const triggerPrice = toBigInt(price.value)
       const currentLiquiditySource = tradeStore.getLiquiditySourceFromOracle(tradeStore.selectedOracle)
-      
+
       // Store order data before creating it for the popup
       const orderData = {
         market: selectedMarket.value,
@@ -1010,8 +1050,6 @@ async function handleConfirmOrder() {
         accountId: selectedEvaluationId.value ?? tradeStore.currentAccountId ?? '',
         timestamp: Date.now(),
       }
-      
-      
 
       // Create order object for notification
       // We construct it manually since the store function doesn't return the created order
@@ -1027,7 +1065,7 @@ async function handleConfirmOrder() {
         chainId: orderData.chainId,
         liquiditySource: orderData.liquiditySource,
       }
-      
+
       // Show notification with fill Promise
       const notificationInstance = notification.create({
         content: PositionFilledNotification,
@@ -1052,7 +1090,7 @@ async function handleConfirmOrder() {
                 orderData.orderType,
                 orderData.chainId,
                 orderData.liquiditySource,
-                orderData.accountId
+                orderData.accountId,
               )
             }, DURATION_SUCCESS_NOTIFICATION)
           }),
@@ -1146,20 +1184,18 @@ const marginUsageAmount = computed(() => {
 // Trade Details array
 const tradeDetails = computed((): TradeDetailItem[] => {
   // Get the first active liquidity source name, default to 'Aster'
-  const liquiditySourceName = activeLiquiditySources.value.length > 0 
-    ? activeLiquiditySources.value[0].name 
-    : 'Aster'
+  const liquiditySourceName = activeLiquiditySources.value.length > 0 ? activeLiquiditySources.value[0].name : 'Aster'
 
   return [
     {
       key: 'availableMargin',
       label: 'Available Margin',
-      value: formatCurrency(accountBalance.value)
+      value: formatCurrency(accountBalance.value),
     },
     {
       key: 'availableLiquidity',
       label: 'Available Liquidity',
-      value: availableLiquidity.value
+      value: availableLiquidity.value,
     },
     {
       key: 'liquiditySource',
@@ -1169,12 +1205,12 @@ const tradeDetails = computed((): TradeDetailItem[] => {
 
 The available liquidity will change as the long positions open interest change.
 
-You can customize your preferred liquidity sources under Trading Settings if needed.`
+You can customize your preferred liquidity sources under Trading Settings if needed.`,
     },
     {
       key: 'priceImpact',
       label: 'Price Impact',
-      value: '0%'
+      value: '0%',
     },
     {
       key: 'maxSlippage',
@@ -1185,13 +1221,14 @@ You can customize your preferred liquidity sources under Trading Settings if nee
       key: 'liqPrice',
       label: 'Liq. Price',
       value: liquidationPrice.value,
-      tooltip: 'Please note when you use volatile assets as collateral, the liquidation price will be affected by both collateral and underlying asset prices.' 
+      tooltip:
+        'Please note when you use volatile assets as collateral, the liquidation price will be affected by both collateral and underlying asset prices.',
     },
     {
       key: 'marginRequired',
       label: 'Margin Required',
       value: marginRequired.value,
-      tooltip: 'The margin required to be allocated from your cross account equity for opening this position.'
+      tooltip: 'The margin required to be allocated from your cross account equity for opening this position.',
     },
     {
       key: 'openCost',
@@ -1203,7 +1240,7 @@ Position Fee = Asset Price * Amount * Position Fee Rate. The position fee rate i
 
 Additional costs from spread and/or price impact will also be applied.
 
-Funding fee for each position will be tracked every 1 hour and settled as funding fees when you add changes to your positions.`
+Funding fee for each position will be tracked every 1 hour and settled as funding fees when you add changes to your positions.`,
     },
   ]
 })
@@ -1218,7 +1255,7 @@ function handleClickOutside(event: MouseEvent) {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
-  
+
   // Initialize price if order type is limit/stop
   if (orderType.value === 'limit' || orderType.value === 'stop') {
     const currentPrice = fromBigInt(currentMarketPrice.value, 2)

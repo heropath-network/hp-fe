@@ -1,13 +1,7 @@
 <template>
-  <div
-    class="flex items-center gap-[2px] px-2 py-1 absolute top-0 left-0 bg-[#373737]"
-  >
+  <div class="flex items-center gap-[2px] px-2 py-1 absolute top-0 left-0 bg-[#373737]">
     <div class="relative shrink-0 w-4 h-4">
-      <img
-        :src="chainIcon"
-        :alt="chainName"
-        class="block w-full h-full object-contain"
-      />
+      <img :src="chainIcon" :alt="chainName" class="block w-full h-full object-contain" />
     </div>
     <div class="text-[12px] leading-[16px] text-[#9b9b9b] font-normal whitespace-nowrap">
       {{ liquiditySourceName }}
@@ -32,8 +26,6 @@ const props = defineProps<Props>()
 
 const chainConfig = {
   [bsc.id]: { name: 'BNB Chain', icon: BSCIcon },
-  [arbitrum.id]: { name: 'Arbitrum', icon: ArbitrumIcon },
-  [optimism.id]: { name: 'Optimism', icon: OptimismIcon },
 }
 
 const chainInfo = computed(() => {
@@ -48,4 +40,3 @@ const liquiditySourceName = computed(() => {
   return source?.name || props.liquiditySource
 })
 </script>
-
